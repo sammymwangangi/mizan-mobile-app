@@ -1,0 +1,733 @@
+import { useEffect, useState, useRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Platform, Animated } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation/types';
+import { COLORS, FONTS, SIZES } from '../constants/theme';
+import Button from '../components/Button';
+import { ArrowLeft, ArrowRight } from 'lucide-react-native';
+import Slider from '@react-native-community/slider';
+import { LinearGradient } from 'expo-linear-gradient';
+import { PanGestureHandler, State } from 'react-native-gesture-handler';
+
+type KYCScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'KYC'>;
+
+// KYC steps
+enum KYCStep {
+  GENDER,
+  DURATION,
+  FINANCIAL_EXPOSURE,
+  PLAN,
+  CARD,
+  CONGRATULATIONS,
+  COMPLETE
+}
+
+const KYCScreen = () => {
+  const navigation = useNavigation<KYCScreenNavigationProp>();
+  const [currentStep, setCurrentStep] = useState<KYCStep>(KYCStep.GENDER);
+  const [gender, setGender] = useState<'male' | 'female' | null>(null);
+  const [duration, setDuration] = useState({ years: 3, months: 6 });
+  const [financialExposure, setFinancialExposure] = useState(78);
+  const [selectedPlan, setSelectedPlan] = useState('Premium Ethics');
+  const [customizeCard, setCustomizeCard] = useState(false);
+
+  // Animation values for the swipe button
+  const translateX = useRef(new Animated.Value(0)).current;
+  const arrowTranslateX = useRef(new Animated.Value(0)).current;
+  const buttonOpacity = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    if (currentStep === KYCStep.CONGRATULATIONS) {
+      // Navigate to complete step after 2 seconds
+      const timer = setTimeout(() => {
+        setCurrentStep(KYCStep.COMPLETE);
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [currentStep]);
+
+  // Animate the arrow to indicate swipe direction
+  useEffect(() => {
+    if (currentStep === KYCStep.COMPLETE) {
+      const pulseAnimation = Animated.loop(
+        Animated.sequence([
+          Animated.timing(arrowTranslateX, {
+            toValue: 10,
+            duration: 1000,
+            useNativeDriver: true
+          }),
+          Animated.timing(arrowTranslateX, {
+            toValue: 0,
+            duration: 1000,
+            useNativeDriver: true
+          })
+        ])
+      );
+
+      pulseAnimation.start();
+
+      return () => {
+        pulseAnimation.stop();
+      };
+    }
+  }, [currentStep, arrowTranslateX]);
+
+  const handleNext = () => {
+    if (currentStep < KYCStep.COMPLETE) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      navigation.replace('Home');
+    }
+  };
+
+  const handleBack = () => {
+    if (currentStep > KYCStep.GENDER) {
+      setCurrentStep(currentStep - 1);
+    } else {
+      navigation.goBack();
+    }
+    // hide the back button on congratulations step
+    if (currentStep === KYCStep.CONGRATULATIONS) {
+      return null;
+    }
+  };
+
+  const renderProgressBar = () => {
+    const totalSteps = KYCStep.COMPLETE;
+    const progress = ((currentStep + 1) / (totalSteps + 1)) * 100;
+    // hide progress bar on congratulations step
+    if (currentStep === KYCStep.CONGRATULATIONS) {
+      return null;
+    }
+
+    return (
+      <View style={styles.progressContainer}>
+        <View style={styles.progressBar}>
+          <View style={[styles.progressFill, { width: `${progress}%` }]} />
+        </View>
+      </View>
+    );
+  };
+
+  const renderGenderStep = () => {
+    return (
+      <View style={styles.stepContainer}>
+        <Text style={styles.stepTitle}>And what&apos;s your gender?</Text>
+
+        <View style={styles.genderContainer}>
+          <TouchableOpacity
+            style={[
+              styles.genderOption,
+              gender === 'male' && styles.selectedGenderOption,
+            ]}
+            onPress={() => setGender('male')}
+          >
+            <View style={styles.genderIconContainer}>
+              <Image
+                source={require('../assets/onboarding-images/ob1.png')}
+                style={styles.genderIcon}
+                resizeMode="contain"
+              />
+            </View>
+            <Text style={[
+              styles.genderText,
+              gender === 'male' && styles.selectedGenderText,
+            ]}>Male</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.genderOption,
+              gender === 'female' && styles.selectedGenderOption,
+            ]}
+            onPress={() => setGender('female')}
+          >
+            <View style={styles.genderIconContainer}>
+              <Image
+                source={require('../assets/onboarding-images/ob2.png')}
+                style={styles.genderIcon}
+                resizeMode="contain"
+              />
+            </View>
+            <Text style={[
+              styles.genderText,
+              gender === 'female' && styles.selectedGenderText,
+            ]}>Female</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  };
+
+  const renderDurationStep = () => {
+    return (
+      <View style={styles.stepContainer}>
+        <Text style={styles.stepSubtitle}>Nice, you&apos;ve got something good going!</Text>
+        <Text style={styles.stepTitle}>For how long now?</Text>
+
+        <View style={styles.durationContainer}>
+          <View style={styles.durationSelector}>
+            <Text style={styles.durationValue}>{duration.years}</Text>
+            <Text style={styles.durationLabel}>years</Text>
+          </View>
+
+          <View style={styles.durationSelector}>
+            <Text style={styles.durationValue}>{duration.months}</Text>
+            <Text style={styles.durationLabel}>months</Text>
+          </View>
+        </View>
+      </View>
+    );
+  };
+
+  const renderFinancialExposureStep = () => {
+    return (
+      <View style={styles.stepContainer}>
+        <Text style={styles.stepSubtitle}>we need to work on this</Text>
+        <Text style={styles.stepTitle}>Your financial exposure</Text>
+
+        <View style={styles.exposureContainer}>
+          <View style={styles.exposureCircle}>
+            <Text style={styles.exposureValue}>{financialExposure}%</Text>
+          </View>
+
+          <View style={styles.portfolioContainer}>
+            <Text style={styles.portfolioText}>Moderate Portfolio</Text>
+          </View>
+
+          <Slider
+            style={styles.slider}
+            minimumValue={0}
+            maximumValue={100}
+            value={financialExposure}
+            onValueChange={setFinancialExposure}
+            minimumTrackTintColor={COLORS.primary}
+            maximumTrackTintColor={COLORS.border}
+            thumbTintColor={COLORS.primary}
+          />
+
+          <Text style={styles.sliderHint}>
+            By sliding you will notice that your financial exposure becomes less severe.
+          </Text>
+        </View>
+      </View>
+    );
+  };
+
+  const renderPlanStep = () => {
+    return (
+      <View style={styles.stepContainer}>
+        <Text style={styles.stepSubtitle}>Get a one month&apos;s free on any plan</Text>
+        <Text style={styles.stepTitle}>Slide to choose a plan</Text>
+
+        <View style={styles.planContainer}>
+          <View style={styles.planGraph}>
+            {/* Graph visualization would go here */}
+            <Text style={styles.planAmount}>$500</Text>
+          </View>
+
+          <View style={styles.planSelector}>
+            <Text style={styles.planPrice}>$3 p.m</Text>
+            <Text style={styles.planName}>{selectedPlan}</Text>
+          </View>
+
+          <Slider
+            style={styles.slider}
+            minimumValue={0}
+            maximumValue={100}
+            value={50}
+            minimumTrackTintColor={COLORS.primary}
+            maximumTrackTintColor={COLORS.border}
+            thumbTintColor={COLORS.primary}
+          />
+
+          <Text style={styles.sliderHint}>
+            Use this tool to see how round-ups and depositing money each month can impact the long term value of your account.
+          </Text>
+        </View>
+      </View>
+    );
+  };
+
+  const renderCardStep = () => {
+    return (
+      <View style={styles.stepContainer}>
+        <Text style={styles.stepSubtitle}>Make it yours, personalize your card</Text>
+        <Text style={styles.stepTitle}>Order a fancy card</Text>
+
+        <View style={styles.cardContainer}>
+          <Text style={styles.cardInstructions}>Slide to choose</Text>
+
+          <Image
+            source={require('../assets/onboarding-images/ob5.png')}
+            style={styles.cardImage}
+            resizeMode="contain"
+          />
+
+          <Text style={styles.cardQuestion}>
+            Would you like to customize your card?
+          </Text>
+        </View>
+      </View>
+    );
+  };
+
+  const renderCongratulationsStep = () => {
+    return (
+      <View className="relative flex-1 flex-col justify-start items-center gap-[137px] px-10">
+        <Image
+          source={require('../assets/kyc/arabic-logo.png')}
+          className="w-[104px] h-[21.83px]"
+          resizeMode="contain"
+        />
+        <Text className="text-[25px] font-semibold text-[#1B1C39] text-center">Congratulations</Text>
+        <Image
+          source={require('../assets/kyc/tick.png')}
+          className="w-20 h-20"
+          resizeMode="contain"
+        />
+        <Text className="text-lg text-[#1B1C39] text-center">
+          Great job Habibi, your account is being setup, sabr In Shaa Allah
+        </Text>
+        <Image
+          source={require('../assets/kyc/congratulation-pattern.png')}
+          className="absolute bottom-0 right-0 w-[195px] h-[195px]"
+          resizeMode="contain"
+        />
+      </View>
+    );
+  };
+
+  const renderCompleteStep = () => {
+    const onGestureEvent = Animated.event(
+      [{ nativeEvent: { translationX: translateX } }],
+      { useNativeDriver: true }
+    );
+
+    const onHandlerStateChange = (event: any) => {
+      if (event.nativeEvent.oldState === State.ACTIVE) {
+        const { translationX } = event.nativeEvent;
+
+        // If swiped more than 120px (about half the button width), navigate to Home
+        if (translationX > 120) {
+          // Animate the button to slide out
+          Animated.timing(buttonOpacity, {
+            toValue: 0,
+            duration: 200,
+            useNativeDriver: true
+          }).start(() => {
+            navigation.replace('Home');
+          });
+        } else {
+          // Reset the position
+          Animated.spring(translateX, {
+            toValue: 0,
+            useNativeDriver: true,
+            bounciness: 5
+          }).start();
+        }
+      }
+    };
+
+    return (
+      <View className="flex-1 flex-col justify-between items-center px-2 py-20">
+        <Image
+          source={require('../assets/kyc/arabic-logo.png')}
+          className="w-[104px] h-[21.83px]"
+          resizeMode="contain"
+        />
+
+        <Text className="text-[25px] font-semibold text-[#1B1C39] text-center">That&apos;s it</Text>
+
+        <Image
+          source={require('../assets/kyc/high_five.png')}
+          className='w-[200px] h-[200px]'
+          resizeMode="contain"
+        />
+
+        <Text className="text-[#1B1C39] text-[20px] text-center">
+          That&apos;s it, start moving moolah
+        </Text>
+
+        <Animated.View style={[styles.swipeButtonContainer, { opacity: buttonOpacity }]}>
+          <LinearGradient
+            colors={['#5592EF', '#8532E0', '#F053E0']}
+            start={{ x: 1, y: 0 }}
+            end={{ x: 0, y: 1 }}
+            style={styles.swipeButton}
+          >
+            <PanGestureHandler
+              onGestureEvent={onGestureEvent}
+              onHandlerStateChange={onHandlerStateChange}
+            >
+              <Animated.View
+                style={[
+                  styles.swipeContent,
+                  { transform: [{ translateX: translateX }] }
+                ]}
+              >
+                <Animated.View
+                  style={[
+                    styles.arrowCircle,
+                    { transform: [{ translateX: arrowTranslateX }] }
+                  ]}
+                >
+                  <ArrowRight size={20} color="#000" />
+                </Animated.View>
+                <Text style={styles.swipeButtonText}>SWIPE TO START</Text>
+              </Animated.View>
+            </PanGestureHandler>
+          </LinearGradient>
+        </Animated.View>
+      </View>
+    );
+  };
+
+  const renderCurrentStep = () => {
+    switch (currentStep) {
+      case KYCStep.GENDER:
+        return renderGenderStep();
+      case KYCStep.DURATION:
+        return renderDurationStep();
+      case KYCStep.FINANCIAL_EXPOSURE:
+        return renderFinancialExposureStep();
+      case KYCStep.PLAN:
+        return renderPlanStep();
+      case KYCStep.CARD:
+        return renderCardStep();
+      case KYCStep.CONGRATULATIONS:
+        return renderCongratulationsStep();
+      case KYCStep.COMPLETE:
+        return renderCompleteStep();
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      {currentStep !== KYCStep.COMPLETE && (
+        <>
+          <View style={styles.header}>
+            <TouchableOpacity onPress={handleBack} style={styles.backButton}>
+              <ArrowLeft size={24} color={COLORS.text} />
+            </TouchableOpacity>
+            {renderProgressBar()}
+          </View>
+
+          {renderCurrentStep()}
+
+          {currentStep !== KYCStep.COMPLETE && currentStep !== KYCStep.CONGRATULATIONS && (
+            <Button
+              title="NEXT"
+              onPress={handleNext}
+              gradient={true}
+              style={styles.nextButton}
+            />
+          )}
+        </>
+      )}
+
+      {currentStep === KYCStep.COMPLETE && renderCompleteStep()}
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: SIZES.padding,
+    paddingTop: 50,
+    paddingBottom: 20,
+  },
+  backButton: {
+    marginRight: 10,
+  },
+  progressContainer: {
+    flex: 1,
+    marginLeft: 10,
+  },
+  progressBar: {
+    height: 4,
+    backgroundColor: COLORS.border,
+    borderRadius: 2,
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: COLORS.primary,
+    borderRadius: 2,
+  },
+  stepContainer: {
+    flex: 1,
+    padding: SIZES.padding,
+  },
+  stepSubtitle: {
+    ...FONTS.body3,
+    color: COLORS.primary,
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  arabicStepTitle: {
+    fontFamily: Platform.select({
+      android: 'Poppins_400Regular',
+      ios: 'Poppins_400Regular',
+    }),
+    fontWeight: 400,
+    fontSize: 18,
+    color: '#1B1C39',
+    textAlign: 'center'
+  },
+  stepTitle: {
+    ...FONTS.h1,
+    color: COLORS.text,
+    marginBottom: 40,
+    textAlign: 'center',
+  },
+  genderContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 20,
+  },
+  genderOption: {
+    width: 150,
+    height: 180,
+    borderRadius: SIZES.radius,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: COLORS.card,
+  },
+  selectedGenderOption: {
+    borderColor: COLORS.primary,
+    borderWidth: 2,
+  },
+  genderIconContainer: {
+    width: 80,
+    height: 80,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  genderIcon: {
+    width: 60,
+    height: 60,
+  },
+  genderText: {
+    ...FONTS.h3,
+    color: COLORS.textLight,
+  },
+  selectedGenderText: {
+    color: COLORS.primary,
+  },
+  durationContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: SIZES.radius,
+    padding: 15,
+    backgroundColor: COLORS.card,
+  },
+  durationSelector: {
+    alignItems: 'center',
+    marginHorizontal: 20,
+  },
+  durationValue: {
+    ...FONTS.h1,
+    color: COLORS.text,
+  },
+  durationLabel: {
+    ...FONTS.body3,
+    color: COLORS.textLight,
+  },
+  exposureContainer: {
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  exposureCircle: {
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    backgroundColor: COLORS.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 30,
+  },
+  exposureValue: {
+    ...FONTS.h1,
+    color: COLORS.textWhite,
+  },
+  portfolioContainer: {
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: SIZES.radius,
+    padding: 10,
+    paddingHorizontal: 20,
+    marginBottom: 30,
+  },
+  portfolioText: {
+    ...FONTS.body3,
+    color: COLORS.text,
+  },
+  slider: {
+    width: '100%',
+    height: 40,
+  },
+  sliderHint: {
+    ...FONTS.body4,
+    color: COLORS.textLight,
+    textAlign: 'center',
+    marginTop: 20,
+  },
+  planContainer: {
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  planGraph: {
+    width: '100%',
+    height: 150,
+    justifyContent: 'flex-end',
+    alignItems: 'flex-end',
+    marginBottom: 30,
+  },
+  planAmount: {
+    ...FONTS.body3,
+    color: COLORS.text,
+    backgroundColor: COLORS.card,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: SIZES.radius,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  planSelector: {
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: SIZES.radius,
+    padding: 10,
+    paddingHorizontal: 20,
+    marginBottom: 30,
+    alignItems: 'center',
+  },
+  planPrice: {
+    ...FONTS.body3,
+    color: COLORS.text,
+  },
+  planName: {
+    ...FONTS.body4,
+    color: COLORS.textLight,
+  },
+  cardContainer: {
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  cardInstructions: {
+    ...FONTS.body3,
+    color: COLORS.textLight,
+    marginBottom: 20,
+  },
+  cardImage: {
+    width: 250,
+    height: 350,
+    marginBottom: 30,
+  },
+  cardQuestion: {
+    ...FONTS.h3,
+    color: COLORS.text,
+    marginBottom: 20,
+  },
+  completeLogo: {
+    width: 80,
+    height: 80,
+    marginBottom: 20,
+    alignSelf: 'center',
+  },
+  tickImage: {
+    width: 80,
+    height: 80,
+    marginBottom: 137,
+    marginTop: 123,
+    alignSelf: 'center',
+  },
+
+  arabicLogo: {
+    width: 104,
+    height: 21.83,
+    marginBottom: 137,
+    alignSelf: 'center',
+  },
+  completeTitle: {
+    ...FONTS.h1,
+    color: COLORS.text,
+    textAlign: 'center',
+    marginBottom: 40
+  },
+  completeImage: {
+    width: 150,
+    height: 150,
+    marginBottom: 30,
+    alignSelf: 'center',
+  },
+  completeText: {
+    ...FONTS.body3,
+    color: COLORS.text,
+    textAlign: 'center',
+    marginBottom: 50,
+  },
+  nextButton: {
+    marginHorizontal: SIZES.padding,
+    marginBottom: 30,
+  },
+  swipeButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    height: 60,
+    borderRadius: 30,
+    paddingHorizontal: 10,
+    width: '90%',
+    overflow: 'hidden',
+  },
+  swipeButtonText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    letterSpacing: 1,
+    color: 'white',
+    marginLeft: 20,
+    textAlign: 'center',
+    flex: 1,
+  },
+  arrowCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'white',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  swipeButtonContainer: {
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: SIZES.padding,
+    marginBottom: 30,
+  },
+  swipeContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    width: '100%',
+  },
+});
+
+export default KYCScreen;
