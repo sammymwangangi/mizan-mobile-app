@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    height: 50,
+    height: 55,
     paddingHorizontal: SIZES.padding / 2,
     color: COLORS.text,
     ...FONTS.body3,

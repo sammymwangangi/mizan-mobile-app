@@ -8,6 +8,7 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  ImageBackground,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -15,8 +16,9 @@ import { RootStackParamList } from '../navigation/types';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
 import Button from '../components/Button';
 import Input from '../components/Input';
-import { Mail, Lock, Fingerprint, User } from 'lucide-react-native';
+import { User } from 'lucide-react-native';
 import { validateEmail, validatePassword } from '../utils';
+import { LinearGradient } from 'expo-linear-gradient';
 
 type AuthScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Auth'>;
 
@@ -72,6 +74,13 @@ const AuthScreen = () => {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
+      {/* Pattern in top-right corner */}
+      <Image
+        source={require('../assets/pattern1.png')}
+        style={styles.patternImage}
+        resizeMode="contain"
+      />
+
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -82,7 +91,6 @@ const AuthScreen = () => {
             style={styles.logo}
             resizeMode="contain"
           />
-          <Text style={styles.title}>mizan</Text>
         </View>
 
         <View style={styles.formContainer}>
@@ -98,23 +106,19 @@ const AuthScreen = () => {
           )}
 
           <Input
-            label="Email"
             placeholder="Enter your email"
             value={email}
             onChangeText={setEmail}
             error={emailError}
-            leftIcon={<Mail size={20} color={COLORS.textLight} />}
             keyboardType="email-address"
             autoCapitalize="none"
           />
 
           <Input
-            label="Password"
-            placeholder="Enter your password"
+            placeholder="Type your password"
             value={password}
             onChangeText={setPassword}
             error={passwordError}
-            leftIcon={<Lock size={20} color={COLORS.textLight} />}
             secureTextEntry
           />
 
@@ -124,30 +128,49 @@ const AuthScreen = () => {
             </TouchableOpacity>
           )}
 
-          <Button
-            title={isLogin ? "Sign In" : "Sign Up"}
-            onPress={handleSubmit}
-            gradient={true}
-            style={styles.submitButton}
-          />
+          <View style={styles.submitButtonContainer}>
+            <ImageBackground
+              source={require('../assets/button-bg.png')}
+              style={styles.buttonBackground}
+              resizeMode="contain"
+            >
+              <TouchableOpacity
+                style={styles.submitButtonTouchable}
+                onPress={handleSubmit}
+              >
+                <LinearGradient
+                  colors={['#5592EF', '#8532E0', '#F053E0']}
+                  start={{ x: 1, y: 0 }}
+                  end={{ x: 0, y: 1 }}
+                  style={styles.submitButton}
+                >
+                  <Text style={styles.submitButtonText}>
+                    {isLogin ? "SIGN IN" : "SIGN UP"}
+                  </Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </ImageBackground>
+          </View>
 
           <View style={styles.orContainer}>
-            <View style={styles.divider} />
             <Text style={styles.orText}>or sign in with biometrics</Text>
-            <View style={styles.divider} />
           </View>
 
           <View style={styles.biometricsContainer}>
             <TouchableOpacity style={styles.biometricButton}>
-              <View style={styles.biometricIconContainer}>
-                <User size={24} color={COLORS.primary} />
-              </View>
+              <Image
+                source={require('../assets/FaceID.png')}
+                style={styles.biometricIcon}
+                resizeMode="contain"
+              />
             </TouchableOpacity>
-            
+
             <TouchableOpacity style={styles.biometricButton}>
-              <View style={styles.biometricIconContainer}>
-                <Fingerprint size={24} color={COLORS.primary} />
-              </View>
+              <Image
+                source={require('../assets/fingerprint.png')}
+                style={styles.biometricIcon}
+                resizeMode="contain"
+              />
             </TouchableOpacity>
           </View>
         </View>
@@ -170,18 +193,26 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
+  patternImage: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    width: 308,
+    height: 308,
+    zIndex: 0,
+  },
   scrollContent: {
     flexGrow: 1,
     padding: SIZES.padding,
   },
   header: {
     alignItems: 'center',
-    marginTop: 50,
+    marginTop: 160,
     marginBottom: 40,
   },
   logo: {
-    width: 60,
-    height: 60,
+    width: 145,
+    height: 75,
     marginBottom: 10,
   },
   title: {
@@ -199,41 +230,70 @@ const styles = StyleSheet.create({
     ...FONTS.body4,
     color: COLORS.primary,
   },
-  submitButton: {
+  submitButtonContainer: {
+    alignItems: 'flex-end',
     marginTop: 10,
+    marginBottom: 10,
+    marginRight: -24, // Negative margin to make the button background touch the edge of the screen
+  },
+  buttonBackground: {
+    width: 220,
+    height: 80,
+    justifyContent: 'center',
+    alignItems: 'flex-start', // Align to the left to position the button correctly
+    paddingLeft: 20, // Add padding to position the button within the background
+  },
+  submitButtonTouchable: {
+    width: '84%', // Adjusted width to better fit in the visible part of the background
+    height: '64.5%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  submitButton: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  submitButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+    letterSpacing: 1,
   },
   orContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     marginVertical: 20,
-  },
-  divider: {
-    flex: 1,
-    height: 1,
-    backgroundColor: COLORS.border,
   },
   orText: {
     ...FONTS.body4,
     color: COLORS.textLight,
-    marginHorizontal: 10,
   },
   biometricsContainer: {
     flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 10,
-  },
-  biometricButton: {
-    marginHorizontal: 15,
-  },
-  biometricIconContainer: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
     borderWidth: 1,
     borderColor: COLORS.border,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: COLORS.card,
+    borderRadius: 25,
+    padding: 15,
+    marginHorizontal: 20,
+    backgroundColor: 'white',
+    shadowColor: '#6943AF',
+    shadowOffset: { width: 0, height: 20 },
+    shadowOpacity: 0.1,
+    shadowRadius: 40,
+    elevation: 5,
+  },
+  biometricButton: {
+    padding: 10,
+  },
+  biometricIcon: {
+    width: 74,
+    height: 74,
   },
   footer: {
     flexDirection: 'row',
