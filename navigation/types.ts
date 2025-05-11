@@ -3,6 +3,8 @@ export type RootStackParamList = {
     Intro: undefined;
     Onboarding: undefined;
     Auth: undefined;
+    PhoneNumber: undefined;
+    OTP: { phoneNumber: string };
     KYC: undefined;
     Home: undefined;
     Congratulations: undefined;

@@ -54,7 +54,7 @@ const AuthScreen = () => {
   const handleSubmit = () => {
     if (validateForm()) {
       // In a real app, you would handle authentication here
-      navigation.navigate('KYC');
+      navigation.navigate('Home');
     }
   };
 
@@ -63,10 +63,16 @@ const AuthScreen = () => {
   };
 
   const toggleAuthMode = () => {
-    setIsLogin(!isLogin);
-    // Clear form when switching modes
-    setEmailError('');
-    setPasswordError('');
+    if (isLogin) {
+      // If currently in login mode, navigate to phone number screen for sign up
+      navigation.navigate('PhoneNumber');
+    } else {
+      // If in sign up mode, switch to login
+      setIsLogin(true);
+      // Clear form when switching modes
+      setEmailError('');
+      setPasswordError('');
+    }
   };
 
   return (

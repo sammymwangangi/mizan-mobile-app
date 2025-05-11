@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Platform, Animated } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Platform, Animated, TextInput } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
@@ -9,11 +9,13 @@ import { ArrowLeft, ArrowRight } from 'lucide-react-native';
 import Slider from '@react-native-community/slider';
 import { LinearGradient } from 'expo-linear-gradient';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
+import Input from '../components/Input';
 
 type KYCScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'KYC'>;
 
 // KYC steps
 enum KYCStep {
+  FULL_NAME,
   GENDER,
   DURATION,
   FINANCIAL_EXPOSURE,
@@ -25,7 +27,9 @@ enum KYCStep {
 
 const KYCScreen = () => {
   const navigation = useNavigation<KYCScreenNavigationProp>();
-  const [currentStep, setCurrentStep] = useState<KYCStep>(KYCStep.GENDER);
+  const [currentStep, setCurrentStep] = useState<KYCStep>(KYCStep.FULL_NAME);
+  const [fullName, setFullName] = useState('');
+  const [fullNameError, setFullNameError] = useState('');
   const [gender, setGender] = useState<'male' | 'female' | null>(null);
   const [duration, setDuration] = useState({ years: 3, months: 6 });
   const [financialExposure, setFinancialExposure] = useState(78);
@@ -75,6 +79,15 @@ const KYCScreen = () => {
   }, [currentStep, arrowTranslateX]);
 
   const handleNext = () => {
+    // Validate full name if on the full name step
+    if (currentStep === KYCStep.FULL_NAME) {
+      if (!fullName.trim()) {
+        setFullNameError('Please enter your full name');
+        return;
+      }
+      setFullNameError('');
+    }
+
     if (currentStep < KYCStep.COMPLETE) {
       setCurrentStep(currentStep + 1);
     } else {
@@ -83,7 +96,7 @@ const KYCScreen = () => {
   };
 
   const handleBack = () => {
-    if (currentStep > KYCStep.GENDER) {
+    if (currentStep > KYCStep.FULL_NAME) {
       setCurrentStep(currentStep - 1);
     } else {
       navigation.goBack();
@@ -111,6 +124,41 @@ const KYCScreen = () => {
     );
   };
 
+  const renderFullNameStep = () => {
+    return (
+      <View style={styles.stepContainer}>
+        <Text style={styles.stepSubtitle}>While we review your documents, lets get to know you more</Text>
+        <Text style={styles.stepTitle}>Lets start by getting to know your full legal name</Text>
+
+        <View style={styles.fullNameContainer}>
+          <Input
+            value={fullName}
+            onChangeText={setFullName}
+            placeholder="Habibi Robin"
+            error={fullNameError}
+            containerStyle={styles.fullNameInput}
+          />
+        </View>
+
+        <View style={styles.spacer} />
+
+        <TouchableOpacity
+          style={styles.nextButtonContainer}
+          onPress={handleNext}
+        >
+          <LinearGradient
+            colors={['#5592EF', '#8532E0', '#F053E0']}
+            start={{ x: 1, y: 0 }}
+            end={{ x: 0, y: 1 }}
+            style={styles.gradientNextButton}
+          >
+            <Text style={styles.nextButtonText}>NEXT</Text>
+          </LinearGradient>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
   const renderGenderStep = () => {
     return (
       <View style={styles.stepContainer}>
@@ -126,7 +174,7 @@ const KYCScreen = () => {
           >
             <View style={styles.genderIconContainer}>
               <Image
-                source={require('../assets/onboarding-images/ob1.png')}
+                source={require('../assets/kyc/male.png')}
                 style={styles.genderIcon}
                 resizeMode="contain"
               />
@@ -146,7 +194,7 @@ const KYCScreen = () => {
           >
             <View style={styles.genderIconContainer}>
               <Image
-                source={require('../assets/onboarding-images/ob2.png')}
+                source={require('../assets/kyc/female.png')}
                 style={styles.genderIcon}
                 resizeMode="contain"
               />
@@ -387,6 +435,8 @@ const KYCScreen = () => {
 
   const renderCurrentStep = () => {
     switch (currentStep) {
+      case KYCStep.FULL_NAME:
+        return renderFullNameStep();
       case KYCStep.GENDER:
         return renderGenderStep();
       case KYCStep.DURATION:
@@ -419,7 +469,7 @@ const KYCScreen = () => {
 
           {renderCurrentStep()}
 
-          {currentStep !== KYCStep.COMPLETE && currentStep !== KYCStep.CONGRATULATIONS && (
+          {(currentStep < KYCStep.CONGRATULATIONS && currentStep !== KYCStep.FULL_NAME) && (
             <Button
               title="NEXT"
               onPress={handleNext}
@@ -467,6 +517,32 @@ const styles = StyleSheet.create({
   stepContainer: {
     flex: 1,
     padding: SIZES.padding,
+  },
+  fullNameContainer: {
+    width: '100%',
+    marginTop: 20,
+  },
+  fullNameInput: {
+    width: '100%',
+  },
+  spacer: {
+    flex: 1,
+  },
+  nextButtonContainer: {
+    width: '100%',
+    marginBottom: 30,
+  },
+  gradientNextButton: {
+    height: 56,
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  nextButtonText: {
+    color: COLORS.textWhite,
+    fontSize: 16,
+    fontWeight: 'bold',
+    letterSpacing: 1,
   },
   stepSubtitle: {
     ...FONTS.body3,
@@ -704,8 +780,6 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     color: 'white',
     marginLeft: 20,
-    textAlign: 'center',
-    flex: 1,
   },
   arrowCircle: {
     width: 40,

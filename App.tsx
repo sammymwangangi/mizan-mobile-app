@@ -13,6 +13,8 @@ import SplashScreen from './screens/SplashScreen';
 import IntroScreen from './screens/IntroScreen';
 import OnboardingScreen from './screens/OnboardingScreen';
 import AuthScreen from './screens/AuthScreen';
+import PhoneNumberScreen from './screens/PhoneNumberScreen';
+import OTPScreen from './screens/OTPScreen';
 import KYCScreen from './screens/KYCScreen';
 import HomeScreen from './screens/HomeScreen';
 
@@ -34,6 +36,8 @@ function RootStack() {
       <Stack.Screen name="Intro" component={IntroScreen} />
       <Stack.Screen name="Onboarding" component={OnboardingScreen} />
       <Stack.Screen name="Auth" component={AuthScreen} />
+      <Stack.Screen name="PhoneNumber" component={PhoneNumberScreen} />
+      <Stack.Screen name="OTP" component={OTPScreen} />
       <Stack.Screen name="KYC" component={KYCScreen} />
       <Stack.Screen name="Home" component={HomeScreen} />
     </Stack.Navigator>
