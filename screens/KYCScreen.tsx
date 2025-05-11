@@ -309,7 +309,7 @@ const KYCScreen = () => {
           <Text style={styles.cardInstructions}>Slide to choose</Text>
 
           <Image
-            source={require('../assets/onboarding-images/ob5.png')}
+            source={require('../assets/kyc/fancy-card.png')}
             style={styles.cardImage}
             resizeMode="contain"
           />
