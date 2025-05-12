@@ -1,15 +1,24 @@
 
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { StyleSheet, View, Alert } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Toaster } from 'sonner-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { RootStackParamList } from './navigation/types';
+import * as SplashScreen from 'expo-splash-screen';
+import * as Font from 'expo-font';
+import {
+  Poppins_400Regular,
+  Poppins_500Medium,
+  Poppins_600SemiBold,
+  Poppins_700Bold,
+  Poppins_900Black
+} from '@expo-google-fonts/poppins';
 
 // Import screens
-import SplashScreen from './screens/SplashScreen';
+import SplashScreenComponent from './screens/SplashScreen';
 import IntroScreen from './screens/IntroScreen';
 import OnboardingScreen from './screens/OnboardingScreen';
 import AuthScreen from './screens/AuthScreen';
@@ -20,6 +29,9 @@ import HomeScreen from './screens/HomeScreen';
 
 // Import test component
 import './global.css';
+
+// Keep the splash screen visible while we fetch resources
+SplashScreen.preventAutoHideAsync();
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -32,7 +44,7 @@ function RootStack() {
         animation: 'fade',
       }}
     >
-      <Stack.Screen name="Splash" component={SplashScreen} />
+      <Stack.Screen name="Splash" component={SplashScreenComponent} />
       <Stack.Screen name="Intro" component={IntroScreen} />
       <Stack.Screen name="Onboarding" component={OnboardingScreen} />
       <Stack.Screen name="Auth" component={AuthScreen} />
@@ -45,8 +57,43 @@ function RootStack() {
 }
 
 export default function App() {
+  const [appIsReady, setAppIsReady] = useState(false);
+
+  useEffect(() => {
+    async function prepare() {
+      try {
+        // Load fonts
+        await Font.loadAsync({
+          'Poppins': Poppins_400Regular,
+          'Poppins_500Medium': Poppins_500Medium,
+          'Poppins_600SemiBold': Poppins_600SemiBold,
+          'Poppins_700Bold': Poppins_700Bold,
+          'Poppins_900Black': Poppins_900Black,
+        });
+      } catch (e) {
+        console.warn(e);
+      } finally {
+        // Tell the application to render
+        setAppIsReady(true);
+      }
+    }
+
+    prepare();
+  }, []);
+
+  const onLayoutRootView = useCallback(async () => {
+    if (appIsReady) {
+      // This tells the splash screen to hide immediately
+      await SplashScreen.hideAsync();
+    }
+  }, [appIsReady]);
+
+  if (!appIsReady) {
+    return null;
+  }
+
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayoutRootView}>
       <SafeAreaProvider style={styles.container}>
         <Toaster />
         <NavigationContainer>

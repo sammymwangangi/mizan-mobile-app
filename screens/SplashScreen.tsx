@@ -52,7 +52,7 @@ const SplashScreen = () => {
         ]}
       >
         <Image
-          source={require('../assets/gradient-logo.png')}
+          source={require('../assets/LauncherIcon.png')}
           style={styles.logo}
           resizeMode="contain"
         />

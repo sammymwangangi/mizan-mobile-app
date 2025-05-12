@@ -67,17 +67,17 @@ export const SIZES = {
 };
 
 export const FONTS = {
-  largeTitle: { fontFamily: 'System', fontSize: SIZES.largeTitle, lineHeight: 40 },
-  h1: { fontFamily: 'System', fontSize: SIZES.h1, lineHeight: 36, fontWeight: '700' as const },
-  h2: { fontFamily: 'System', fontSize: SIZES.h2, lineHeight: 30, fontWeight: '700' as const },
-  h3: { fontFamily: 'System', fontSize: SIZES.h3, lineHeight: 22, fontWeight: '700' as const },
-  h4: { fontFamily: 'System', fontSize: SIZES.h4, lineHeight: 20, fontWeight: '700' as const },
-  h5: { fontFamily: 'System', fontSize: SIZES.h5, lineHeight: 18, fontWeight: '700' as const },
-  body1: { fontFamily: 'System', fontSize: SIZES.body1, lineHeight: 36 },
-  body2: { fontFamily: 'System', fontSize: SIZES.body2, lineHeight: 30 },
-  body3: { fontFamily: 'System', fontSize: SIZES.body3, lineHeight: 22 },
-  body4: { fontFamily: 'System', fontSize: SIZES.body4, lineHeight: 20 },
-  body5: { fontFamily: 'System', fontSize: SIZES.body5, lineHeight: 18 },
+  largeTitle: { fontFamily: 'Poppins', fontSize: SIZES.largeTitle, lineHeight: 40 },
+  h1: { fontFamily: 'Poppins', fontSize: SIZES.h1, lineHeight: 36, fontWeight: '700' as const },
+  h2: { fontFamily: 'Poppins', fontSize: SIZES.h2, lineHeight: 30, fontWeight: '700' as const },
+  h3: { fontFamily: 'Poppins', fontSize: SIZES.h3, lineHeight: 22, fontWeight: '700' as const },
+  h4: { fontFamily: 'Poppins', fontSize: SIZES.h4, lineHeight: 20, fontWeight: '700' as const },
+  h5: { fontFamily: 'Poppins', fontSize: SIZES.h5, lineHeight: 18, fontWeight: '700' as const },
+  body1: { fontFamily: 'Poppins', fontSize: SIZES.body1, lineHeight: 36 },
+  body2: { fontFamily: 'Poppins', fontSize: SIZES.body2, lineHeight: 30 },
+  body3: { fontFamily: 'Poppins', fontSize: SIZES.body3, lineHeight: 22 },
+  body4: { fontFamily: 'Poppins', fontSize: SIZES.body4, lineHeight: 20 },
+  body5: { fontFamily: 'Poppins', fontSize: SIZES.body5, lineHeight: 18 },
 };
 
 const appTheme = { COLORS, SIZES, FONTS };
