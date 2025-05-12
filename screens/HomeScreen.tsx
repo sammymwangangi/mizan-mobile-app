@@ -8,6 +8,9 @@ import {
   TouchableOpacity,
   StatusBar,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation/types';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
 import { Bell, CreditCard, Send, Clock, Smartphone, Home, BarChart2, Clock3, User } from 'lucide-react-native';
@@ -16,9 +19,12 @@ import { formatCurrency } from '../utils';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Circle, G, Text as SvgText } from 'react-native-svg';
 
+type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
+
 const HomeScreen = () => {
   // Get safe area insets
   const insets = useSafeAreaInsets();
+  const navigation = useNavigation<HomeScreenNavigationProp>();
 
   // State for card pagination
   const [activeCardIndex, setActiveCardIndex] = React.useState(0);
@@ -90,12 +96,15 @@ const HomeScreen = () => {
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <View style={styles.avatarContainer}>
+            <TouchableOpacity 
+              style={styles.avatarContainer}
+              onPress={() => navigation.navigate('Profile')}
+            >
               <Image
                 source={require('../assets/home/user-avatar.png')}
                 style={styles.avatar}
               />
-            </View>
+            </TouchableOpacity>
             <View style={styles.headerInfo}>
               <Text style={styles.welcomeText}>Welcome Back</Text>
               <Text style={styles.userName}>{userData.name}</Text>

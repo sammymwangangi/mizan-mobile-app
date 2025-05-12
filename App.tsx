@@ -27,6 +27,7 @@ import PhoneNumberScreen from './screens/PhoneNumberScreen';
 import OTPScreen from './screens/OTPScreen';
 import KYCScreen from './screens/KYCScreen';
 import HomeScreen from './screens/HomeScreen';
+import ProfileScreen from './screens/ProfileScreen';
 
 // Import test component
 import './global.css';
@@ -53,6 +54,7 @@ function RootStack() {
       <Stack.Screen name="OTP" component={OTPScreen} />
       <Stack.Screen name="KYC" component={KYCScreen} />
       <Stack.Screen name="Home" component={TabNavigator} />
+      <Stack.Screen name="Profile" component={ProfileScreen} />
     </Stack.Navigator>
   );
 }

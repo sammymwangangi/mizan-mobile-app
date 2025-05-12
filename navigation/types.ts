@@ -7,5 +7,6 @@ export type RootStackParamList = {
     OTP: { phoneNumber: string };
     KYC: undefined;
     Home: undefined;
+    Profile: undefined;
     Congratulations: undefined;
   };

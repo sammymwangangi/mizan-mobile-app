@@ -13,7 +13,9 @@
       [
         "expo-font",
         {
-          "fonts": ["node_modules/@expo-google-fonts/poppins/Poppins_900Black.ttf"]
+          "fonts": [
+            "node_modules/@expo-google-fonts/poppins/900Black/Poppins_900Black.ttf"
+          ]
         }
       ]
     ],
@@ -21,7 +23,7 @@
     "icon": "./assets/gradient-logo.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/gradient-logo.png",
+      "image": "./assets/LauncherIcon.png",
       "resizeMode": "contain",
       "backgroundColor": "#8A2BE2"
     },
@@ -35,6 +37,12 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
+      },
+      "package": "com.wingi.mizanbankingapp"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "2840f4e8-0d73-4221-a407-eceb34e28db3"
       }
     }
   }
