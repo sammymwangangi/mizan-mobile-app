@@ -35,7 +35,7 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
   return (
     <View style={[styles.tabBarContainer, { height: tabBarHeight + insets.bottom }]}>
       {/* Main background with notch */}
-      <View style={[styles.tabBarBackground, { backgroundColor: '#8C5FED' }]} />
+      <View style={styles.tabBarBackground} />
       
       {/* White circle for the active tab notch */}
       <View 
@@ -205,6 +205,7 @@ const styles = StyleSheet.create({
     height: 81,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
+    backgroundColor: '#8C5FED',
   },
   curveContainer: {
     position: 'absolute',
@@ -213,7 +214,7 @@ const styles = StyleSheet.create({
     right: 0,
     height: 81,
     overflow: 'hidden',
-    backgroundColor: '#ECF1F6',
+    backgroundColor: 'transparent',
   },
   tabNotch: {
     position: 'absolute',
@@ -280,14 +281,14 @@ const styles = StyleSheet.create({
     tintColor: '#FFFFFF',
   },
   inactiveIcon: {
-    tintColor: '#A9A9A9',
+    tintColor: '#FFFFFF',
   },
   tabLabel: {
-    fontSize: 12,
+    fontSize: 10,
     marginTop: 50,
-    color: '#A4A5C3',
+    color: '#FFFFFF',
     fontFamily: 'Poppins',
-    fontWeight: '600',
+    fontWeight: '500',
   },
 });
 
