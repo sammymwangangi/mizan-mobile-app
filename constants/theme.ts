@@ -12,7 +12,7 @@ export const COLORS = {
   secondary: '#FF6B6B', // Accent color
 
   // Background colors
-  background: '#F5F5F5', // Light background
+  background: '#F5F5F8', // Light background
   card: '#FFFFFF', // Card background
 
   // Text colors

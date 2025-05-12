@@ -9,6 +9,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { RootStackParamList } from './navigation/types';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Font from 'expo-font';
+import TabNavigator from './navigation/TabNavigator';
 import {
   Poppins_400Regular,
   Poppins_500Medium,
@@ -51,7 +52,7 @@ function RootStack() {
       <Stack.Screen name="PhoneNumber" component={PhoneNumberScreen} />
       <Stack.Screen name="OTP" component={OTPScreen} />
       <Stack.Screen name="KYC" component={KYCScreen} />
-      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="Home" component={TabNavigator} />
     </Stack.Navigator>
   );
 }

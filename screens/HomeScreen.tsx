@@ -35,19 +35,19 @@ const HomeScreen = () => {
   };
 
   const quickActions = [
-    { id: '1', icon: <CreditCard size={24} color="#8C5FED" />, title: 'Cards' },
-    { id: '2', icon: <Clock size={24} color="#8C5FED" />, title: 'Pay Later' },
-    { id: '3', icon: <Send size={24} color="#8C5FED" />, title: 'Send' },
-    { id: '4', icon: <Smartphone size={24} color="#8C5FED" />, title: 'M-Pesa' },
+    { id: '1', icon: require('../assets/home/icons/cards.png'), title: 'Cards' },
+    { id: '2', icon: require('../assets/home/icons/pay-later.png'), title: 'Pay Later' },
+    { id: '3', icon: require('../assets/home/icons/send.png'), title: 'Send' },
+    { id: '4', icon: require('../assets/home/icons/m-pesa.png'), title: 'M-Pesa' },
   ];
 
   const promotions = [
-    { id: '1', title: 'Special Offers', color: '#90CAF9', image: require('../assets/home/whatsHot/special-offers.png') },
-    { id: '2', title: 'Ramadhan Plan', color: '#9575CD', image: require('../assets/home/whatsHot/ramadhan-plan.png') },
-    { id: '3', title: 'Free Banking for kids', color: '#F48FB1', image: require('../assets/home/whatsHot/free-banking-for-kids.png') },
-    { id: '4', title: 'Order a Metal Card', color: '#FFB74D', image: require('../assets/home/whatsHot/order-a-metal-card.png') },
-    { id: '5', title: 'StashAway with Round-Ups', color: '#AED581', image: require('../assets/home/whatsHot/stash-away.png') },
-    { id: '6', title: 'Smart Budgeting', color: '#4FC3F7', image: require('../assets/home/whatsHot/smart-budgeting.png') },
+    { id: '1', title: 'Special Offers', color: '#90CAF9', image: require('../assets/home/whatsHot/special-offers.png'), textColor: '#FFFFFF' },
+    { id: '2', title: 'Ramadhan Plan', color: '#9575CD', image: require('../assets/home/whatsHot/ramadhan-plan.png'), textColor: '#FFFFFF', gradient: true },
+    { id: '3', title: 'Free Banking for kids', color: '#F48FB1', image: require('../assets/home/whatsHot/free-banking-for-kids.png'), textColor: '#FFFFFF' },
+    { id: '4', title: 'Order a Metal Card', color: '#FFB74D', image: require('../assets/home/whatsHot/order-a-metal-card.png'), textColor: '#CE72E3', gradient: true },
+    { id: '5', title: 'StashAway with Round-Ups', color: '#AED581', image: require('../assets/home/whatsHot/stash-away.png'), textColor: '#CE72E3', gradient: true },
+    { id: '6', title: 'Smart Budgeting', color: '#4FC3F7', image: require('../assets/home/whatsHot/smart-budgeting.png'), textColor: '#FFFFFF', gradient: true },
   ];
 
   // Progress percentage is hardcoded in the SVG circles (67%)
@@ -282,7 +282,7 @@ const HomeScreen = () => {
             {quickActions.map((action) => (
               <TouchableOpacity key={action.id} style={styles.actionButton}>
                 <View style={styles.actionIconContainer}>
-                  {action.icon}
+                  <Image source={action.icon} style={styles.actionIcon} resizeMode="contain" />
                 </View>
                 <Text style={styles.actionText}>{action.title}</Text>
               </TouchableOpacity>
@@ -297,43 +297,30 @@ const HomeScreen = () => {
               {promotions.map((promo) => (
                 <TouchableOpacity
                   key={promo.id}
-                  style={[styles.promotionCard, { backgroundColor: promo.color }]}
+                  style={styles.promotionCard}
                 >
-                  <Text style={styles.promotionTitle}>{promo.title}</Text>
                   <Image
                     source={promo.image}
-                    style={styles.promotionImage}
-                    resizeMode="contain"
+                    style={styles.promotionBackground}
+                    resizeMode="cover"
                   />
+                  {promo.gradient ? (
+                    <LinearGradient
+                      colors={['#CE72E3', '#8A2BE2']}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 0 }}
+                      style={styles.gradientText}
+                    >
+                      <Text style={[styles.promotionTitle, { color: promo.textColor }]}>{promo.title}</Text>
+                    </LinearGradient>
+                  ) : (
+                    <Text style={[styles.promotionTitle, { color: promo.textColor }]}>{promo.title}</Text>
+                  )}
                 </TouchableOpacity>
               ))}
             </View>
           </View>
         </ScrollView>
-
-        {/* Bottom Navigation */}
-        <View style={styles.bottomNav}>
-          <TouchableOpacity style={[styles.navButton, styles.activeNavButton]}>
-            <Home size={24} color={COLORS.primary} />
-            <Text style={styles.activeNavText}>Home</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.navButton}>
-            <Send size={24} color={COLORS.textLight} />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.navButton}>
-            <BarChart2 size={24} color={COLORS.textLight} />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.navButton}>
-            <Clock3 size={24} color={COLORS.textLight} />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.navButton}>
-            <User size={24} color={COLORS.textLight} />
-          </TouchableOpacity>
-        </View>
       </SafeAreaView>
     </View>
   );
@@ -563,7 +550,7 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     alignItems: 'center',
     justifyContent: 'center',
-    width: 150,
+    width: 280,
   },
   upgradeButtonText: {
     ...FONTS.body4,
@@ -594,31 +581,37 @@ const styles = StyleSheet.create({
   },
   quickActionsContainer: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
     marginHorizontal: SIZES.padding,
     marginTop: 20,
+    gap: 16,
   },
   actionButton: {
-    width: 160,
-    height: 56,
+    width: '47%',
+    height: 80,
     borderRadius: 25,
     backgroundColor: '#FFFFFF',
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 15,
+    paddingHorizontal: 20,
     shadowColor: '#6943AF',
-    shadowOffset: { width: 0, height: 20 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
-    shadowRadius: 40,
-    elevation: 5,
+    shadowRadius: 10,
+    elevation: 3,
   },
   actionIconContainer: {
-    marginRight: 10,
+    marginRight: 12,
+  },
+  actionIcon: {
+    width: 32,
+    height: 32,
   },
   actionText: {
     fontFamily: 'Poppins',
-    fontWeight: '500',
-    fontSize: 14,
+    fontWeight: '600',
+    fontSize: 16,
     color: COLORS.text,
   },
   sectionContainer: {
@@ -636,48 +629,40 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   promotionCard: {
-    width: '48%',
-    height: 120,
-    borderRadius: SIZES.radius,
-    padding: 15,
+    width: 160,
+    height: 199,
+    borderRadius: 14,
     marginBottom: 15,
     overflow: 'hidden',
+    position: 'relative',
+  },
+  promotionBackground: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    left: 0,
+    top: 0,
   },
   promotionTitle: {
-    ...FONTS.body4,
-    color: COLORS.textWhite,
-    fontWeight: 'bold',
-  },
-  promotionImage: {
+    fontFamily: 'Poppins',
+    fontWeight: '600',
+    fontSize: 14,
     position: 'absolute',
-    right: -10,
-    bottom: -10,
-    width: 80,
-    height: 80,
-    opacity: 0.8,
+    left: 10,
+    top: 10,
+    width: '100%',
   },
-  bottomNav: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    backgroundColor: COLORS.card,
-    paddingVertical: 10,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.border,
+  gradientText: {
+    fontFamily: 'Poppins',
+    fontWeight: '600',
+    fontSize: 14,
+    position: 'absolute',
+    left: 10,
+    top: 10,
+    width: '100%',
+    borderRadius: 4,
   },
-  navButton: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 5,
-  },
-  activeNavButton: {
-    borderBottomWidth: 2,
-    borderBottomColor: COLORS.primary,
-  },
-  activeNavText: {
-    ...FONTS.body5,
-    color: COLORS.primary,
-    marginTop: 2,
-  },
+
 });
 
 export default HomeScreen;
