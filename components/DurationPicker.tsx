@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, FONTS } from '../constants/theme';
@@ -40,9 +40,13 @@ const DurationPicker: React.FC<DurationPickerProps> = ({
   const validInitialYears = Math.min(Math.max(initialYears, 0), maxYears);
   const validInitialMonths = Math.min(Math.max(initialMonths, 0), maxMonths);
 
-  // Use refs instead of state to avoid re-renders
+  // Use refs to track values without causing re-renders during scrolling
   const selectedYearsRef = useRef(validInitialYears);
   const selectedMonthsRef = useRef(validInitialMonths);
+
+  // Use state to trigger re-renders for display
+  const [displayYears, setDisplayYears] = useState(validInitialYears);
+  const [displayMonths, setDisplayMonths] = useState(validInitialMonths);
 
   // Generate arrays for years and months
   const yearsArray = Array.from({ length: maxYears + 1 }, (_, i) => i);
@@ -61,6 +65,7 @@ const DurationPicker: React.FC<DurationPickerProps> = ({
     const index = Math.round(scrollY / ITEM_HEIGHT);
     if (index >= 0 && index <= maxYears && index !== selectedYearsRef.current) {
       selectedYearsRef.current = index;
+      setDisplayYears(index); // Update state to trigger re-render
       onValueChange?.(index, selectedMonthsRef.current);
     }
   };
@@ -69,17 +74,27 @@ const DurationPicker: React.FC<DurationPickerProps> = ({
     const index = Math.round(scrollY / ITEM_HEIGHT);
     if (index >= 0 && index <= maxMonths && index !== selectedMonthsRef.current) {
       selectedMonthsRef.current = index;
+      setDisplayMonths(index); // Update state to trigger re-render
       onValueChange?.(selectedYearsRef.current, index);
     }
   };
 
-  // Scroll handlers
+  // Scroll handlers with both scroll and momentum end events
   const yearsScrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
       yearsScrollY.value = event.contentOffset.y;
     },
     onMomentumEnd: (event) => {
       runOnJS(updateSelectedYears)(event.contentOffset.y);
+    },
+    onEndDrag: (event) => {
+      // Snap to the nearest item when dragging ends
+      const index = Math.round(event.contentOffset.y / ITEM_HEIGHT);
+      const targetY = index * ITEM_HEIGHT;
+
+      if (yearsScrollViewRef.current) {
+        runOnJS(updateSelectedYears)(targetY);
+      }
     },
   });
 
@@ -89,6 +104,15 @@ const DurationPicker: React.FC<DurationPickerProps> = ({
     },
     onMomentumEnd: (event) => {
       runOnJS(updateSelectedMonths)(event.contentOffset.y);
+    },
+    onEndDrag: (event) => {
+      // Snap to the nearest item when dragging ends
+      const index = Math.round(event.contentOffset.y / ITEM_HEIGHT);
+      const targetY = index * ITEM_HEIGHT;
+
+      if (monthsScrollViewRef.current) {
+        runOnJS(updateSelectedMonths)(targetY);
+      }
     },
   });
 
@@ -148,6 +172,7 @@ const DurationPicker: React.FC<DurationPickerProps> = ({
     const handleYearPress = () => {
       if (year !== selectedYearsRef.current) {
         selectedYearsRef.current = year;
+        setDisplayYears(year); // Update state to trigger re-render
         yearsScrollViewRef.current?.scrollTo({ y: year * ITEM_HEIGHT, animated: true });
         onValueChange?.(year, selectedMonthsRef.current);
       }
@@ -200,6 +225,7 @@ const DurationPicker: React.FC<DurationPickerProps> = ({
     const handleMonthPress = () => {
       if (month !== selectedMonthsRef.current) {
         selectedMonthsRef.current = month;
+        setDisplayMonths(month); // Update state to trigger re-render
         monthsScrollViewRef.current?.scrollTo({ y: month * ITEM_HEIGHT, animated: true });
         onValueChange?.(selectedYearsRef.current, month);
       }
@@ -230,6 +256,9 @@ const DurationPicker: React.FC<DurationPickerProps> = ({
             onScroll={yearsScrollHandler}
             scrollEventThrottle={16}
             contentContainerStyle={styles.scrollViewContent}
+            bounces={true}
+            alwaysBounceVertical={true}
+            pagingEnabled={false}
           >
             {yearsArray.map((year) => (
               <YearItem key={`year-${year}`} year={year} />
@@ -247,6 +276,9 @@ const DurationPicker: React.FC<DurationPickerProps> = ({
             onScroll={monthsScrollHandler}
             scrollEventThrottle={16}
             contentContainerStyle={styles.scrollViewContent}
+            bounces={true}
+            alwaysBounceVertical={true}
+            pagingEnabled={false}
           >
             {monthsArray.map((month) => (
               <MonthItem key={`month-${month}`} month={month} />
@@ -264,19 +296,15 @@ const DurationPicker: React.FC<DurationPickerProps> = ({
       >
         <View style={styles.highlightInner}>
           <View style={styles.highlightContent}>
-            <Text style={styles.highlightValue}>{selectedYearsRef.current}</Text>
+            <Text style={styles.highlightValue}>{displayYears}</Text>
             <Text style={styles.highlightLabel}>years</Text>
           </View>
           <View style={styles.highlightContent}>
-            <Text style={styles.highlightValue}>{selectedMonthsRef.current}</Text>
+            <Text style={styles.highlightValue}>{displayMonths}</Text>
             <Text style={styles.highlightLabel}>months</Text>
           </View>
         </View>
       </LinearGradient>
-
-      {/* Picker Overlays for fading effect */}
-      <View style={[styles.overlay, styles.topOverlay]} />
-      <View style={[styles.overlay, styles.bottomOverlay]} />
     </View>
   );
 };
@@ -297,6 +325,7 @@ const styles = StyleSheet.create({
   pickerColumn: {
     flex: 1,
     height: PICKER_HEIGHT,
+    overflow: 'visible', // Allow scrolling outside the column
   },
   scrollViewContent: {
     paddingVertical: PICKER_HEIGHT / 2 - ITEM_HEIGHT / 2,
@@ -324,7 +353,7 @@ const styles = StyleSheet.create({
     right: 20,
     height: ITEM_HEIGHT,
     borderRadius: 25,
-    padding: 2, // Border width
+    padding: 1.5, // Border width
     zIndex: 2,
     transform: [{ translateY: -ITEM_HEIGHT / 2 }],
   },
@@ -350,19 +379,6 @@ const styles = StyleSheet.create({
   highlightLabel: {
     ...FONTS.body3,
     color: COLORS.textLight,
-  },
-  overlay: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    height: CONTAINER_HEIGHT / 2 - ITEM_HEIGHT / 2,
-    zIndex: 1,
-  },
-  topOverlay: {
-    top: 0,
-  },
-  bottomOverlay: {
-    bottom: 0,
   },
 });
 
