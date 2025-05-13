@@ -10,6 +10,7 @@ import Slider from '@react-native-community/slider';
 import { LinearGradient } from 'expo-linear-gradient';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import Input from '../components/Input';
+import DurationPicker from '../components/DurationPicker';
 
 type KYCScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'KYC'>;
 
@@ -215,16 +216,16 @@ const KYCScreen = () => {
         <Text style={styles.stepSubtitle}>Nice, you&apos;ve got something good going!</Text>
         <Text style={styles.stepTitle}>For how long now?</Text>
 
-        <View style={styles.durationContainer}>
-          <View style={styles.durationSelector}>
-            <Text style={styles.durationValue}>{duration.years}</Text>
-            <Text style={styles.durationLabel}>years</Text>
-          </View>
-
-          <View style={styles.durationSelector}>
-            <Text style={styles.durationValue}>{duration.months}</Text>
-            <Text style={styles.durationLabel}>months</Text>
-          </View>
+        <View style={styles.durationPickerContainer}>
+          <DurationPicker
+            initialYears={duration.years}
+            initialMonths={duration.months}
+            maxYears={6}
+            maxMonths={11}
+            onValueChange={(years, months) => {
+              setDuration({ years, months });
+            }}
+          />
         </View>
       </View>
     );
@@ -613,6 +614,12 @@ const styles = StyleSheet.create({
     borderRadius: SIZES.radius,
     padding: 15,
     backgroundColor: COLORS.card,
+  },
+  durationPickerContainer: {
+    marginTop: 40,
+    height: 250,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   durationSelector: {
     alignItems: 'center',
