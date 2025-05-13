@@ -1,9 +1,15 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
-import WheelPicker, { WheelPickerProps } from 'react-native-wheel-picker';
+import React, { useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, FONTS } from '../constants/theme';
-import { useSharedValue, useAnimatedScrollHandler, useAnimatedStyle, interpolate, withTiming, runOnJS, Animated } from 'react-native-reanimated';
+import Animated, {
+  useSharedValue,
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  interpolate,
+  withTiming,
+  runOnJS
+} from 'react-native-reanimated';
 
 interface DurationPickerProps {
   initialYears?: number;
@@ -14,11 +20,13 @@ interface DurationPickerProps {
 }
 
 // Item height for each picker item
-const ITEM_HEIGHT = 50;
+const ITEM_HEIGHT = 60;
 // Number of visible items (should be odd to have center item)
 const VISIBLE_ITEMS = 5;
 // Total height of the picker
 const PICKER_HEIGHT = ITEM_HEIGHT * VISIBLE_ITEMS;
+// Container height
+const CONTAINER_HEIGHT = 371;
 
 const DurationPicker: React.FC<DurationPickerProps> = ({
   initialYears = 3,
@@ -27,155 +35,187 @@ const DurationPicker: React.FC<DurationPickerProps> = ({
   maxMonths = 11,
   onValueChange,
 }) => {
+
   // Ensure the initial values are within bounds
   const validInitialYears = Math.min(Math.max(initialYears, 0), maxYears);
   const validInitialMonths = Math.min(Math.max(initialMonths, 0), maxMonths);
 
-  // Current selected values
-  const [selectedYears, setSelectedYears] = useState(validInitialYears);
-  const [selectedMonths, setSelectedMonths] = useState(validInitialMonths);
+  // Use refs instead of state to avoid re-renders
+  const selectedYearsRef = useRef(validInitialYears);
+  const selectedMonthsRef = useRef(validInitialMonths);
 
-  const updateSelectedYears = (scrollY: number) => {
-    const index = Math.round(scrollY / ITEM_HEIGHT);
-    setSelectedYears(index);
-  };
+  // Generate arrays for years and months
+  const yearsArray = Array.from({ length: maxYears + 1 }, (_, i) => i);
+  const monthsArray = Array.from({ length: maxMonths + 1 }, (_, i) => i);
 
-  const updateSelectedMonths = (scrollY: number) => {
-    const index = Math.round(scrollY / ITEM_HEIGHT);
-    setSelectedMonths(index);
-  };
-
-  const yearsScrollViewRef = useRef<WheelPicker>(null);
-  const monthsScrollViewRef = useRef<WheelPicker>(null);
+  // Refs for scroll views
+  const yearsScrollViewRef = useRef<Animated.ScrollView>(null);
+  const monthsScrollViewRef = useRef<Animated.ScrollView>(null);
 
   // Scroll position values
   const yearsScrollY = useSharedValue(0);
   const monthsScrollY = useSharedValue(0);
 
-  // Scroll to initial positions on mount
-  useEffect(() => {
-    setSelectedYears(validInitialYears);
-    setSelectedMonths(validInitialMonths);
-  }, [validInitialYears, validInitialMonths]);
+  // Update selected values based on scroll position
+  const updateSelectedYears = (scrollY: number) => {
+    const index = Math.round(scrollY / ITEM_HEIGHT);
+    if (index >= 0 && index <= maxYears && index !== selectedYearsRef.current) {
+      selectedYearsRef.current = index;
+      onValueChange?.(index, selectedMonthsRef.current);
+    }
+  };
 
-  // Update the values when they change
-  useEffect(() => {
-    onValueChange?.(selectedYears, selectedMonths);
-  }, [selectedYears, selectedMonths, onValueChange]);
+  const updateSelectedMonths = (scrollY: number) => {
+    const index = Math.round(scrollY / ITEM_HEIGHT);
+    if (index >= 0 && index <= maxMonths && index !== selectedMonthsRef.current) {
+      selectedMonthsRef.current = index;
+      onValueChange?.(selectedYearsRef.current, index);
+    }
+  };
 
-  // Generate arrays for years and months
-  const years = Array.from({ length: maxYears + 1 }, (_, i) => i);
-  const months = Array.from({ length: maxMonths + 1 }, (_, i) => i);
-
+  // Scroll handlers
   const yearsScrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
       yearsScrollY.value = event.contentOffset.y;
-      runOnJS(updateSelectedYears)(yearsScrollY.value);
+    },
+    onMomentumEnd: (event) => {
+      runOnJS(updateSelectedYears)(event.contentOffset.y);
     },
   });
 
   const monthsScrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
       monthsScrollY.value = event.contentOffset.y;
-      runOnJS(updateSelectedMonths)(monthsScrollY.value);
+    },
+    onMomentumEnd: (event) => {
+      runOnJS(updateSelectedMonths)(event.contentOffset.y);
     },
   });
 
-  // Render year items with animated opacity
-  const renderYearItems = () => {
-    return years.map((year, index) => {
+  // Scroll to initial positions on mount - only run once
+  useEffect(() => {
+    // Store the values in local variables to avoid dependency warnings
+    const initialYearsPos = validInitialYears * ITEM_HEIGHT;
+    const initialMonthsPos = validInitialMonths * ITEM_HEIGHT;
+
+    const timer = setTimeout(() => {
+      yearsScrollViewRef.current?.scrollTo({
+        y: initialYearsPos,
+        animated: false
+      });
+      monthsScrollViewRef.current?.scrollTo({
+        y: initialMonthsPos,
+        animated: false
+      });
+    }, 100);
+
+    return () => clearTimeout(timer);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Year item component with animated style
+  const YearItem = React.memo(({ year }: { year: number }) => {
+    const animatedStyle = useAnimatedStyle(() => {
       const inputRange = [
-        (index - 2) * ITEM_HEIGHT,
-        (index - 1) * ITEM_HEIGHT,
-        index * ITEM_HEIGHT,
-        (index + 1) * ITEM_HEIGHT,
-        (index + 2) * ITEM_HEIGHT,
+        (year - 2) * ITEM_HEIGHT,
+        (year - 1) * ITEM_HEIGHT,
+        year * ITEM_HEIGHT,
+        (year + 1) * ITEM_HEIGHT,
+        (year + 2) * ITEM_HEIGHT,
       ];
 
-      const animatedStyle = useAnimatedStyle(() => {
-        const opacity = interpolate(
-          yearsScrollY.value,
-          inputRange,
-          [0.3, 0.5, 1, 0.5, 0.3],
-          'clamp'
-        );
-
-        const scale = interpolate(
-          yearsScrollY.value,
-          inputRange,
-          [0.8, 0.9, 1, 0.9, 0.8],
-          'clamp'
-        );
-
-        return {
-          opacity: withTiming(opacity, { duration: 100 }),
-          transform: [{ scale: withTiming(scale, { duration: 100 }) }],
-        };
-      });
-
-      return (
-        <Animated.View key={`year-${year}`} style={[styles.itemContainer, animatedStyle]}>
-          <Pressable 
-            onPress={() => {
-              setSelectedYears(year);
-              onValueChange?.(year, selectedMonths);
-            }}
-            style={styles.itemPressable}
-          >
-            <Text style={styles.itemText}>{year}</Text>
-          </Pressable>
-        </Animated.View>
+      const opacity = interpolate(
+        yearsScrollY.value,
+        inputRange,
+        [0.3, 0.5, 1, 0.5, 0.3],
+        'clamp'
       );
-    });
-  };
 
-  // Render month items with animated opacity
-  const renderMonthItems = () => {
-    return months.map((month, index) => {
+      const scale = interpolate(
+        yearsScrollY.value,
+        inputRange,
+        [0.8, 0.9, 1, 0.9, 0.8],
+        'clamp'
+      );
+
+      return {
+        opacity: withTiming(opacity, { duration: 100 }),
+        transform: [{ scale: withTiming(scale, { duration: 100 }) }],
+      };
+    });
+
+    // Handle year selection
+    const handleYearPress = () => {
+      if (year !== selectedYearsRef.current) {
+        selectedYearsRef.current = year;
+        yearsScrollViewRef.current?.scrollTo({ y: year * ITEM_HEIGHT, animated: true });
+        onValueChange?.(year, selectedMonthsRef.current);
+      }
+    };
+
+    return (
+      <Animated.View style={[styles.itemContainer, animatedStyle]}>
+        <TouchableOpacity
+          style={styles.itemPressable}
+          onPress={handleYearPress}
+        >
+          <Text style={styles.itemText}>{year}</Text>
+        </TouchableOpacity>
+      </Animated.View>
+    );
+  });
+
+  // Month item component with animated style
+  const MonthItem = React.memo(({ month }: { month: number }) => {
+    const animatedStyle = useAnimatedStyle(() => {
       const inputRange = [
-        (index - 2) * ITEM_HEIGHT,
-        (index - 1) * ITEM_HEIGHT,
-        index * ITEM_HEIGHT,
-        (index + 1) * ITEM_HEIGHT,
-        (index + 2) * ITEM_HEIGHT,
+        (month - 2) * ITEM_HEIGHT,
+        (month - 1) * ITEM_HEIGHT,
+        month * ITEM_HEIGHT,
+        (month + 1) * ITEM_HEIGHT,
+        (month + 2) * ITEM_HEIGHT,
       ];
 
-      const animatedStyle = useAnimatedStyle(() => {
-        const opacity = interpolate(
-          monthsScrollY.value,
-          inputRange,
-          [0.3, 0.5, 1, 0.5, 0.3],
-          'clamp'
-        );
-
-        const scale = interpolate(
-          monthsScrollY.value,
-          inputRange,
-          [0.8, 0.9, 1, 0.9, 0.8],
-          'clamp'
-        );
-
-        return {
-          opacity: withTiming(opacity, { duration: 100 }),
-          transform: [{ scale: withTiming(scale, { duration: 100 }) }],
-        };
-      });
-
-      return (
-        <Animated.View key={`month-${month}`} style={[styles.itemContainer, animatedStyle]}>
-          <Pressable 
-            onPress={() => {
-              setSelectedMonths(month);
-              onValueChange?.(selectedYears, month);
-            }}
-            style={styles.itemPressable}
-          >
-            <Text style={styles.itemText}>{month}</Text>
-          </Pressable>
-        </Animated.View>
+      const opacity = interpolate(
+        monthsScrollY.value,
+        inputRange,
+        [0.3, 0.5, 1, 0.5, 0.3],
+        'clamp'
       );
+
+      const scale = interpolate(
+        monthsScrollY.value,
+        inputRange,
+        [0.8, 0.9, 1, 0.9, 0.8],
+        'clamp'
+      );
+
+      return {
+        opacity: withTiming(opacity, { duration: 100 }),
+        transform: [{ scale: withTiming(scale, { duration: 100 }) }],
+      };
     });
-  };
+
+    // Handle month selection
+    const handleMonthPress = () => {
+      if (month !== selectedMonthsRef.current) {
+        selectedMonthsRef.current = month;
+        monthsScrollViewRef.current?.scrollTo({ y: month * ITEM_HEIGHT, animated: true });
+        onValueChange?.(selectedYearsRef.current, month);
+      }
+    };
+
+    return (
+      <Animated.View style={[styles.itemContainer, animatedStyle]}>
+        <TouchableOpacity
+          style={styles.itemPressable}
+          onPress={handleMonthPress}
+        >
+          <Text style={styles.itemText}>{month}</Text>
+        </TouchableOpacity>
+      </Animated.View>
+    );
+  });
 
   return (
     <View style={styles.container}>
@@ -191,7 +231,9 @@ const DurationPicker: React.FC<DurationPickerProps> = ({
             scrollEventThrottle={16}
             contentContainerStyle={styles.scrollViewContent}
           >
-            {renderYearItems()}
+            {yearsArray.map((year) => (
+              <YearItem key={`year-${year}`} year={year} />
+            ))}
           </Animated.ScrollView>
         </View>
 
@@ -206,7 +248,9 @@ const DurationPicker: React.FC<DurationPickerProps> = ({
             scrollEventThrottle={16}
             contentContainerStyle={styles.scrollViewContent}
           >
-            {renderMonthItems()}
+            {monthsArray.map((month) => (
+              <MonthItem key={`month-${month}`} month={month} />
+            ))}
           </Animated.ScrollView>
         </View>
       </View>
@@ -214,17 +258,17 @@ const DurationPicker: React.FC<DurationPickerProps> = ({
       {/* Highlight Overlay */}
       <LinearGradient
         colors={['#5592EF', '#8532E0', '#F053E0']}
-        start={{ x: 1, y: 0 }}
-        end={{ x: 0, y: 1 }}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
         style={styles.highlightBorder}
       >
         <View style={styles.highlightInner}>
           <View style={styles.highlightContent}>
-            <Text style={styles.highlightValue}>{selectedYears}</Text>
+            <Text style={styles.highlightValue}>{selectedYearsRef.current}</Text>
             <Text style={styles.highlightLabel}>years</Text>
           </View>
           <View style={styles.highlightContent}>
-            <Text style={styles.highlightValue}>{selectedMonths}</Text>
+            <Text style={styles.highlightValue}>{selectedMonthsRef.current}</Text>
             <Text style={styles.highlightLabel}>months</Text>
           </View>
         </View>
@@ -239,18 +283,16 @@ const DurationPicker: React.FC<DurationPickerProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    height: 370,
+    height: CONTAINER_HEIGHT,
     width: '100%',
     position: 'relative',
   },
   pickerContainer: {
     flexDirection: 'row',
-    height: 370,
+    height: CONTAINER_HEIGHT,
     width: '100%',
-  },
-  picker: {
-    flex: 1,
-    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   pickerColumn: {
     flex: 1,
@@ -273,16 +315,18 @@ const styles = StyleSheet.create({
   itemText: {
     ...FONTS.h2,
     color: COLORS.text,
+    fontSize: 24,
   },
   highlightBorder: {
     position: 'absolute',
-    top: PICKER_HEIGHT / 2 - ITEM_HEIGHT / 2,
-    left: 0,
-    right: 0,
+    top: '50%',
+    left: 20,
+    right: 20,
     height: ITEM_HEIGHT,
     borderRadius: 25,
     padding: 2, // Border width
     zIndex: 2,
+    transform: [{ translateY: -ITEM_HEIGHT / 2 }],
   },
   highlightInner: {
     flex: 1,
@@ -301,6 +345,7 @@ const styles = StyleSheet.create({
     ...FONTS.h2,
     color: COLORS.text,
     marginRight: 5,
+    fontSize: 24,
   },
   highlightLabel: {
     ...FONTS.body3,
@@ -310,16 +355,14 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 0,
     right: 0,
-    height: PICKER_HEIGHT / 2 - ITEM_HEIGHT / 2,
+    height: CONTAINER_HEIGHT / 2 - ITEM_HEIGHT / 2,
     zIndex: 1,
   },
   topOverlay: {
     top: 0,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
   },
   bottomOverlay: {
     bottom: 0,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
   },
 });
 
