@@ -5,7 +5,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
 import Button from '../components/Button';
-import { ArrowLeft, ArrowRight } from 'lucide-react-native';
+import { ArrowLeft, ArrowRight, Clock, Wrench, BarChart2, TrendingUp, Umbrella, HelpCircle } from 'lucide-react-native';
 import Slider from '@react-native-community/slider';
 import { LinearGradient } from 'expo-linear-gradient';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
@@ -14,10 +14,87 @@ import DurationPicker from '../components/DurationPicker';
 
 type KYCScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'KYC'>;
 
+// RadioOptionCard component for the interests step
+interface RadioOptionCardProps {
+  text: string;
+  icon: React.ReactNode;
+  selected: boolean;
+  onPress: () => void;
+}
+
+const RadioOptionCard: React.FC<RadioOptionCardProps> = ({ text, icon, selected, onPress }) => {
+  // Render the card with or without gradient border based on selection state
+  if (selected) {
+    return (
+      <TouchableOpacity
+        activeOpacity={0.7}
+        onPress={onPress}
+        style={styles.cardWrapper}
+      >
+        <LinearGradient
+          colors={['#A276FF', '#F053E0']}
+          start={{ x: 0, y: 0.25 }}
+          end={{ x: 1, y: 0.75 }}
+          style={{
+            borderRadius: 25,
+            padding: 1, // This creates the border effect
+            shadowColor: '#6943AF',
+            shadowOffset: { width: 0, height: 20 },
+            shadowOpacity: 0.1,
+            shadowRadius: 40,
+            elevation: 5,
+          }}
+        >
+          <View style={[styles.radioOptionCard, { borderWidth: 0 }]}>
+            <View style={styles.radioContainer}>
+              <View style={[styles.radioOuter, styles.radioOuterSelected]}>
+                <LinearGradient
+                  colors={['#8BB4F2', 'rgba(124, 39, 217, 0.887)', 'rgba(222, 82, 208, 0.76)']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.radioInner}
+                />
+              </View>
+            </View>
+            <View style={styles.radioIconContainer}>
+              {icon}
+            </View>
+            <View style={styles.radioTextContainer}>
+              <Text style={styles.radioText}>{text}</Text>
+            </View>
+          </View>
+        </LinearGradient>
+      </TouchableOpacity>
+    );
+  }
+
+  // Non-selected card
+  return (
+    <TouchableOpacity
+      style={[styles.radioOptionCard, styles.cardWrapper]}
+      activeOpacity={0.7}
+      onPress={onPress}
+    >
+      <View style={styles.radioContainer}>
+        <View style={styles.radioOuter}>
+          {/* Empty inner circle for non-selected state */}
+        </View>
+      </View>
+      <View style={styles.radioIconContainer}>
+        {icon}
+      </View>
+      <View style={styles.radioTextContainer}>
+        <Text style={styles.radioText}>{text}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+};
+
 // KYC steps
 enum KYCStep {
   FULL_NAME,
   GENDER,
+  INTERESTS, // New step for "what gets you most excited"
   DURATION,
   FINANCIAL_EXPOSURE,
   PLAN,
@@ -26,12 +103,24 @@ enum KYCStep {
   COMPLETE
 }
 
-const KYCScreen = () => {
+const KYCScreen: React.FC = () => {
   const navigation = useNavigation<KYCScreenNavigationProp>();
   const [currentStep, setCurrentStep] = useState<KYCStep>(KYCStep.FULL_NAME);
   const [fullName, setFullName] = useState('');
   const [fullNameError, setFullNameError] = useState('');
   const [gender, setGender] = useState<'male' | 'female' | null>(null);
+
+  // Options for the "what gets you most excited" step
+  const interestOptions = [
+    { id: 'budget', text: 'Create a budget i can stick to', icon: 'clock' },
+    { id: 'debts', text: 'Crushing my debts with confidence', icon: 'tool' },
+    { id: 'stocks', text: 'Get a piece of the stock markets', icon: 'bar-chart-2' },
+    { id: 'credit', text: 'Improve my credit score', icon: 'trending-up' },
+    { id: 'savings', text: 'Save spare change for a rainy day', icon: 'umbrella' },
+    { id: 'unsure', text: 'Not sure really.', icon: 'help-circle' },
+  ];
+  const [selectedInterests, setSelectedInterests] = useState<string[]>(['budget']);
+
   const [duration, setDuration] = useState({ years: 3, months: 6 });
   const [financialExposure, setFinancialExposure] = useState(78);
   const [selectedPlan, setSelectedPlan] = useState('Premium Ethics');
@@ -205,6 +294,54 @@ const KYCScreen = () => {
               gender === 'female' && styles.selectedGenderText,
             ]}>Female</Text>
           </TouchableOpacity>
+        </View>
+      </View>
+    );
+  };
+
+  const renderInterestsStep = () => {
+    // Function to select a single interest (radio button behavior)
+    const toggleInterest = (id: string) => {
+      // Set only the selected interest (radio button behavior)
+      setSelectedInterests([id]);
+    };
+
+    // Get the icon component based on the icon name
+    const getIconComponent = (iconName: string) => {
+      switch (iconName) {
+        case 'clock':
+          return <Clock size={24} color="#BABBD2" />;
+        case 'tool':
+          return <Wrench size={24} color="#BABBD2" />;
+        case 'bar-chart-2':
+          return <BarChart2 size={24} color="#BABBD2" />;
+        case 'trending-up':
+          return <TrendingUp size={24} color="#BABBD2" />;
+        case 'umbrella':
+          return <Umbrella size={24} color="#BABBD2" />;
+        case 'help-circle':
+          return <HelpCircle size={24} color="#BABBD2" />;
+        default:
+          return null;
+      }
+    };
+
+    return (
+      <View style={styles.stepContainer}>
+        <Text style={styles.stepSubtitle}>Perfect, few more steps and we shall be done</Text>
+        <Text style={styles.stepTitle}>Habibi, what gets you most excited?</Text>
+        <Text style={styles.interestsSubtitle}>(Select one option)</Text>
+
+        <View style={styles.interestsContainer}>
+          {interestOptions.map((option) => (
+            <RadioOptionCard
+              key={option.id}
+              text={option.text}
+              icon={getIconComponent(option.icon)}
+              selected={selectedInterests.includes(option.id)}
+              onPress={() => toggleInterest(option.id)}
+            />
+          ))}
         </View>
       </View>
     );
@@ -440,6 +577,8 @@ const KYCScreen = () => {
         return renderFullNameStep();
       case KYCStep.GENDER:
         return renderGenderStep();
+      case KYCStep.INTERESTS:
+        return renderInterestsStep();
       case KYCStep.DURATION:
         return renderDurationStep();
       case KYCStep.FINANCIAL_EXPOSURE:
@@ -518,6 +657,67 @@ const styles = StyleSheet.create({
   stepContainer: {
     flex: 1,
     padding: SIZES.padding,
+  },
+  // Radio option card styles
+  cardWrapper: {
+    marginBottom: 10,
+  },
+  radioOptionCard: {
+    width: 340,
+    height: 57,
+    borderRadius: 25,
+    borderWidth: 1,
+    borderColor: 'rgba(222, 222, 222, 0.48)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 15,
+    backgroundColor: COLORS.card,
+  },
+  radioContainer: {
+    marginRight: 15,
+  },
+  radioOuter: {
+    width: 35,
+    height: 35,
+    borderRadius: 40,
+    borderWidth: 2,
+    borderColor: '#BABBD2',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  radioOuterSelected: {
+    // Keep the border visible even when selected
+    borderColor: '#BABBD2',
+  },
+  radioInner: {
+    width: 21,
+    height: 21,
+    borderRadius: 40,
+  },
+  radioIconContainer: {
+    width: 24,
+    height: 24,
+    marginRight: 15,
+  },
+  radioTextContainer: {
+    flex: 1,
+  },
+  radioText: {
+    fontFamily: 'Poppins',
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#1B1C39',
+  },
+  interestsContainer: {
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  interestsSubtitle: {
+    ...FONTS.body4,
+    color: COLORS.textLight,
+    textAlign: 'center',
+    marginTop: -30,
+    marginBottom: 30,
   },
   fullNameContainer: {
     width: '100%',

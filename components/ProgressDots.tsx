@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, ViewStyle } from 'react-native';
 import { COLORS, SIZES } from '../constants/theme';
+import { LinearGradient } from 'expo-linear-gradient';
 
 interface ProgressDotsProps {
   count: number;
@@ -20,15 +21,28 @@ const ProgressDots: React.FC<ProgressDotsProps> = ({
   return (
     <View style={[styles.container, style]}>
       {Array.from({ length: count }).map((_, index) => (
-        <View
-          key={index}
-          style={[
-            styles.dot,
-            index === activeIndex && styles.activeDot,
-            dotStyle,
-            index === activeIndex && activeDotStyle,
-          ]}
-        />
+        index === activeIndex ? (
+          <LinearGradient
+            key={index}
+            colors={['#D155FF', '#A276FF']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={[
+              styles.dot,
+              styles.activeDot,
+              dotStyle,
+              activeDotStyle,
+            ]}
+          />
+        ) : (
+          <View
+            key={index}
+            style={[
+              styles.dot,
+              dotStyle,
+            ]}
+          />
+        )
       ))}
     </View>
   );
@@ -45,14 +59,13 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: COLORS.border,
+    backgroundColor: '#E0E0E0',
     marginHorizontal: 4,
   },
   activeDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: COLORS.primary,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
   },
 });
 

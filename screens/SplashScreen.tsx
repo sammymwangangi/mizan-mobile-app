@@ -3,15 +3,13 @@ import { View, Image, StyleSheet, Animated } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
-import { COLORS } from '../constants/theme';
-import GradientBackground from '../components/GradientBackground';
 
 type SplashScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Splash'>;
 
 const SplashScreen = () => {
   const navigation = useNavigation<SplashScreenNavigationProp>();
-  const logoOpacity = new Animated.Value(0);
-  const logoScale = new Animated.Value(0.3);
+  const logoOpacity = React.useMemo(() => new Animated.Value(0), []);
+  const logoScale = React.useMemo(() => new Animated.Value(0.3), []);
 
   useEffect(() => {
     // Animate logo appearance
@@ -38,10 +36,7 @@ const SplashScreen = () => {
   }, [navigation, logoOpacity, logoScale]);
 
   return (
-    <GradientBackground
-      colors={[COLORS.gradientStart, COLORS.gradientEnd]}
-      style={styles.container}
-    >
+    <View style={styles.container}>
       <Animated.View
         style={[
           styles.logoContainer,
@@ -57,7 +52,7 @@ const SplashScreen = () => {
           resizeMode="contain"
         />
       </Animated.View>
-    </GradientBackground>
+    </View>
   );
 };
 
@@ -66,10 +61,15 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#FFFFFF',
   },
   logoContainer: {
     alignItems: 'center',
     justifyContent: 'center',
+    width: 170,
+    height: 170,
+    borderRadius: 85,
+    backgroundColor: '#FFFFFF',
   },
   logo: {
     width: 150,

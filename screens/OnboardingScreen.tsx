@@ -12,10 +12,9 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
-import { COLORS, FONTS, SIZES } from '../constants/theme';
-import Button from '../components/Button';
+import { SIZES } from '../constants/theme';
+
 import ProgressDots from '../components/ProgressDots';
-import GradientBackground from '../components/GradientBackground';
 
 type OnboardingScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Onboarding'>;
 
@@ -24,7 +23,7 @@ const { width } = Dimensions.get('window');
 interface OnboardingItem {
   id: string;
   image: ImageSourcePropType;
-  title: string;
+  title?: string;
   description: string;
 }
 
@@ -32,38 +31,36 @@ const onboardingData: OnboardingItem[] = [
   {
     id: '1',
     image: require('../assets/onboarding-images/ob1.png'),
-    title: 'No yidi yadas',
-    description: 'Open your account in minutes...jump into a saving habit',
+    description: 'No yidi yadas,open your account in minutes...jump into a saving habit, interest free product loans. No Tricks, and all shariah compliant',
   },
   {
     id: '2',
     image: require('../assets/onboarding-images/ob2.png'),
-    title: 'Interest Free Products',
-    description: 'All our products are interest-free and Shariah compliant',
+    description: 'No Hidden fees, no tricks no boring paper work. Get your guest plus shopping card and get those sneakers!',
   },
   {
     id: '3',
     image: require('../assets/onboarding-images/ob3.png'),
-    title: 'Secure Banking',
-    description: 'Your money and data are protected with the highest security standards',
+    title: 'Jump into a Saving habit, habibi, its time',
+    description: 'Whether that\'s a new phone or a ticket to Space - we can help you form the right saving habits.It\'s not so much about how much really - it\'s about how often.',
   },
   {
     id: '4',
     image: require('../assets/onboarding-images/ob4.png'),
-    title: 'Smart Budgeting',
-    description: 'Track your spending and save more with our smart budgeting tools',
+    title: 'Investing is a game Robin-habibi is your coach',
+    description: 'Forget complex brokerage paperwork, Take your moolah global with Robin Habibi',
   },
   {
     id: '5',
     image: require('../assets/onboarding-images/ob5.png'),
-    title: 'Easy Transfers',
-    description: 'Send money to friends and family with just a few taps',
+    title: 'Invest Spare Change',
+    description: 'Get the heavy metal debit card that saves and invests for you every time you spend.With round-up, robin habit silently invest that cash into low cost index fund in the background of life.',
   },
   {
     id: '6',
     image: require('../assets/onboarding-images/ob6.png'),
-    title: 'Ready to Start?',
-    description: 'Create your account now and experience ethical banking',
+    title: '& many more',
+    description: 'Customise your debit card, save for your kids, automate your monthly sadaqa to your favourite charity guided by leading Shariah Review Bureau of Bahrain.',
   },
 ];
 
@@ -87,12 +84,28 @@ const OnboardingScreen = () => {
     navigation.replace('Auth');
   };
 
+  const handleBack = () => {
+    if (currentIndex > 0) {
+      flatListRef.current?.scrollToIndex({
+        index: currentIndex - 1,
+        animated: true,
+      });
+    }
+  };
+
   const renderItem = ({ item }: { item: OnboardingItem }) => {
     return (
       <View style={styles.slide}>
         <Image source={item.image} style={styles.image} resizeMode="contain" />
+
+        <ProgressDots
+          count={onboardingData.length}
+          activeIndex={currentIndex}
+          style={styles.progressDots}
+        />
+
         <View style={styles.textContainer}>
-          <Text style={styles.title}>{item.title}</Text>
+          {item.title && <Text style={styles.title}>{item.title}</Text>}
           <Text style={styles.description}>{item.description}</Text>
         </View>
       </View>
@@ -102,10 +115,7 @@ const OnboardingScreen = () => {
   const isLastSlide = currentIndex === onboardingData.length - 1;
 
   return (
-    <GradientBackground
-      colors={[COLORS.gradientStart, COLORS.gradientEnd]}
-      style={styles.container}
-    >
+    <View style={styles.container}>
       <FlatList
         ref={flatListRef}
         data={onboardingData}
@@ -121,30 +131,39 @@ const OnboardingScreen = () => {
       />
 
       <View style={styles.footer}>
-        <ProgressDots count={onboardingData.length} activeIndex={currentIndex} />
-        
+
         <View style={styles.buttonContainer}>
-          {!isLastSlide && (
-            <TouchableOpacity onPress={handleSkip} style={styles.skipButton}>
-              <Text style={styles.skipText}>Skip</Text>
-            </TouchableOpacity>
+          {isLastSlide ? (
+            <>
+              <TouchableOpacity onPress={handleBack} style={styles.skipButton}>
+                <Text style={styles.skipText}>Back</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={handleNext} style={styles.nextButton}>
+                <Text style={styles.skipText}>Done</Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            <>
+              <TouchableOpacity onPress={handleSkip} style={styles.skipButton}>
+                <Text style={styles.skipText}>Skip</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={handleNext} style={styles.nextButton}>
+                <Text style={styles.skipText}>Next</Text>
+              </TouchableOpacity>
+            </>
           )}
-          
-          <Button
-            title={isLastSlide ? "Get Started" : "Next"}
-            onPress={handleNext}
-            gradient={true}
-            style={styles.nextButton}
-          />
         </View>
       </View>
-    </GradientBackground>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#FFFFFF',
   },
   slide: {
     width,
@@ -152,30 +171,38 @@ const styles = StyleSheet.create({
     padding: SIZES.padding,
   },
   image: {
-    width: width * 0.8,
-    height: width * 0.8,
-    marginTop: 50,
+    width: width * 0.6,
+    height: width * 0.6,
+    marginTop: 80,
+  },
+  progressDots: {
+    marginTop: 84,
+    marginBottom: 65,
   },
   textContainer: {
     alignItems: 'center',
-    marginTop: 30,
+    marginTop: 10,
+    paddingHorizontal: 20,
   },
   title: {
-    ...FONTS.h2,
-    color: COLORS.textWhite,
+    fontFamily: 'Poppins',
+    fontWeight: '600',
+    fontSize: 24,
     textAlign: 'center',
+    color: '#6B3BA6',
     marginBottom: 10,
   },
   description: {
-    ...FONTS.body3,
-    color: COLORS.textWhite,
+    fontFamily: 'Poppins',
+    fontWeight: '400',
+    fontSize: 16,
     textAlign: 'center',
-    opacity: 0.8,
+    color: '#1B1C39',
     paddingHorizontal: SIZES.padding,
   },
   footer: {
     position: 'absolute',
-    bottom: 50,
+    bottom: 30,
     left: 0,
     right: 0,
     alignItems: 'center',
@@ -191,13 +218,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   skipText: {
-    ...FONTS.body3,
-    color: COLORS.textWhite,
-    opacity: 0.8,
+    fontFamily: 'Poppins',
+    fontWeight: '500',
+    fontSize: 18,
+    color: '#A276FF',
   },
   nextButton: {
-    width: 120,
+    justifyContent: 'center',
+    alignItems: 'flex-end',
   },
+
 });
 
 export default OnboardingScreen;

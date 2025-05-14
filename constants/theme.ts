@@ -31,6 +31,9 @@ export const COLORS = {
   gradientStart: '#8A2BE2',
   gradientEnd: '#9370DB',
 
+  // Mizan gradient colors
+  mizanGradientColors: ['#D155FF', '#B532F2', '#A016E8', '#9406E2', '#8F00E0', '#A08CFF'],
+
   // Other colors
   border: '#E0E0E0',
   disabled: '#BDBDBD',

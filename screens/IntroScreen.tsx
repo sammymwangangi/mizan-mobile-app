@@ -3,30 +3,22 @@ import { View, Image, StyleSheet, Animated, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
-import { COLORS, FONTS } from '../constants/theme';
-import GradientBackground from '../components/GradientBackground';
+
+import { LinearGradient } from 'expo-linear-gradient';
 
 type IntroScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Intro'>;
 
 const IntroScreen = () => {
   const navigation = useNavigation<IntroScreenNavigationProp>();
-  const logoOpacity = new Animated.Value(0);
-  const textOpacity = new Animated.Value(0);
+  const logoOpacity = React.useMemo(() => new Animated.Value(0), []);
 
   useEffect(() => {
-    // Animate logo and text appearance
-    Animated.sequence([
-      Animated.timing(logoOpacity, {
-        toValue: 1,
-        duration: 1000,
-        useNativeDriver: true,
-      }),
-      Animated.timing(textOpacity, {
-        toValue: 1,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-    ]).start();
+    // Animate logo appearance
+    Animated.timing(logoOpacity, {
+      toValue: 1,
+      duration: 1000,
+      useNativeDriver: true,
+    }).start();
 
     // Navigate to onboarding screen after 3 seconds
     const timer = setTimeout(() => {
@@ -34,28 +26,28 @@ const IntroScreen = () => {
     }, 3000);
 
     return () => clearTimeout(timer);
-  }, [navigation, logoOpacity, textOpacity]);
+  }, [navigation, logoOpacity]);
 
+  // Calculate the angle of 11.18 degrees for the gradient
+  // This approximates the angle by adjusting start and end points
   return (
-    <GradientBackground
-      colors={[COLORS.gradientStart, COLORS.gradientEnd]}
+    <LinearGradient
+      colors={['#D155FF', '#B532F2', '#A016E8', '#9406E2', '#8F00E0', '#A08CFF']}
+      locations={[0.0063, 0.1475, 0.2856, 0.4075, 0.5002, 0.9941]}
       style={styles.container}
+      start={{ x: 0.45, y: 0.0 }}
+      end={{ x: 0.55, y: 1.0 }}
     >
       <View style={styles.content}>
         <Animated.View style={[styles.logoContainer, { opacity: logoOpacity }]}>
           <Image
-            source={require('../assets/colored-logo.png')}
+            source={require('../assets/logo.png')}
             style={styles.logo}
             resizeMode="contain"
           />
         </Animated.View>
-        
-        <Animated.View style={[styles.textContainer, { opacity: textOpacity }]}>
-          <Text style={styles.title}>Mizan</Text>
-          <Text style={styles.subtitle}>Your Shariah Compliant Banking</Text>
-        </Animated.View>
       </View>
-    </GradientBackground>
+    </LinearGradient>
   );
 };
 
@@ -71,24 +63,11 @@ const styles = StyleSheet.create({
   logoContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 30,
   },
   logo: {
-    width: 120,
-    height: 120,
-  },
-  textContainer: {
-    alignItems: 'center',
-  },
-  title: {
-    ...FONTS.h1,
-    color: COLORS.textWhite,
-    marginBottom: 10,
-  },
-  subtitle: {
-    ...FONTS.body3,
-    color: COLORS.textWhite,
-    opacity: 0.8,
+    width: 160,
+    height: 50,
+    alignSelf: 'center',
   },
 });
 
