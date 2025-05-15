@@ -14,8 +14,10 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
-import { ChevronLeft } from 'lucide-react-native';
+import { ArrowLeft } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import MaskedView from '@react-native-masked-view/masked-view';
+import CustomGradientText from 'components/CustomGradientText';
 
 type OTPScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'OTP'>;
 
@@ -98,6 +100,29 @@ const OTPScreen = () => {
     return `${mins}:${secs < 10 ? '0' + secs : secs}`;
   };
 
+  const gradientText = (
+    <View style={{ padding: 20 }}>
+      <MaskedView
+        style={{ height: 60, width: 300 }}
+        maskElement={
+          <View style={{ flex: 1, backgroundColor: 'transparent', justifyContent: 'center', alignItems: 'center' }}>
+            <Text style={{ fontSize: 40, fontWeight: 'bold' }}>
+              6-digit code
+            </Text>
+          </View>
+        }
+      >
+        <LinearGradient
+          colors={['#80B2FF', '#7C27D9', '#FF68F0']}
+          locations={[0, 0.5155, 1]}
+          start={{ x: 0, y: 1 }}
+          end={{ x: 1, y: 0 }}
+          style={{ flex: 1 }}
+        />
+      </MaskedView>
+    </View>
+  );
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -107,13 +132,14 @@ const OTPScreen = () => {
         {/* Header with back button */}
         <View style={styles.header}>
           <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
-            <ChevronLeft size={24} color={COLORS.text} />
+            <ArrowLeft size={24} color={COLORS.text} />
           </TouchableOpacity>
         </View>
 
         <View style={styles.content}>
           {/* Title */}
-          <Text style={styles.title}>6-digit code</Text>
+
+          {gradientText}
 
           {/* Subtitle with phone number */}
           <Text style={styles.subtitle}>
@@ -208,15 +234,24 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     alignItems: 'center',
   },
-  title: {
-    ...FONTS.h1,
-    color: '#7C27D9',
-    marginBottom: 10,
-    fontSize: 28,
+  titleContainer: {
+    marginBottom: 15,
+  },
+  titleGradient: {
+    borderRadius: 8,
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+  },
+  titleText: {
+    fontSize: 32,
+    fontFamily: 'Poppins',
+    fontWeight: '600',
   },
   subtitle: {
     ...FONTS.body3,
-    color: COLORS.textLight,
+    fontFamily: 'Poppins',
+    fontWeight: '400',
+    color: '#6D6E8A',
     textAlign: 'center',
     marginBottom: 40,
   },
