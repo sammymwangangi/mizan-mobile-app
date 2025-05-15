@@ -17,6 +17,8 @@ import { RootStackParamList } from '../navigation/types';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ChevronDown } from 'lucide-react-native';
+// @ts-ignore - Ignore the missing type declaration file
+import MaskedView from '@react-native-masked-view/masked-view';
 
 type PhoneNumberScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'PhoneNumber'>;
 
@@ -34,6 +36,29 @@ const PhoneNumberScreen = () => {
   const handleSignIn = () => {
     navigation.navigate('Auth');
   };
+
+  const gradientText = (
+      <View style={{ padding: 20 }}>
+        <MaskedView
+          style={{ height: 90, width: 300 }}
+          maskElement={
+            <View style={{ flex: 1, backgroundColor: 'transparent', justifyContent: 'center', alignItems: 'center' }}>
+              <Text style={{ fontSize: 30, fontWeight: 'bold', textAlign: 'center' }}>
+              Powerhouse - Shariah Finance, Begins Now
+              </Text>
+            </View>
+          }
+        >
+          <LinearGradient
+            colors={['#80B2FF', '#7C27D9', '#FF68F0']}
+            locations={[0, 0.7155, 1]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 0, y: 1 }}
+            style={{ flex: 1 }}
+          />
+        </MaskedView>
+      </View>
+    );
 
   return (
     <KeyboardAvoidingView
@@ -53,10 +78,8 @@ const PhoneNumberScreen = () => {
       >
         <View style={styles.contentContainer}>
           {/* Gradient Title */}
-          <View style={styles.titleContainer}>
-            <Text style={styles.titleText}>Powerhouse - Shariah</Text>
-            <Text style={styles.titleText}>Finance, Begins Now</Text>
-          </View>
+          {gradientText}
+
 
           {/* Subtitle */}
           <Text style={styles.subtitleText}>
@@ -130,6 +153,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: SIZES.padding,
     paddingTop: 20,
     marginTop: 40, // Overlap with the pattern image
+    // alignItems: 'center',
   },
   titleContainer: {
     marginBottom: 20,
@@ -143,9 +167,10 @@ const styles = StyleSheet.create({
   },
   subtitleText: {
     ...FONTS.body3,
-    color: COLORS.textLight,
+    color: '#6D6E8A',
     textAlign: 'center',
     marginBottom: 40,
+
   },
   inputContainer: {
     flexDirection: 'row',

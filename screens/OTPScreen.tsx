@@ -16,6 +16,7 @@ import { RootStackParamList } from '../navigation/types';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
 import { ArrowLeft } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+// @ts-ignore - Ignore the missing type declaration file
 import MaskedView from '@react-native-masked-view/masked-view';
 import CustomGradientText from 'components/CustomGradientText';
 
@@ -138,8 +139,8 @@ const OTPScreen = () => {
 
         <View style={styles.content}>
           {/* Title */}
-
           {gradientText}
+
 
           {/* Subtitle with phone number */}
           <Text style={styles.subtitle}>
