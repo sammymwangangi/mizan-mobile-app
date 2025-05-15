@@ -11,6 +11,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import Input from '../components/Input';
 import DurationPicker from '../components/DurationPicker';
+import LiquidProgressCircle from '../components/LiquidProgressCircle';
 
 type KYCScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'KYC'>;
 
@@ -114,6 +115,7 @@ const KYCScreen: React.FC = () => {
   const [fullName, setFullName] = useState('');
   const [fullNameError, setFullNameError] = useState('');
   const [gender, setGender] = useState<'male' | 'female' | null>(null);
+  const [value, setValue] = useState<number>(78);
 
   // Options for the "what gets you most excited" step
   const interestOptions = [
@@ -603,8 +605,21 @@ const KYCScreen: React.FC = () => {
         <Text style={styles.stepSubtitle}>we need to work on this</Text>
         <Text style={styles.stepTitle}>Your financial exposure</Text>
 
+        <View style={styles.container}>
+      <LiquidProgressCircle value={value} size={220} />
+      <Slider
+        style={{ width: 250, marginTop: 40 }}
+        minimumValue={0}
+        maximumValue={100}
+        value={value}
+        onValueChange={setValue}
+        minimumTrackTintColor="#974BEB"
+        maximumTrackTintColor="#ddd"
+        thumbTintColor="#974BEB"
+      />
+    </View>
         <View style={styles.exposureContainer}>
-          <View style={styles.exposureCircle}>
+          {/* <View style={styles.exposureCircle}>
             <Text style={styles.exposureValue}>{financialExposure}%</Text>
           </View>
 
@@ -652,9 +667,9 @@ const KYCScreen: React.FC = () => {
                 </View>
               </View>
             </LinearGradient>
-          </View>
+          </View> */}
 
-          <View style={styles.sliderWrapper}>
+          {/* <View style={styles.sliderWrapper}>
             <View style={styles.sliderTrackContainer}>
               <View style={styles.sliderTrackBackground} />
               <View
@@ -675,7 +690,7 @@ const KYCScreen: React.FC = () => {
                 tapToSeek={true}
               />
             </View>
-            {/* Custom thumb overlay */}
+
             <View
               style={[
                 styles.sliderThumbContainer,
@@ -689,7 +704,7 @@ const KYCScreen: React.FC = () => {
                 style={styles.sliderThumbGradient}
               />
             </View>
-          </View>
+          </View> */}
 
           <Text style={styles.sliderHint}>
             By sliding you will notice that your financial exposure becomes less severe.
