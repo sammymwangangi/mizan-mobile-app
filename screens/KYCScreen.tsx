@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Platform, Animated, TextInput, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Platform, Animated, TextInput, ScrollView, ImageSourcePropType } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
@@ -18,11 +18,12 @@ type KYCScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'KY
 interface RadioOptionCardProps {
   text: string;
   icon: React.ReactNode;
+  image: ImageSourcePropType;
   selected: boolean;
   onPress: () => void;
 }
 
-const RadioOptionCard: React.FC<RadioOptionCardProps> = ({ text, icon, selected, onPress }) => {
+const RadioOptionCard: React.FC<RadioOptionCardProps> = ({ text, icon, image, selected, onPress }) => {
   // Render the card with or without gradient border based on selection state
   if (selected) {
     return (
@@ -57,7 +58,8 @@ const RadioOptionCard: React.FC<RadioOptionCardProps> = ({ text, icon, selected,
               </View>
             </View>
             <View style={styles.radioIconContainer}>
-              {icon}
+              {/* {icon} */}
+              <Image source={image} style={{ width: 24, height: 24 }} resizeMode="contain" />
             </View>
             <View style={styles.radioTextContainer}>
               <Text style={styles.radioText}>{text}</Text>
@@ -81,7 +83,7 @@ const RadioOptionCard: React.FC<RadioOptionCardProps> = ({ text, icon, selected,
         </View>
       </View>
       <View style={styles.radioIconContainer}>
-        {icon}
+        <Image source={image} style={{ width: 24, height: 24 }} resizeMode="contain" />
       </View>
       <View style={styles.radioTextContainer}>
         <Text style={styles.radioText}>{text}</Text>
@@ -115,12 +117,12 @@ const KYCScreen: React.FC = () => {
 
   // Options for the "what gets you most excited" step
   const interestOptions = [
-    { id: 'budget', text: 'Create a budget i can stick to', icon: 'clock' },
-    { id: 'debts', text: 'Crushing my debts with confidence', icon: 'tool' },
-    { id: 'stocks', text: 'Get a piece of the stock markets', icon: 'bar-chart-2' },
-    { id: 'credit', text: 'Improve my credit score', icon: 'trending-up' },
-    { id: 'savings', text: 'Save spare change for a rainy day', icon: 'umbrella' },
-    { id: 'unsure', text: 'Not sure really.', icon: 'help-circle' },
+    { id: 'budget', text: 'Create a budget i can stick to', icon: 'clock', image: require('../assets/interests/budget.png'), },
+    { id: 'debts', text: 'Crushing my debts with confidence', icon: 'tool', image: require('../assets/interests/crush-debts.png') },
+    { id: 'stocks', text: 'Get a piece of the stock markets', icon: 'bar-chart-2', image: require('../assets/interests/stock.png') },
+    { id: 'credit', text: 'Improve my credit score', icon: 'trending-up', image: require('../assets/interests/credit-score.png') },
+    { id: 'savings', text: 'Save spare change for a rainy day', icon: 'umbrella', image: require('../assets/interests/save.png') },
+    { id: 'unsure', text: 'Not sure really.', icon: 'help-circle', image: require('../assets/interests/help-circle.png') },
   ];
   const [selectedInterests, setSelectedInterests] = useState<string[]>(['budget']);
 
@@ -370,7 +372,7 @@ const KYCScreen: React.FC = () => {
       <View style={styles.stepContainer}>
         <Text style={styles.stepSubtitle}>Perfect, few more steps and we shall be done</Text>
         <Text style={styles.stepTitle}>Habibi, what gets you most excited?</Text>
-        <Text style={styles.interestsSubtitle}>(Select one option)</Text>
+        <Text style={styles.interestsSubtitle}>(Feel free to select multiple)</Text>
 
         <View style={styles.interestsContainer}>
           {interestOptions.map((option) => (
@@ -378,6 +380,7 @@ const KYCScreen: React.FC = () => {
               key={option.id}
               text={option.text}
               icon={getIconComponent(option.icon)}
+              image={option.image}
               selected={selectedInterests.includes(option.id)}
               onPress={() => toggleInterest(option.id)}
             />
@@ -605,11 +608,54 @@ const KYCScreen: React.FC = () => {
             <Text style={styles.exposureValue}>{financialExposure}%</Text>
           </View>
 
-          <View style={styles.portfolioContainer}>
-            <Text style={styles.portfolioText}>Moderate Portfolio</Text>
+          <View style={{
+            flexDirection: 'row',
+            width: '100%',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginVertical: 40,
+          }}>
+            <LinearGradient
+              colors={['#4B99DE', '#6B3BA6']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: 20,
+                right: 20,
+                height: 64,
+                borderRadius: 45,
+                padding: 1.5, // Border width
+                zIndex: 2,
+                width: 175,
+                transform: [{ translateY: -64 / 2 }],
+              }}
+            >
+
+              <View style={{
+                flex: 1,
+                backgroundColor: COLORS.background,
+                borderRadius: 45,
+                flexDirection: 'row',
+                overflow: 'hidden',
+                width: 174,
+              }}>
+                <View style={{
+                  flex: 1,
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+
+                  <Text style={styles.portfolioText}>Moderate Portfolio</Text>
+                </View>
+              </View>
+            </LinearGradient>
           </View>
 
-          <Slider
+
+          {/* <Slider
             style={styles.financialSlider}
             minimumValue={0}
             maximumValue={100}
@@ -618,7 +664,56 @@ const KYCScreen: React.FC = () => {
             minimumTrackTintColor={COLORS.primary}
             maximumTrackTintColor={COLORS.border}
             thumbTintColor={COLORS.primary}
-          />
+          /> */}
+
+          {/* <Slider
+            style={styles.financialSlider}
+            minimumValue={0}
+            maximumValue={100}
+            value={financialExposure}
+            onValueChange={setFinancialExposure}
+            minimumTrackTintColor="transparent"
+            maximumTrackTintColor="transparent"
+            thumbTintColor="transparent"
+            tapToSeek={true}
+          /> */}
+
+          <View style={styles.sliderWrapper}>
+            <View style={styles.sliderTrackContainer}>
+              <View style={styles.sliderTrackBackground} />
+              <View
+                style={[
+                  styles.sliderTrackActive,
+                  { width: `${(financialExposure / 100) * 100}%` }
+                ]}
+              />
+              <Slider
+                style={styles.sliderAbsolute}
+                minimumValue={0}
+                maximumValue={100}
+                value={financialExposure}
+                onValueChange={(value) => setFinancialExposure(Math.round(value))}
+                minimumTrackTintColor="transparent"
+                maximumTrackTintColor="transparent"
+                thumbTintColor="transparent"
+                tapToSeek={true}
+              />
+            </View>
+            {/* Custom thumb overlay */}
+            <View
+              style={[
+                styles.sliderThumbContainer,
+                { left: `${(financialExposure / 100) * 100}%` }
+              ]}
+            >
+              <LinearGradient
+                colors={['#8BB4F2', '#7C27D9', '#F053E0']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.sliderThumbGradient}
+              />
+            </View>
+          </View>
 
           <Text style={styles.sliderHint}>
             By sliding you will notice that your financial exposure becomes less severe.
@@ -867,7 +962,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: SIZES.padding,
     paddingTop: 50,
-    paddingBottom: 20,
+    paddingBottom: 18,
   },
   backButton: {
     marginRight: 10,
@@ -896,7 +991,7 @@ const styles = StyleSheet.create({
   },
   stepContainer: {
     flex: 1,
-    padding: SIZES.padding,
+    paddingBottom: 0,
   },
   // Radio option card styles
   cardWrapper: {
@@ -954,7 +1049,7 @@ const styles = StyleSheet.create({
   },
   interestsSubtitle: {
     ...FONTS.body4,
-    color: COLORS.textLight,
+    color: '#969696',
     textAlign: 'center',
     marginTop: -30,
     marginBottom: 30,
@@ -1007,7 +1102,7 @@ const styles = StyleSheet.create({
   },
   incomeOptionText: {
     fontFamily: 'Poppins',
-    fontSize: 14,
+    fontSize: 20,
     fontWeight: '500',
     color: '#1B1C39',
     marginLeft: 10,
@@ -1116,7 +1211,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     position: 'absolute',
     top: 10,
-    marginLeft: -10, // Center the thumb on the track
+    marginLeft: -4, // Center the thumb on the track
     zIndex: 2,
   },
   sliderThumbGradient: {
@@ -1163,8 +1258,9 @@ const styles = StyleSheet.create({
 
   stepSubtitle: {
     ...FONTS.body3,
-    color: COLORS.primary,
-    marginBottom: 10,
+    fontWeight: 'bold',
+    color: '#A276FF',
+    marginBottom: 45,
     textAlign: 'center',
   },
   arabicStepTitle: {
@@ -1179,8 +1275,8 @@ const styles = StyleSheet.create({
   },
   stepTitle: {
     ...FONTS.h1,
-    color: COLORS.text,
-    marginBottom: 40,
+    color: '#1B1C39',
+    marginBottom: 18,
     textAlign: 'center',
   },
   genderContainer: {
@@ -1284,9 +1380,11 @@ const styles = StyleSheet.create({
   },
   sliderHint: {
     ...FONTS.body4,
-    color: COLORS.textLight,
+    color: '#6D6E8A',
     textAlign: 'center',
-    marginTop: 20,
+    marginTop: 40,
+    paddingLeft: 36,
+    paddingRight: 36,
   },
   planContainer: {
     alignItems: 'center',
