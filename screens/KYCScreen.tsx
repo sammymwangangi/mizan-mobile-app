@@ -610,7 +610,7 @@ const KYCScreen: React.FC = () => {
 
           <View style={{
             flexDirection: 'row',
-            width: '100%',
+            width: '50%',
             justifyContent: 'center',
             alignItems: 'center',
             marginVertical: 40,
@@ -653,30 +653,6 @@ const KYCScreen: React.FC = () => {
               </View>
             </LinearGradient>
           </View>
-
-
-          {/* <Slider
-            style={styles.financialSlider}
-            minimumValue={0}
-            maximumValue={100}
-            value={financialExposure}
-            onValueChange={setFinancialExposure}
-            minimumTrackTintColor={COLORS.primary}
-            maximumTrackTintColor={COLORS.border}
-            thumbTintColor={COLORS.primary}
-          /> */}
-
-          {/* <Slider
-            style={styles.financialSlider}
-            minimumValue={0}
-            maximumValue={100}
-            value={financialExposure}
-            onValueChange={setFinancialExposure}
-            minimumTrackTintColor="transparent"
-            maximumTrackTintColor="transparent"
-            thumbTintColor="transparent"
-            tapToSeek={true}
-          /> */}
 
           <View style={styles.sliderWrapper}>
             <View style={styles.sliderTrackContainer}>

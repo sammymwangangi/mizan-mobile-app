@@ -43,7 +43,7 @@ const PhoneNumberScreen = () => {
           style={{ height: 90, width: 300 }}
           maskElement={
             <View style={{ flex: 1, backgroundColor: 'transparent', justifyContent: 'center', alignItems: 'center' }}>
-              <Text style={{ fontSize: 30, fontWeight: 'bold', textAlign: 'center' }}>
+              <Text style={{...FONTS.body1, textAlign: 'center' }}>
               Powerhouse - Shariah Finance, Begins Now
               </Text>
             </View>
