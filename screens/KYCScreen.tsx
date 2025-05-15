@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Platform, Animated, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Platform, Animated, TextInput, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
@@ -95,7 +95,10 @@ enum KYCStep {
   FULL_NAME,
   GENDER,
   INTERESTS, // New step for "what gets you most excited"
+  HUSTLE, // New step for "By the way, whats your hustle?"
   DURATION,
+  INCOME, // New step for "How much do you make per month"
+  SPENDING, // New step for "How do you spend your mulah?"
   FINANCIAL_EXPOSURE,
   PLAN,
   CARD,
@@ -120,6 +123,35 @@ const KYCScreen: React.FC = () => {
     { id: 'unsure', text: 'Not sure really.', icon: 'help-circle' },
   ];
   const [selectedInterests, setSelectedInterests] = useState<string[]>(['budget']);
+
+  // Hustle options for the "By the way, whats your hustle?" step
+  const hustleOptions = [
+    { id: 'employed', text: 'Employed - On a 8 to 5 grind' },
+    { id: 'freelancing', text: 'Freelancing - Doing what I love' },
+    { id: 'business', text: 'Business - Chasing the mullah' },
+  ];
+  const [selectedHustle, setSelectedHustle] = useState<string>('employed');
+
+  // Income options for the "How much do you make per month" step
+  const incomeOptions = [
+    { id: 'under500', text: '< U$ 500' },
+    { id: '500to1000', text: 'U$ 500 - U$ 1,000' },
+    { id: '1001to2000', text: 'U$ 1001 - U$ 2,000' },
+    { id: '2001to3500', text: 'U$ 2001 - U$ 3,500' },
+    { id: 'above3500', text: 'U$ 3,500 & above' },
+  ];
+  const [selectedIncome, setSelectedIncome] = useState<string>('under500');
+
+  // Spending categories for the "How do you spend your mulah?" step
+  const [spendingCategories, setSpendingCategories] = useState([
+    { id: 'rent', name: 'Rent / Mortgage', value: 1000 },
+    { id: 'transport', name: 'Transport', value: 20 },
+    { id: 'groceries', name: 'Groceries/Food', value: 30 },
+    { id: 'utilities', name: 'Utilities', value: 50 },
+    { id: 'savings', name: 'Savings', value: 100 },
+    { id: 'custom', name: 'Add your own', value: 0 },
+  ]);
+  const [totalSpending, setTotalSpending] = useState(2500);
 
   const [duration, setDuration] = useState({ years: 3, months: 6 });
   const [financialExposure, setFinancialExposure] = useState(78);
@@ -198,17 +230,32 @@ const KYCScreen: React.FC = () => {
   };
 
   const renderProgressBar = () => {
-    const totalSteps = KYCStep.COMPLETE;
-    const progress = ((currentStep + 1) / (totalSteps + 1)) * 100;
-    // hide progress bar on congratulations step
+    // Total number of steps (excluding CONGRATULATIONS and COMPLETE)
+    const totalSteps = KYCStep.CONGRATULATIONS;
+
+    // Hide progress bar on congratulations step
     if (currentStep === KYCStep.CONGRATULATIONS) {
       return null;
     }
 
+    // Create an array of step indicators
+    const stepIndicators = Array.from({ length: totalSteps }, (_, index) => {
+      const isActive = index <= currentStep;
+      return (
+        <View
+          key={index}
+          style={[
+            styles.progressStep,
+            isActive ? styles.progressStepActive : styles.progressStepInactive
+          ]}
+        />
+      );
+    });
+
     return (
       <View style={styles.progressContainer}>
-        <View style={styles.progressBar}>
-          <View style={[styles.progressFill, { width: `${progress}%` }]} />
+        <View style={styles.progressStepsContainer}>
+          {stepIndicators}
         </View>
       </View>
     );
@@ -232,19 +279,12 @@ const KYCScreen: React.FC = () => {
 
         <View style={styles.spacer} />
 
-        <TouchableOpacity
-          style={styles.nextButtonContainer}
+        <Button
+          title="NEXT"
           onPress={handleNext}
-        >
-          <LinearGradient
-            colors={['#5592EF', '#8532E0', '#F053E0']}
-            start={{ x: 1, y: 0 }}
-            end={{ x: 0, y: 1 }}
-            style={styles.gradientNextButton}
-          >
-            <Text style={styles.nextButtonText}>NEXT</Text>
-          </LinearGradient>
-        </TouchableOpacity>
+          gradient={true}
+          style={styles.nextButton}
+        />
       </View>
     );
   };
@@ -347,6 +387,192 @@ const KYCScreen: React.FC = () => {
     );
   };
 
+  const renderHustleStep = () => {
+    // Function to select a single hustle option
+    const selectHustle = (id: string) => {
+      setSelectedHustle(id);
+    };
+
+    return (
+      <View style={styles.stepContainer}>
+        <Text style={styles.stepSubtitle}>Don&apos;t worry, we are in this together</Text>
+        <Text style={styles.stepTitle}>By the way, whats your hustle?</Text>
+
+        <View style={styles.hustleContainer}>
+          {hustleOptions.map((option) => (
+            <TouchableOpacity
+              key={option.id}
+              style={[
+                styles.hustleCard,
+                selectedHustle === option.id && styles.hustleCardActive
+              ]}
+              activeOpacity={0.7}
+              onPress={() => selectHustle(option.id)}
+            >
+              <Text
+                style={[
+                  styles.hustleText,
+                  selectedHustle === option.id && styles.hustleTextActive
+                ]}
+              >
+                {option.text}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
+    );
+  };
+
+  const renderIncomeStep = () => {
+    // Function to select a single income option (radio button behavior)
+    const selectIncome = (id: string) => {
+      setSelectedIncome(id);
+    };
+
+    return (
+      <View style={styles.stepContainer}>
+        <Text style={styles.stepSubtitle}>Oh wow, quite impressive</Text>
+        <Text style={styles.stepTitle}>How much do you make per month?</Text>
+
+        <View style={styles.incomeContainer}>
+          {incomeOptions.map((option) => (
+            <TouchableOpacity
+              key={option.id}
+              style={styles.incomeOptionContainer}
+              activeOpacity={0.7}
+              onPress={() => selectIncome(option.id)}
+            >
+              <View style={styles.radioContainer}>
+                <View style={styles.radioOuter}>
+                  {selectedIncome === option.id && (
+                    <LinearGradient
+                      colors={['#8BB4F2', 'rgba(124, 39, 217, 0.887)', 'rgba(222, 82, 208, 0.76)']}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={styles.radioInner}
+                    />
+                  )}
+                </View>
+              </View>
+              <Text style={styles.incomeOptionText}>{option.text}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
+    );
+  };
+
+  const renderSpendingStep = () => {
+    // Function to update a spending category value
+    const updateCategoryValue = (id: string, value: number) => {
+      const updatedCategories = spendingCategories.map(category =>
+        category.id === id ? { ...category, value } : category
+      );
+      setSpendingCategories(updatedCategories);
+
+      // Calculate total spending
+      const newTotal = updatedCategories.reduce((sum, cat) => sum + cat.value, 0);
+      setTotalSpending(newTotal);
+    };
+
+    // Format currency
+    const formatCurrency = (amount: number) => {
+      return `$${amount.toFixed(0)}`;
+    };
+
+    return (
+      <View style={styles.stepContainer}>
+        <Text style={styles.stepSubtitle}>Umm, not bad, can be improved</Text>
+        <Text style={styles.stepTitle}>How do you spend your mulah?</Text>
+
+        <View style={styles.spendingContainer}>
+          <View style={styles.totalAmountContainer}>
+            <LinearGradient
+              colors={['#A276FF', '#F053E0']}
+              start={{ x: 0, y: 0.25 }}
+              end={{ x: 1, y: 0.75 }}
+              style={styles.totalAmountBorder}
+            >
+              <View style={styles.totalAmountInner}>
+                <Text style={styles.totalAmountText}>{formatCurrency(totalSpending)}</Text>
+              </View>
+            </LinearGradient>
+          </View>
+
+          <ScrollView style={styles.categoriesScrollView} showsVerticalScrollIndicator={false}>
+            {spendingCategories.map((category) => (
+              <View key={category.id} style={styles.categoryContainer}>
+                <View style={styles.categoryLabelContainer}>
+                  <Text style={styles.categoryName}>{category.name}</Text>
+                </View>
+
+                {category.id !== 'custom' ? (
+                  <View style={styles.sliderWrapper}>
+                    <View style={styles.sliderTrackContainer}>
+                      <View style={styles.sliderTrackBackground} />
+                      <View
+                        style={[
+                          styles.sliderTrackActive,
+                          { width: `${(category.value / 2000) * 100}%` }
+                        ]}
+                      />
+                      <Slider
+                        style={styles.sliderAbsolute}
+                        minimumValue={0}
+                        maximumValue={2000}
+                        value={category.value}
+                        onValueChange={(value) => updateCategoryValue(category.id, Math.round(value))}
+                        minimumTrackTintColor="transparent"
+                        maximumTrackTintColor="transparent"
+                        thumbTintColor="transparent"
+                        tapToSeek={true}
+                      />
+                    </View>
+                    {/* Custom thumb overlay */}
+                    <View
+                      style={[
+                        styles.sliderThumbContainer,
+                        { left: `${(category.value / 2000) * 100}%` }
+                      ]}
+                    >
+                      <LinearGradient
+                        colors={['#8BB4F2', '#7C27D9', '#F053E0']}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 1 }}
+                        style={styles.sliderThumbGradient}
+                      />
+                    </View>
+                  </View>
+                ) : (
+                  <View style={[styles.sliderWrapper, { justifyContent: 'center' }]}>
+                    <Text style={{ color: '#9A9999', fontFamily: 'Poppins', fontSize: 13 }}>Custom amount</Text>
+                  </View>
+                )}
+
+                <View style={styles.valueContainer}>
+                  {category.id !== 'custom' ? (
+                    <Text style={styles.valueText}>{formatCurrency(category.value)}</Text>
+                  ) : (
+                    <TextInput
+                      style={styles.customValueInput}
+                      placeholder="$0"
+                      keyboardType="numeric"
+                      onChangeText={(text) => {
+                        const value = parseInt(text.replace(/[^0-9]/g, '')) || 0;
+                        updateCategoryValue(category.id, value);
+                      }}
+                    />
+                  )}
+                </View>
+              </View>
+            ))}
+          </ScrollView>
+        </View>
+      </View>
+    );
+  };
+
   const renderDurationStep = () => {
     return (
       <View style={styles.stepContainer}>
@@ -384,7 +610,7 @@ const KYCScreen: React.FC = () => {
           </View>
 
           <Slider
-            style={styles.slider}
+            style={styles.financialSlider}
             minimumValue={0}
             maximumValue={100}
             value={financialExposure}
@@ -420,7 +646,7 @@ const KYCScreen: React.FC = () => {
           </View>
 
           <Slider
-            style={styles.slider}
+            style={styles.financialSlider}
             minimumValue={0}
             maximumValue={100}
             value={50}
@@ -579,8 +805,14 @@ const KYCScreen: React.FC = () => {
         return renderGenderStep();
       case KYCStep.INTERESTS:
         return renderInterestsStep();
+      case KYCStep.HUSTLE:
+        return renderHustleStep();
       case KYCStep.DURATION:
         return renderDurationStep();
+      case KYCStep.INCOME:
+        return renderIncomeStep();
+      case KYCStep.SPENDING:
+        return renderSpendingStep();
       case KYCStep.FINANCIAL_EXPOSURE:
         return renderFinancialExposureStep();
       case KYCStep.PLAN:
@@ -644,15 +876,23 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 10,
   },
-  progressBar: {
-    height: 4,
-    backgroundColor: COLORS.border,
-    borderRadius: 2,
+  progressStepsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    height: 5,
   },
-  progressFill: {
-    height: '100%',
-    backgroundColor: COLORS.primary,
-    borderRadius: 2,
+  progressStep: {
+    width: 35,
+    height: 5,
+    borderRadius: 2.5,
+  },
+  progressStepActive: {
+    backgroundColor: '#A276FF',
+  },
+  progressStepInactive: {
+    backgroundColor: '#EEEFF5',
   },
   stepContainer: {
     flex: 1,
@@ -719,6 +959,197 @@ const styles = StyleSheet.create({
     marginTop: -30,
     marginBottom: 30,
   },
+  // Hustle step styles
+  hustleContainer: {
+    marginTop: 30,
+    paddingHorizontal: 20,
+  },
+  hustleCard: {
+    width: '100%',
+    height: 99,
+    borderRadius: 25,
+    borderWidth: 1,
+    borderColor: 'rgba(222, 222, 222, 0.48)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 15,
+    backgroundColor: COLORS.card,
+    paddingHorizontal: 20,
+  },
+  hustleCardActive: {
+    borderColor: '#A276FF',
+    borderWidth: 1,
+    shadowColor: '#6943AF',
+    shadowOffset: { width: 0, height: 20 },
+    shadowOpacity: 0.1,
+    shadowRadius: 40,
+    elevation: 5,
+  },
+  hustleText: {
+    fontFamily: 'Poppins',
+    fontSize: 18,
+    fontWeight: '500',
+    color: '#6D6E8A',
+    textAlign: 'center',
+  },
+  hustleTextActive: {
+    color: '#1B1C39',
+  },
+  // Income step styles
+  incomeContainer: {
+    marginTop: 20,
+    paddingHorizontal: 20,
+  },
+  incomeOptionContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  incomeOptionText: {
+    fontFamily: 'Poppins',
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#1B1C39',
+    marginLeft: 10,
+  },
+  // Spending step styles
+  spendingContainer: {
+    marginTop: 20,
+    paddingHorizontal: 10,
+    flex: 1,
+  },
+  categoriesScrollView: {
+    flex: 1,
+    marginBottom: 20,
+  },
+  totalAmountContainer: {
+    alignItems: 'center',
+    marginBottom: 30,
+  },
+  totalAmountBorder: {
+    borderRadius: 25,
+    padding: 1,
+  },
+  totalAmountInner: {
+    backgroundColor: COLORS.card,
+    borderRadius: 25,
+    paddingVertical: 10,
+    paddingHorizontal: 30,
+  },
+  totalAmountText: {
+    fontFamily: 'Poppins',
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1B1C39',
+  },
+  categoryContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 25,
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  categoryLabelContainer: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 25,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+    elevation: 2,
+    width: 140, // Reduced width for the category label
+  },
+  categoryName: {
+    fontFamily: 'Poppins',
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#1B1C39',
+  },
+  sliderWrapper: {
+    flex: 1,
+    height: 40,
+    position: 'relative',
+    marginHorizontal: 8,
+    width: 150, // Set a fixed width for the slider
+  },
+  slider: {
+    width: '100%',
+    height: 40,
+    zIndex: 1,
+  },
+  sliderTrackContainer: {
+    width: '100%',
+    height: 4,
+    backgroundColor: 'transparent',
+    borderRadius: 2,
+    position: 'relative',
+    marginTop: 18,
+  },
+  sliderTrackBackground: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#EEEFF5',
+    borderRadius: 2,
+  },
+  sliderTrackActive: {
+    position: 'absolute',
+    height: '100%',
+    backgroundColor: '#6B3BA6',
+    borderRadius: 2,
+  },
+  sliderAbsolute: {
+    position: 'absolute',
+    width: '100%',
+    height: 40,
+    top: -18,
+    zIndex: 2,
+  },
+  sliderThumbContainer: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+    position: 'absolute',
+    top: 10,
+    marginLeft: -10, // Center the thumb on the track
+    zIndex: 2,
+  },
+  sliderThumbGradient: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 10,
+  },
+  valueContainer: {
+    width: 60,
+    height: 24,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E0D2FF',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  valueText: {
+    fontFamily: 'Poppins',
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#9A9999',
+  },
+  customValueInput: {
+    fontFamily: 'Poppins',
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#9A9999',
+    width: '100%',
+    textAlign: 'center',
+    height: '100%',
+    paddingVertical: 0,
+  },
   fullNameContainer: {
     width: '100%',
     marginTop: 20,
@@ -729,22 +1160,7 @@ const styles = StyleSheet.create({
   spacer: {
     flex: 1,
   },
-  nextButtonContainer: {
-    width: '100%',
-    marginBottom: 30,
-  },
-  gradientNextButton: {
-    height: 56,
-    borderRadius: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  nextButtonText: {
-    color: COLORS.textWhite,
-    fontSize: 16,
-    fontWeight: 'bold',
-    letterSpacing: 1,
-  },
+
   stepSubtitle: {
     ...FONTS.body3,
     color: COLORS.primary,
@@ -862,7 +1278,7 @@ const styles = StyleSheet.create({
     ...FONTS.body3,
     color: COLORS.text,
   },
-  slider: {
+  financialSlider: {
     width: '100%',
     height: 40,
   },
@@ -970,6 +1386,8 @@ const styles = StyleSheet.create({
   nextButton: {
     marginHorizontal: SIZES.padding,
     marginBottom: 30,
+    alignSelf: 'center',
+    width: '85%',
   },
   swipeButton: {
     flexDirection: 'row',

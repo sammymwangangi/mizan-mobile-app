@@ -22,7 +22,7 @@ interface ButtonProps extends TouchableOpacityProps {
   style?: ViewStyle;
   textStyle?: TextStyle;
   gradient?: boolean;
-  gradientColors?: string[];
+  gradientColors?: string[] | readonly string[];
   gradientStart?: { x: number; y: number };
   gradientEnd?: { x: number; y: number };
   leftIcon?: React.ReactNode;
@@ -107,18 +107,24 @@ const Button: React.FC<ButtonProps> = ({
   };
 
   const getTextStyles = (): TextStyle => {
-    let textStyleObj: TextStyle = { ...FONTS.body3 };
+    let textStyleObj: TextStyle = {
+      fontFamily: 'Poppins',
+      fontSize: 16,
+      fontWeight: '600',
+      letterSpacing: 1,
+      color: COLORS.textWhite
+    };
 
     // Size styles
     switch (size) {
       case 'small':
-        textStyleObj = { ...textStyleObj, ...FONTS.body4 };
+        textStyleObj = { ...textStyleObj, fontSize: 14 };
         break;
       case 'large':
-        textStyleObj = { ...textStyleObj, ...FONTS.body2 };
+        textStyleObj = { ...textStyleObj, fontSize: 18 };
         break;
       default: // medium
-        textStyleObj = { ...textStyleObj, ...FONTS.body3 };
+        textStyleObj = { ...textStyleObj, fontSize: 16 };
     }
 
     // Variant styles
@@ -162,9 +168,9 @@ const Button: React.FC<ButtonProps> = ({
         {...rest}
       >
         <LinearGradient
-          colors={gradientColors || [COLORS.gradientStart, COLORS.gradientEnd]}
-          start={gradientStart}
-          end={gradientEnd}
+          colors={(gradientColors || ['#E9B8FF', '#A9C7FF']) as readonly string[]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
           style={[getButtonStyles(), styles.gradientButton]}
         >
           {buttonContent}
@@ -195,6 +201,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
+    height: 56,
+    borderRadius: 28,
   },
   contentContainer: {
     flexDirection: 'row',
