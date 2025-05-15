@@ -165,8 +165,10 @@ const OTPScreen = () => {
 
           {/* Display entered OTP for demo */}
           <Text style={styles.demoOtp}>{otp.join('-')}</Text>
+        </View>
 
-          {/* Next Button */}
+        {/* Next Button - Moved outside content view to position at bottom */}
+        <View style={styles.bottomButtonContainer}>
           <TouchableOpacity
             style={styles.nextButtonContainer}
             onPress={handleVerifyOTP}
@@ -269,12 +271,15 @@ const styles = StyleSheet.create({
     marginTop: 30,
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 40,
+  },
+  bottomButtonContainer: {
+    width: '100%',
+    paddingHorizontal: SIZES.padding,
+    paddingBottom: Platform.OS === 'ios' ? 40 : 30,
+    paddingTop: 20,
   },
   nextButtonContainer: {
     width: '100%',
-    marginTop: 20,
-    marginBottom: 30,
   },
   nextButton: {
     height: 56,
