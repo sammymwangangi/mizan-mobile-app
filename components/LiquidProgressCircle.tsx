@@ -42,32 +42,33 @@ const COLORS = {
   ],
 };
 
-// function getWavePath(
-//   percentage: number,
-//   phase: number,
-//   amplitude: number,
-//   frequency: number,
-//   size: number
-// ): string {
-//   const width = size;
-//   const height = size;
-//   const waveHeight = height * (1 - percentage / 100);
+function getWavePath(
+  percentage: number,
+  phase: number,
+  amplitude: number,
+  frequency: number,
+  size: number
+): string {
+  'worklet';
+  const width = size;
+  const height = size;
+  const waveHeight = height * (1 - percentage / 100);
 
-//   let path = `M0,${waveHeight}`;
-//   for (let i = 0; i <= width; i++) {
-//     const y =
-//       waveHeight +
-//       amplitude * Math.sin(((i / width) * Math.PI * 2 * frequency) + phase);
-//     path += ` L${i},${y}`;
-//   }
-//   path += ` L${width},${height}`;
-//   path += ` L0,${height} Z`;
-//   return path;
-// }
-function getWavePath(a: number, b: number, c: number, d: number, e: number): string {
-    // Simple implementation just to test if the function works
-    return `M0,0 L${e},${e} Z`;
+  let path = `M0,${waveHeight}`;
+  for (let i = 0; i <= width; i++) {
+    const y =
+      waveHeight +
+      amplitude * Math.sin(((i / width) * Math.PI * 2 * frequency) + phase);
+    path += ` L${i},${y}`;
   }
+  path += ` L${width},${height}`;
+  path += ` L0,${height} Z`;
+  return path;
+}
+// function getWavePath(a: number, b: number, c: number, d: number, e: number): string {
+//     // Simple implementation just to test if the function works
+//     return `M0,0 L${e},${e} Z`;
+//   }
 
 const LiquidProgressCircle: React.FC<Props> = ({
   value,
@@ -88,27 +89,33 @@ const LiquidProgressCircle: React.FC<Props> = ({
       -1,
       false
     );
-  }, []);
+  }, [phase1, phase2]);
 
-  const animatedProps1 = useAnimatedProps(() => ({
-    d: getWavePath(
-      value,
-      phase1.value,
-      WAVE_AMPLITUDE_1,
-      WAVE_FREQUENCY_1,
-      size
-    ),
-  }));
+  const animatedProps1 = useAnimatedProps(() => {
+    'worklet';
+    return {
+      d: getWavePath(
+        value,
+        phase1.value,
+        WAVE_AMPLITUDE_1,
+        WAVE_FREQUENCY_1,
+        size
+      ),
+    };
+  });
 
-  const animatedProps2 = useAnimatedProps(() => ({
-    d: getWavePath(
-      value,
-      phase2.value,
-      WAVE_AMPLITUDE_2,
-      WAVE_FREQUENCY_2,
-      size
-    ),
-  }));
+  const animatedProps2 = useAnimatedProps(() => {
+    'worklet';
+    return {
+      d: getWavePath(
+        value,
+        phase2.value,
+        WAVE_AMPLITUDE_2,
+        WAVE_FREQUENCY_2,
+        size
+      ),
+    };
+  });
 
   return (
     <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>

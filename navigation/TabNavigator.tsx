@@ -7,6 +7,11 @@ import Animated, { useAnimatedStyle, withTiming, useSharedValue } from 'react-na
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 
+// Import screens
+import HomeScreen from '../screens/HomeScreen';
+import TransactionsScreen from '../screens/TransactionsScreen';
+import SubscriptionScreen from '../screens/SubscriptionScreen';
+
 // Define types for tab navigation
 type TabParamList = {
   Home: undefined;
@@ -16,12 +21,7 @@ type TabParamList = {
   Support: undefined;
 };
 
-// Import screens
-import HomeScreen from '../screens/HomeScreen';
-
 // Placeholder screens for other tabs
-const TransactionsScreen = () => <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><Text>Transactions Screen</Text></View>;
-const ReportsScreen = () => <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><Text>Reports Screen</Text></View>;
 const IslamicCornerScreen = () => <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><Text>Islamic Corner Screen</Text></View>;
 const SupportScreen = () => <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><Text>Support Screen</Text></View>;
 
@@ -31,27 +31,27 @@ const Tab = createBottomTabNavigator<TabParamList>();
 const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation }) => {
   const insets = useSafeAreaInsets();
   const tabBarHeight = 81;
-  
+
   return (
     <View style={[styles.tabBarContainer, { height: tabBarHeight + insets.bottom }]}>
       {/* Main background with notch */}
       <View style={styles.tabBarBackground} />
-      
+
       {/* White circle for the active tab notch */}
-      <View 
-        style={[styles.tabNotch, { 
+      <View
+        style={[styles.tabNotch, {
           left: state.index * (390 / 5) + (390 / 10) - 40,
         }]}
       />
-      
+
       {/* Shadow for the notch */}
-      <View 
-        style={[styles.notchShadow, { 
+      <View
+        style={[styles.notchShadow, {
           left: state.index * (390 / 5) + (390 / 10) - 30,
         }]}
       />
-      
-      
+
+
       {/* Active Tab Indicator - positioned absolutely */}
       {state.routes.map((route, index: number) => {
         const isFocused = state.index === index;
@@ -77,9 +77,9 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
             default:
               iconSource = require('../assets/home/tabs/home.png');
           }
-          
+
           return (
-            <View 
+            <View
               key={`active-${index}`}
               style={[styles.activeTabContainer, {
                 left: index * (390 / 5) + (390 / 10) - 35,
@@ -91,9 +91,9 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
                 end={{ x: 0.93, y: 0.93 }}
                 style={styles.activeIconContainer}
               >
-                <Image 
-                  source={iconSource} 
-                  style={[styles.tabIcon, styles.activeIcon]} 
+                <Image
+                  source={iconSource}
+                  style={[styles.tabIcon, styles.activeIcon]}
                   resizeMode="contain"
                 />
               </LinearGradient>
@@ -105,25 +105,25 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
         }
         return null;
       })}
-      
+
       {/* Tab buttons */}
       <View style={styles.tabButtonsContainer}>
         {state.routes.map((route, index: number) => {
           const { options } = descriptors[route.key];
           const isFocused = state.index === index;
-          
+
           const onPress = () => {
             const event = navigation.emit({
               type: 'tabPress',
               target: route.key,
               canPreventDefault: true,
             });
-            
+
             if (!isFocused && !event.defaultPrevented) {
               navigation.navigate(route.name);
             }
           };
-          
+
           // Define icon source based on route name
           let iconSource;
           switch (route.name) {
@@ -145,7 +145,7 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
             default:
               iconSource = require('../assets/home/tabs/home.png');
           }
-          
+
           return (
             <TouchableOpacity
               key={index}
@@ -156,9 +156,9 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
             >
               {!isFocused && (
                 <View>
-                  <Image 
-                    source={iconSource} 
-                    style={[styles.tabIcon, styles.inactiveIcon]} 
+                  <Image
+                    source={iconSource}
+                    style={[styles.tabIcon, styles.inactiveIcon]}
                     resizeMode="contain"
                   />
                 </View>
@@ -182,7 +182,7 @@ const TabNavigator = () => {
     >
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Transactions" component={TransactionsScreen} />
-      <Tab.Screen name="Reports" component={ReportsScreen} />
+      <Tab.Screen name="Reports" component={SubscriptionScreen} />
       <Tab.Screen name="IslamicCorner" component={IslamicCornerScreen} />
       <Tab.Screen name="Support" component={SupportScreen} />
     </Tab.Navigator>
