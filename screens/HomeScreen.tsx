@@ -299,6 +299,8 @@ const HomeScreen = () => {
                     navigation.navigate('MPESA');
                   } else if (action.title === 'Send') {
                     navigation.navigate('SendMoney');
+                  } else if (action.title === 'Pay Later') {
+                    navigation.navigate('Shop');
                   } else {
                     console.log(`${action.title} pressed`);
                   }

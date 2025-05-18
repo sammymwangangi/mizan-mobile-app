@@ -1,10 +1,8 @@
 import React, { useEffect } from 'react';
-import { View, Image, StyleSheet, Animated, Text } from 'react-native';
+import { View, Image, StyleSheet, Animated, ImageBackground } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
-
-import { LinearGradient } from 'expo-linear-gradient';
 
 type IntroScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Intro'>;
 
@@ -28,15 +26,11 @@ const IntroScreen = () => {
     return () => clearTimeout(timer);
   }, [navigation, logoOpacity]);
 
-  // Calculate the angle of 11.18 degrees for the gradient
-  // This approximates the angle by adjusting start and end points
   return (
-    <LinearGradient
-      colors={['#D155FF', '#B532F2', '#A016E8', '#9406E2', '#8F00E0', '#A08CFF']}
-      locations={[0.0063, 0.1475, 0.2856, 0.4075, 0.5002, 0.9941]}
+    <ImageBackground
+      source={require('../assets/splash2-bg.png')}
       style={styles.container}
-      start={{ x: 0.45, y: 0.0 }}
-      end={{ x: 0.55, y: 1.0 }}
+      resizeMode="cover"
     >
       <View style={styles.content}>
         <Animated.View style={[styles.logoContainer, { opacity: logoOpacity }]}>
@@ -47,7 +41,7 @@ const IntroScreen = () => {
           />
         </Animated.View>
       </View>
-    </LinearGradient>
+    </ImageBackground>
   );
 };
 

@@ -1,0 +1,43 @@
+diff --git a/node_modules/react-native-wheel-picker/android/build.gradle b/node_modules/react-native-wheel-picker/android/build.gradle
+index f0a74ba..d2dbf38 100644
+--- a/node_modules/react-native-wheel-picker/android/build.gradle
++++ b/node_modules/react-native-wheel-picker/android/build.gradle
+@@ -1,11 +1,16 @@
+ apply plugin: 'com.android.library'
+ 
++def safeExtGet(prop, fallback) {
++    rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
++}
++
+ android {
+-    compileSdkVersion 23
+-    buildToolsVersion "23.0.1"
++    compileSdkVersion safeExtGet('compileSdkVersion', 33)
++    buildToolsVersion safeExtGet('buildToolsVersion', '33.0.0')
++
+     defaultConfig {
+-        minSdkVersion 16
+-        targetSdkVersion 22
++        minSdkVersion safeExtGet('minSdkVersion', 21)
++        targetSdkVersion safeExtGet('targetSdkVersion', 33)
+         versionCode 1
+         versionName "1.0"
+         ndk {
+@@ -14,8 +19,14 @@ android {
+     }
+ }
+ 
++repositories {
++    mavenCentral()
++    google()
++    jcenter()
++}
++
+ dependencies {
+-    compile fileTree(dir: 'libs', include: ['*.jar'])
+-    compile "cn.aigestudio.wheelpicker:WheelPicker:1.0.3"
+-    compile 'com.facebook.react:react-native:+'
++    implementation fileTree(dir: 'libs', include: ['*.jar'])
++    implementation "cn.aigestudio.wheelpicker:WheelPicker:1.0.3"
++    implementation 'com.facebook.react:react-native:+'
+ }

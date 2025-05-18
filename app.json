@@ -31,7 +31,8 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.wingi.mizanbankingapp"
     },
     "android": {
       "adaptiveIcon": {

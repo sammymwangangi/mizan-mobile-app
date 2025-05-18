@@ -48,6 +48,11 @@ import MPESAAmountScreen from './screens/MPESAAmountScreen';
 import MPESAConfirmationScreen from './screens/MPESAConfirmationScreen';
 import MPESASuccessScreen from './screens/MPESASuccessScreen';
 
+// Import Shop screens
+import ShopScreen from './screens/ShopScreen';
+import CheckoutScreen from './screens/CheckoutScreen';
+import PaymentScreen from './screens/PaymentScreen';
+
 // Import test component
 import './global.css';
 
@@ -93,6 +98,11 @@ function RootStack() {
       <Stack.Screen name="MPESAAmount" component={MPESAAmountScreen} />
       <Stack.Screen name="MPESAConfirmation" component={MPESAConfirmationScreen} />
       <Stack.Screen name="MPESASuccess" component={MPESASuccessScreen} />
+
+      {/* Shop Screens */}
+      <Stack.Screen name="Shop" component={ShopScreen} />
+      <Stack.Screen name="Checkout" component={CheckoutScreen} />
+      <Stack.Screen name="Payment" component={PaymentScreen} />
     </Stack.Navigator>
   );
 }

@@ -2,13 +2,15 @@
   "name": "my-expo-app",
   "version": "1.0.0",
   "scripts": {
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "start": "expo start",
-    "prebuild": "expo prebuild",
+    "prebuild": "node ./fix-wheel-picker.js && expo prebuild",
     "lint": "eslint \"**/*.{js,jsx,ts,tsx}\" && prettier -c \"**/*.{js,jsx,ts,tsx,json}\"",
     "format": "eslint \"**/*.{js,jsx,ts,tsx}\" --fix && prettier \"**/*.{js,jsx,ts,tsx,json}\" --write",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "postinstall": "npx patch-package",
+    "fix-wheel-picker": "node ./fix-wheel-picker.js"
   },
   "dependencies": {
     "@expo-google-fonts/inter": "^0.3.0",
@@ -28,6 +30,7 @@
     "expo-status-bar": "~2.2.3",
     "lucide-react-native": "0.509.0",
     "nativewind": "latest",
+    "patch-package": "^8.0.0",
     "react": "19.0.0",
     "react-native": "0.79.2",
     "react-native-gesture-handler": "^2.25.0",

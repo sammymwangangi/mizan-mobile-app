@@ -53,4 +53,7 @@ export type RootStackParamList = {
       amount: string;
       transactionId: string;
     };
+    Shop: undefined;
+    Checkout: undefined;
+    Payment: undefined;
   };
