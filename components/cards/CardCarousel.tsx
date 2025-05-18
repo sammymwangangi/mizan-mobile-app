@@ -102,7 +102,11 @@ const CardCarousel: React.FC<CardCarouselProps> = ({ cards, onCardChange }) => {
         }}
         contentContainerStyle={styles.scrollViewContent}
       >
-        {cards.map((item, index) => renderCard({ item, index }))}
+        {cards.map((item, index) => (
+          <View key={item.id || index.toString()}>
+            {renderCard({ item, index })}
+          </View>
+        ))}
       </ScrollView>
 
       {/* Pagination dots */}
