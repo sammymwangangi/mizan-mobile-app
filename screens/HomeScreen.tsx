@@ -636,6 +636,7 @@ const styles = StyleSheet.create({
   sectionContainer: {
     marginTop: 30,
     paddingHorizontal: SIZES.padding,
+    paddingBottom: 100,
   },
   sectionTitle: {
     ...FONTS.h3,
