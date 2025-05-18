@@ -36,6 +36,13 @@ import CardLinkingScreen from './screens/CardLinkingScreen';
 import CardLinkingBackScreen from './screens/CardLinkingBackScreen';
 import CardVerificationScreen from './screens/CardVerificationScreen';
 
+// Import M-PESA screens
+import MPESAScreen from './screens/MPESAScreen';
+import MPESARecipientScreen from './screens/MPESARecipientScreen';
+import MPESAAmountScreen from './screens/MPESAAmountScreen';
+import MPESAConfirmationScreen from './screens/MPESAConfirmationScreen';
+import MPESASuccessScreen from './screens/MPESASuccessScreen';
+
 // Import test component
 import './global.css';
 
@@ -69,6 +76,13 @@ function RootStack() {
       <Stack.Screen name="CardLinking" component={CardLinkingScreen} />
       <Stack.Screen name="CardLinkingBack" component={CardLinkingBackScreen} />
       <Stack.Screen name="CardVerification" component={CardVerificationScreen} />
+
+      {/* M-PESA Screens */}
+      <Stack.Screen name="MPESA" component={MPESAScreen} />
+      <Stack.Screen name="MPESARecipient" component={MPESARecipientScreen} />
+      <Stack.Screen name="MPESAAmount" component={MPESAAmountScreen} />
+      <Stack.Screen name="MPESAConfirmation" component={MPESAConfirmationScreen} />
+      <Stack.Screen name="MPESASuccess" component={MPESASuccessScreen} />
     </Stack.Navigator>
   );
 }

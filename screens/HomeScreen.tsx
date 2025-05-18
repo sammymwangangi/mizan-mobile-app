@@ -295,6 +295,8 @@ const HomeScreen = () => {
                 onPress={() => {
                   if (action.title === 'Cards') {
                     navigation.navigate('CardsDashboard');
+                  } else if (action.title === 'M-Pesa') {
+                    navigation.navigate('MPESA');
                   } else {
                     console.log(`${action.title} pressed`);
                   }

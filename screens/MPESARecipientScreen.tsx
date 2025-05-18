@@ -1,0 +1,302 @@
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  StatusBar,
+  Modal,
+} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation/types';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { COLORS, FONTS, SIZES } from '../constants/theme';
+import { ArrowLeft, Link, Building, UserPlus, UserCircle } from 'lucide-react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import SearchBar from '../components/mpesa/SearchBar';
+import AddContactSheet from '../components/mpesa/AddContactSheet';
+
+type MPESARecipientScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'MPESARecipient'>;
+
+const MPESARecipientScreen = () => {
+  const insets = useSafeAreaInsets();
+  const navigation = useNavigation<MPESARecipientScreenNavigationProp>();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showAddContactSheet, setShowAddContactSheet] = useState(false);
+
+  // Handle back button press
+  const handleBackPress = () => {
+    navigation.goBack();
+  };
+
+  // Handle search query change
+  const handleSearchChange = (text: string) => {
+    setSearchQuery(text);
+  };
+
+  // Handle payment link option
+  const handlePaymentLink = () => {
+    // Navigate to payment link screen
+    console.log('Payment link pressed');
+  };
+
+  // Handle bank recipient option
+  const handleBankRecipient = () => {
+    // Navigate to bank recipient screen
+    console.log('Bank recipient pressed');
+  };
+
+  // Handle invite friend option
+  const handleInviteFriend = () => {
+    // Navigate to invite friend screen
+    console.log('Invite friend pressed');
+  };
+
+  // Handle add contact option
+  const handleAddContact = () => {
+    setShowAddContactSheet(true);
+  };
+
+  // Handle add contact submit
+  const handleAddContactSubmit = (name: string, contact: string) => {
+    setShowAddContactSheet(false);
+    // In a real app, you would save the contact
+    console.log(`Contact added: ${name}, ${contact}`);
+    // Navigate to amount screen with the new contact
+    navigation.navigate('MPESAAmount', {
+      recipientName: name,
+      recipientPhone: contact
+    });
+  };
+
+  return (
+    <View style={styles.container}>
+      <StatusBar barStyle="dark-content" />
+
+      <SafeAreaView style={styles.safeArea}>
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
+            <ArrowLeft size={24} color={COLORS.text} />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Who to pay</Text>
+          <View style={{ width: 24 }} />
+        </View>
+
+        <ScrollView
+          style={styles.scrollView}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        >
+          {/* Search Bar */}
+          <SearchBar
+            value={searchQuery}
+            onChangeText={handleSearchChange}
+            placeholder="Search"
+          />
+
+          {/* Send Money Button */}
+          <TouchableOpacity
+            style={styles.sendMoneyButton}
+          >
+            <LinearGradient
+              colors={['#A276FF', '#8336E6']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.sendMoneyGradient}
+            >
+              <Text style={styles.sendMoneyText}>SEND MONEY</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          {/* Can't find message */}
+          <Text style={styles.cantFindText}>
+            Can't find who you are looking for?
+          </Text>
+
+          {/* New Section */}
+          <Text style={styles.sectionTitle}>New</Text>
+
+          {/* Options */}
+          <View style={styles.optionsContainer}>
+            {/* Create payment link */}
+            <TouchableOpacity
+              style={styles.optionButton}
+              onPress={handlePaymentLink}
+            >
+              <View style={styles.optionIconContainer}>
+                <Link size={24} color={COLORS.primary} />
+              </View>
+              <View style={styles.optionTextContainer}>
+                <Text style={styles.optionTitle}>Create payment link</Text>
+                <Text style={styles.optionSubtitle}>
+                  To make instant payments
+                </Text>
+              </View>
+            </TouchableOpacity>
+
+            {/* Add a bank recipient */}
+            <TouchableOpacity
+              style={styles.optionButton}
+              onPress={handleBankRecipient}
+            >
+              <View style={styles.optionIconContainer}>
+                <Building size={24} color={COLORS.primary} />
+              </View>
+              <View style={styles.optionTextContainer}>
+                <Text style={styles.optionTitle}>Add a bank recipient</Text>
+                <Text style={styles.optionSubtitle}>
+                  To make instant payments
+                </Text>
+              </View>
+            </TouchableOpacity>
+
+            {/* Invite a friend */}
+            <TouchableOpacity
+              style={styles.optionButton}
+              onPress={handleInviteFriend}
+            >
+              <View style={styles.optionIconContainer}>
+                <UserPlus size={24} color={COLORS.primary} />
+              </View>
+              <View style={styles.optionTextContainer}>
+                <Text style={styles.optionTitle}>Invite a friend</Text>
+                <Text style={styles.optionSubtitle}>
+                  To make instant payments
+                </Text>
+              </View>
+            </TouchableOpacity>
+
+            {/* Add a contact */}
+            <TouchableOpacity
+              style={styles.optionButton}
+              onPress={handleAddContact}
+            >
+              <View style={styles.optionIconContainer}>
+                <UserCircle size={24} color={COLORS.primary} />
+              </View>
+              <View style={styles.optionTextContainer}>
+                <Text style={styles.optionTitle}>Add a contact</Text>
+                <Text style={styles.optionSubtitle}>
+                  To make instant payments
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+
+      {/* Add Contact Bottom Sheet */}
+      <AddContactSheet
+        visible={showAddContactSheet}
+        onClose={() => setShowAddContactSheet(false)}
+        onSubmit={handleAddContactSubmit}
+      />
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  safeArea: {
+    flex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: SIZES.padding,
+    paddingVertical: 16,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  headerTitle: {
+    ...FONTS.h2,
+    color: COLORS.text,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingHorizontal: SIZES.padding,
+    paddingBottom: 30,
+  },
+  sendMoneyButton: {
+    marginTop: 20,
+    height: 56,
+    borderRadius: 28,
+    overflow: 'hidden',
+  },
+  sendMoneyGradient: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  sendMoneyText: {
+    ...FONTS.h3,
+    color: COLORS.textWhite,
+    fontWeight: '600',
+    letterSpacing: 1,
+  },
+  cantFindText: {
+    ...FONTS.body4,
+    color: COLORS.textLight,
+    marginTop: 20,
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  sectionTitle: {
+    ...FONTS.h3,
+    color: COLORS.text,
+    marginBottom: 15,
+  },
+  optionsContainer: {
+    marginBottom: 20,
+  },
+  optionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.card,
+    borderRadius: 15,
+    padding: 20,
+    marginBottom: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+    elevation: 2,
+  },
+  optionIconContainer: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: '#F0E6FF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 15,
+  },
+  optionTextContainer: {
+    flex: 1,
+  },
+  optionTitle: {
+    ...FONTS.h4,
+    color: COLORS.text,
+    marginBottom: 4,
+  },
+  optionSubtitle: {
+    ...FONTS.body5,
+    color: COLORS.textLight,
+  },
+});
+
+export default MPESARecipientScreen;
