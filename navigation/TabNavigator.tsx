@@ -11,18 +11,12 @@ import { LinearGradient } from 'expo-linear-gradient';
 import HomeScreen from '../screens/HomeScreen';
 import TransactionsScreen from '../screens/TransactionsScreen';
 import SubscriptionScreen from '../screens/SubscriptionScreen';
+import IslamicCornerScreen from '../screens/IslamicCornerScreen';
 
-// Define types for tab navigation
-type TabParamList = {
-  Home: undefined;
-  Transactions: undefined;
-  Reports: undefined;
-  IslamicCorner: undefined;
-  Support: undefined;
-};
+// Import tab navigation types
+import { TabParamList } from './types';
 
-// Placeholder screens for other tabs
-const IslamicCornerScreen = () => <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><Text>Islamic Corner Screen</Text></View>;
+// Placeholder screen for Support tab
 const SupportScreen = () => <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><Text>Support Screen</Text></View>;
 
 const Tab = createBottomTabNavigator<TabParamList>();

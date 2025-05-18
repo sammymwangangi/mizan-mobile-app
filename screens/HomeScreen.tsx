@@ -96,7 +96,7 @@ const HomeScreen = () => {
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.avatarContainer}
               onPress={() => navigation.navigate('Profile')}
             >
@@ -289,7 +289,17 @@ const HomeScreen = () => {
           {/* Quick Actions */}
           <View style={styles.quickActionsContainer}>
             {quickActions.map((action) => (
-              <TouchableOpacity key={action.id} style={styles.actionButton}>
+              <TouchableOpacity
+                key={action.id}
+                style={styles.actionButton}
+                onPress={() => {
+                  if (action.title === 'Cards') {
+                    navigation.navigate('CardsDashboard');
+                  } else {
+                    console.log(`${action.title} pressed`);
+                  }
+                }}
+              >
                 <View style={styles.actionIconContainer}>
                   <Image source={action.icon} style={styles.actionIcon} resizeMode="contain" />
                 </View>

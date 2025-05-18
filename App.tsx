@@ -28,6 +28,13 @@ import OTPScreen from './screens/OTPScreen';
 import KYCScreen from './screens/KYCScreen';
 import HomeScreen from './screens/HomeScreen';
 import ProfileScreen from './screens/ProfileScreen';
+import CampaignDetailsScreen from './screens/CampaignDetailsScreen';
+import DonationAmountScreen from './screens/DonationAmountScreen';
+import DonationConfirmationScreen from './screens/DonationConfirmationScreen';
+import CardsDashboardScreen from './screens/CardsDashboardScreen';
+import CardLinkingScreen from './screens/CardLinkingScreen';
+import CardLinkingBackScreen from './screens/CardLinkingBackScreen';
+import CardVerificationScreen from './screens/CardVerificationScreen';
 
 // Import test component
 import './global.css';
@@ -55,6 +62,13 @@ function RootStack() {
       <Stack.Screen name="KYC" component={KYCScreen} />
       <Stack.Screen name="Home" component={TabNavigator} />
       <Stack.Screen name="Profile" component={ProfileScreen} />
+      <Stack.Screen name="CampaignDetails" component={CampaignDetailsScreen} />
+      <Stack.Screen name="DonationAmount" component={DonationAmountScreen} />
+      <Stack.Screen name="DonationConfirmation" component={DonationConfirmationScreen} />
+      <Stack.Screen name="CardsDashboard" component={CardsDashboardScreen} />
+      <Stack.Screen name="CardLinking" component={CardLinkingScreen} />
+      <Stack.Screen name="CardLinkingBack" component={CardLinkingBackScreen} />
+      <Stack.Screen name="CardVerification" component={CardVerificationScreen} />
     </Stack.Navigator>
   );
 }
