@@ -29,6 +29,16 @@ export type RootStackParamList = {
     CardLinking: undefined;
     CardLinkingBack: undefined;
     CardVerification: undefined;
+    SendMoney: undefined;
+    SendMoneyConfirmation: {
+      recipientName: string;
+      amount: string;
+    };
+    SendMoneySuccess: {
+      recipientName: string;
+      amount: string;
+      transactionId: string;
+    };
     MPESA: undefined;
     MPESARecipient: undefined;
     MPESAAmount: { recipientId?: string; recipientName?: string; recipientPhone?: string };

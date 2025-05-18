@@ -36,6 +36,11 @@ import CardLinkingScreen from './screens/CardLinkingScreen';
 import CardLinkingBackScreen from './screens/CardLinkingBackScreen';
 import CardVerificationScreen from './screens/CardVerificationScreen';
 
+// Import SendMoney screens
+import SendMoneyScreen from './screens/SendMoneyScreen';
+import SendMoneyConfirmationScreen from './screens/SendMoneyConfirmationScreen';
+import SendMoneySuccessScreen from './screens/SendMoneySuccessScreen';
+
 // Import M-PESA screens
 import MPESAScreen from './screens/MPESAScreen';
 import MPESARecipientScreen from './screens/MPESARecipientScreen';
@@ -76,6 +81,11 @@ function RootStack() {
       <Stack.Screen name="CardLinking" component={CardLinkingScreen} />
       <Stack.Screen name="CardLinkingBack" component={CardLinkingBackScreen} />
       <Stack.Screen name="CardVerification" component={CardVerificationScreen} />
+
+      {/* SendMoney Screens */}
+      <Stack.Screen name="SendMoney" component={SendMoneyScreen} />
+      <Stack.Screen name="SendMoneyConfirmation" component={SendMoneyConfirmationScreen} />
+      <Stack.Screen name="SendMoneySuccess" component={SendMoneySuccessScreen} />
 
       {/* M-PESA Screens */}
       <Stack.Screen name="MPESA" component={MPESAScreen} />

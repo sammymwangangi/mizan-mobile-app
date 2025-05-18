@@ -297,6 +297,8 @@ const HomeScreen = () => {
                     navigation.navigate('CardsDashboard');
                   } else if (action.title === 'M-Pesa') {
                     navigation.navigate('MPESA');
+                  } else if (action.title === 'Send') {
+                    navigation.navigate('SendMoney');
                   } else {
                     console.log(`${action.title} pressed`);
                   }

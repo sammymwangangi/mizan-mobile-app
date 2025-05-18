@@ -36,7 +36,7 @@ const MPESAScreen = () => {
 
   // Handle send money button press
   const handleSendMoney = () => {
-    navigation.navigate('MPESARecipient');
+    navigation.navigate('MPESASend');
   };
 
   // Handle invite friend button press
