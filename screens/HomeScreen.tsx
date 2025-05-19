@@ -30,11 +30,26 @@ const HomeScreen = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<HomeScreenNavigationProp>();
 
-  // State for card pagination
-  const [activeCardIndex, setActiveCardIndex] = React.useState(0);
+  // State for card pagination - start with the Balance Card (index 1)
+  const [activeCardIndex, setActiveCardIndex] = React.useState(1);
 
   // Reference to the ScrollView
   const cardsScrollViewRef = React.useRef<ScrollView>(null);
+
+  // Scroll to the Balance Card (second card) when component mounts
+  React.useEffect(() => {
+    // Calculate the x position to scroll to (card width + margin)
+    const cardWidth = 320;
+    const cardMargin = 19; // Match the margin used in handlePaginationDotPress
+    const xOffset = activeCardIndex * (cardWidth + cardMargin);
+
+    // Add a small delay to ensure the ScrollView is properly rendered
+    const timer = setTimeout(() => {
+      cardsScrollViewRef.current?.scrollTo({ x: xOffset, animated: false });
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [activeCardIndex]);
 
   // Mock data
   const userData = {
