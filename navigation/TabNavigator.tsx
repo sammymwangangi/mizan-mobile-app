@@ -191,9 +191,11 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
                     resizeMode="contain"
                   />
                 )}
-                <Text style={[styles.tabLabel, isFocused ? styles.activeLabel : {}]}>
-                  {route.name}
-                </Text>
+                {isFocused && (
+                  <Text style={[styles.tabLabel, isFocused ? styles.activeLabel : {}]}>
+                    {route.name}
+                  </Text>
+                )}
               </View>
             </TouchableOpacity>
           );
@@ -241,12 +243,12 @@ const styles = StyleSheet.create({
   tabButton: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
     position: 'relative',
   },
   tabItem: {
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
   },
   activeTabContainer: {
     position: 'absolute',
