@@ -625,8 +625,10 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   sectionTitle: {
-    ...FONTS.h3,
-    color: COLORS.text,
+    fontFamily: "Poppins",
+    fontWeight: 'bold',
+    fontSize: 20,
+    color: "#1B1C39",
     marginBottom: 15,
   },
   promotionsGrid: {
@@ -656,7 +658,7 @@ const styles = StyleSheet.create({
   },
   promotionTitle: {
     fontFamily: 'Poppins',
-    fontWeight: '600',
+    fontWeight: 'bold',
     fontSize: 14,
     position: 'absolute',
     left: 10,
@@ -665,7 +667,7 @@ const styles = StyleSheet.create({
   },
   gradientText: {
     fontFamily: 'Poppins',
-    fontWeight: '600',
+    fontWeight: 'bold',
     fontSize: 14,
     position: 'absolute',
     left: 10,

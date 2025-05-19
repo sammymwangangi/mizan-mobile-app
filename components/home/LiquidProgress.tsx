@@ -142,7 +142,7 @@ const LiquidProgress: React.FC<Props> = ({
       <Svg width={svgSize} height={svgSize}>
         <Defs>
           {/* Two gradients for waves */}
-          <LinearGradient id="gradient1" x1="0%" y1="0%" x2="0%" y2="100%">
+          <LinearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="0%">
             {COLORS.gradient1.map((stop, i) => (
               <Stop
                 key={i}
@@ -152,7 +152,7 @@ const LiquidProgress: React.FC<Props> = ({
               />
             ))}
           </LinearGradient>
-          <LinearGradient id="gradient2" x1="0%" y1="0%" x2="0%" y2="100%">
+          <LinearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="0%">
             {COLORS.gradient2.map((stop, i) => (
               <Stop
                 key={i}
