@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -18,10 +18,14 @@ import GradientBackground from '../components/GradientBackground';
 import { formatCurrency } from '../utils';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Circle, G, Text as SvgText } from 'react-native-svg';
+import LiquidProgress from '../components/home/LiquidProgress';
+import CircularProgress from 'components/home/CircularProgress';
+import LiquidProgressCircle from 'components/LiquidProgressCircle';
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
 
 const HomeScreen = () => {
+  // const [value, setValue] = useState<number>(67);
   // Get safe area insets
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<HomeScreenNavigationProp>();
@@ -63,7 +67,7 @@ const HomeScreen = () => {
     setActiveCardIndex(index);
     // Calculate the x position to scroll to (card width + margin)
     const cardWidth = 320;
-    const cardMargin = 15;
+    const cardMargin = 19;
     const xOffset = index * (cardWidth + cardMargin);
 
     // Scroll to the selected card
@@ -142,13 +146,13 @@ const HomeScreen = () => {
               <View style={styles.card}>
                 <View style={styles.cardContent}>
                   <View style={styles.chartContainer}>
-                    <Svg height="120" width="120" viewBox="0 0 100 100">
+                    <Svg height="130" width="120" viewBox="0 0 100 100">
                       <Circle
                         cx="50"
                         cy="50"
                         r="45"
                         stroke="#E6E6FF"
-                        strokeWidth="10"
+                        strokeWidth="5"
                         fill="transparent"
                       />
                       <Circle
@@ -156,7 +160,7 @@ const HomeScreen = () => {
                         cy="50"
                         r="45"
                         stroke="#8A2BE2"
-                        strokeWidth="10"
+                        strokeWidth="5"
                         fill="transparent"
                         strokeDasharray={`${2 * Math.PI * 45 * 0.67} ${2 * Math.PI * 45 * (1 - 0.67)}`}
                         strokeDashoffset={2 * Math.PI * 45 * 0.25}
@@ -178,50 +182,10 @@ const HomeScreen = () => {
               {/* Balance Card */}
               <View style={styles.card}>
                 <View style={styles.cardContent}>
-                  <View style={styles.progressContainer}>
-                    <Svg height="120" width="120" viewBox="0 0 100 100">
-                      <Circle
-                        cx="50"
-                        cy="50"
-                        r="45"
-                        stroke="#E6E6FF"
-                        strokeWidth="10"
-                        fill="transparent"
-                      />
-                      <Circle
-                        cx="50"
-                        cy="50"
-                        r="45"
-                        stroke="#CE72E3"
-                        strokeWidth="10"
-                        fill="transparent"
-                        strokeDasharray={`${2 * Math.PI * 45 * 0.67} ${2 * Math.PI * 45 * (1 - 0.67)}`}
-                        strokeDashoffset={2 * Math.PI * 45 * 0.25}
-                        strokeLinecap="round"
-                      />
-                      <G>
-                        <SvgText
-                          x="50"
-                          y="45"
-                          fontSize="16"
-                          fontWeight="bold"
-                          fill="#8A2BE2"
-                          textAnchor="middle"
-                        >
-                          67%
-                        </SvgText>
-                        <SvgText
-                          x="50"
-                          y="65"
-                          fontSize="10"
-                          fill="#666666"
-                          textAnchor="middle"
-                        >
-                          next milestone
-                        </SvgText>
-                      </G>
-                    </Svg>
+                  <View style={{ flex: 1, justifyContent: 'center' }}>
+                    <LiquidProgress value={67} size={136} />
                   </View>
+
 
                   <View style={styles.balanceInfo}>
                     <Text style={styles.balanceLabel}>Bank Balance</Text>
@@ -481,7 +445,7 @@ const styles = StyleSheet.create({
   chartContainer: {
     position: 'relative',
     width: 120,
-    height: 120,
+    height: 130,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -492,19 +456,21 @@ const styles = StyleSheet.create({
   },
   chartPercentage: {
     ...FONTS.h2,
-    color: COLORS.primary,
+    color: "#1B1C39",
     fontWeight: 'bold',
   },
   chartLabel: {
     ...FONTS.body4,
-    color: '#4CAF50',
+    color: '#28B661',
   },
   cardTextContainer: {
+    flex: 1,
     justifyContent: 'center',
+    marginLeft: 20,
   },
   cardTitle: {
     ...FONTS.body3,
-    color: COLORS.textLight,
+    color: "#6D6E8A",
     marginBottom: 5,
   },
   cardValue: {
@@ -513,7 +479,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   balanceInfo: {
-    flex: 1,
+    justifyContent: 'center',
   },
   balanceLabel: {
     ...FONTS.body4,

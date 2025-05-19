@@ -13,32 +13,32 @@ import Animated, {
   useAnimatedProps,
   withRepeat,
   withTiming,
+  withSpring,
 } from 'react-native-reanimated';
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 interface Props {
   value: number; // 0-100
   size?: number;
 }
 
-const CIRCLE_SIZE = 220;
-const WAVE_AMPLITUDE_1 = 18;
-const WAVE_AMPLITUDE_2 = 12;
-const WAVE_FREQUENCY_1 = 1.7;
-const WAVE_FREQUENCY_2 = 2.2;
+const CIRCLE_SIZE = 136;
+const WAVE_AMPLITUDE_1 = 12;
+const WAVE_AMPLITUDE_2 = 10;
+const WAVE_FREQUENCY_1 = 1.2;
+const WAVE_FREQUENCY_2 = 1.2;
 
 const COLORS = {
-  background: '#E7E3F2',
+  background: '#EADFFB',
   gradient1: [
-    { offset: '17.19%', color: '#8BB4F2', opacity: 1 },
-    { offset: '46.46%', color: '#974BEB', opacity: 0.887 },
-    { offset: '73.61%', color: '#DE52D0', opacity: 0.76 },
+    { offset: '0%', color: '#FF7AE2', opacity: 1 },
+    { offset: '100%', color: '#AC68FF', opacity: 1 },
   ],
   gradient2: [
-    { offset: '16.85%', color: '#8BB4F2', opacity: 1 },
-    { offset: '47.47%', color: '#974BEB', opacity: 0.887 },
-    { offset: '75.89%', color: '#DE52D0', opacity: 0.76 },
+    { offset: '0%', color: '#AC68FF', opacity: 1 },
+    { offset: '100%', color: '#FF7AE2', opacity: 1 },
   ],
 };
 
@@ -66,15 +66,22 @@ function getWavePath(
   return path;
 }
 
-const LiquidProgressCircle: React.FC<Props> = ({
+const LiquidProgress: React.FC<Props> = ({
   value,
   size = CIRCLE_SIZE,
 }) => {
+  const halfSize = size / 2;
+  const strokeWidth = 3; // Stroke width of the progress ring
+  const radius = halfSize + 5; // Radius for the progress ring (to create a gap)
+  const circumference = 2 * Math.PI * radius;
+
   // Shared values for animation
   const phase1 = useSharedValue(0);
   const phase2 = useSharedValue(Math.PI); // offset phase for 2nd wave
+  const progress = useSharedValue(0); // For the progress ring animation
 
   useEffect(() => {
+    // Animate the waves
     phase1.value = withRepeat(
       withTiming(2 * Math.PI, { duration: 3200 }),
       -1,
@@ -85,7 +92,9 @@ const LiquidProgressCircle: React.FC<Props> = ({
       -1,
       false
     );
-  }, [phase1, phase2]);
+    // Animate the progress ring to the target value
+    progress.value = withSpring(value, { damping: 20, stiffness: 100 });
+  }, [phase1, phase2, progress, value]);
 
   const animatedProps1 = useAnimatedProps(() => {
     'worklet';
@@ -113,12 +122,21 @@ const LiquidProgressCircle: React.FC<Props> = ({
     };
   });
 
+  // Animate the strokeDashoffset for the progress ring
+  const progressProps = useAnimatedProps(() => {
+    'worklet';
+    const dashOffset = circumference * (1 - progress.value / 100);
+    return {
+      strokeDashoffset: dashOffset,
+    };
+  });
+
   return (
     <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
       <Svg width={size} height={size}>
         <Defs>
           {/* Two gradients for waves */}
-          <LinearGradient id="gradient1" x1="0" y1="0" x2="0" y2={size}>
+          <LinearGradient id="gradient1" x1="0%" y1="0%" x2="0%" y2="100%">
             {COLORS.gradient1.map((stop, i) => (
               <Stop
                 key={i}
@@ -128,7 +146,7 @@ const LiquidProgressCircle: React.FC<Props> = ({
               />
             ))}
           </LinearGradient>
-          <LinearGradient id="gradient2" x1="0" y1="0" x2="0" y2={size}>
+          <LinearGradient id="gradient2" x1="0%" y1="0%" x2="0%" y2="100%">
             {COLORS.gradient2.map((stop, i) => (
               <Stop
                 key={i}
@@ -141,18 +159,32 @@ const LiquidProgressCircle: React.FC<Props> = ({
           {/* ClipPath for circle */}
           <ClipPath id="clip">
             <Circle
-              cx={size / 2}
-              cy={size / 2}
-              r={size / 2}
+              cx={halfSize}
+              cy={halfSize}
+              r={halfSize}
             />
           </ClipPath>
         </Defs>
         {/* Main background circle */}
         <Circle
-          cx={size / 2}
-          cy={size / 2}
-          r={size / 2}
+          cx={halfSize}
+          cy={halfSize}
+          r={halfSize}
           fill={COLORS.background}
+        />
+        {/* Circular stroke - animated to show progress */}
+        <AnimatedCircle
+          cx={halfSize}
+          cy={halfSize}
+          r={radius}
+          fill="none"
+          stroke="#6A0DAD"
+          strokeWidth={strokeWidth}
+          strokeDasharray={circumference}
+          strokeDashoffset={circumference} // Will be animated
+          strokeLinecap="round"
+          transform={`rotate(-90 ${halfSize} ${halfSize})`} // Start from the top
+          animatedProps={progressProps}
         />
         {/* Animated waves, clipped to circle */}
         <AnimatedPath
@@ -164,13 +196,14 @@ const LiquidProgressCircle: React.FC<Props> = ({
           animatedProps={animatedProps2}
           fill="url(#gradient2)"
           clipPath="url(#clip)"
-          opacity={0.82}
+          opacity={0.85}
         />
       </Svg>
       {/* Percentage Text */}
-      <View style={StyleSheet.absoluteFillObject} pointerEvents="none" >
+      <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
         <View style={styles.textContainer}>
           <Text style={styles.percentText}>{`${Math.round(value)}%`}</Text>
+          <Text style={styles.labelText}>next milestone</Text>
         </View>
       </View>
     </View>
@@ -184,13 +217,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   percentText: {
-    fontSize: 48,
+    fontSize: 20,
     fontWeight: 'bold',
     color: 'white',
     textShadowColor: '#0001',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
   },
+  labelText: {
+    fontSize: 9,
+    fontWeight: '500',
+    color: 'white',
+  },
 });
 
-export default LiquidProgressCircle;
+export default LiquidProgress;

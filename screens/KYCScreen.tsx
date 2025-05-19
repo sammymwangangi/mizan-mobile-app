@@ -606,18 +606,18 @@ const KYCScreen: React.FC = () => {
         <Text style={styles.stepTitle}>Your financial exposure</Text>
 
         <View style={styles.container}>
-      <LiquidProgressCircle value={value} size={220} />
-      <Slider
-        style={{ width: 250, marginTop: 40 }}
-        minimumValue={0}
-        maximumValue={100}
-        value={value}
-        onValueChange={setValue}
-        minimumTrackTintColor="#974BEB"
-        maximumTrackTintColor="#ddd"
-        thumbTintColor="#974BEB"
-      />
-    </View>
+          <LiquidProgressCircle value={value} size={220} />
+          <Slider
+            style={{ width: 250, marginTop: 40 }}
+            minimumValue={0}
+            maximumValue={100}
+            value={value}
+            onValueChange={setValue}
+            minimumTrackTintColor="#974BEB"
+            maximumTrackTintColor="#ddd"
+            thumbTintColor="#974BEB"
+          />
+        </View>
         <View style={styles.exposureContainer}>
           {/* <View style={styles.exposureCircle}>
             <Text style={styles.exposureValue}>{financialExposure}%</Text>
