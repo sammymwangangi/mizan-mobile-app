@@ -95,9 +95,9 @@ const HomeScreen = () => {
 
       {/* Gradient Background */}
       <GradientBackground
-        colors={['#8C5FED', '#8C5FED', '#CE72E3']}
-        start={{ x: 0, y: 0.3 }}
-        end={{ x: 1.4, y: 0.5 }}
+        colors={['#CE72E3', '#8C5FED', '#8C5FED' ]}
+        start={{ x: 1, y: 0}}
+        end={{ x: 1, y: 0 }}
         style={{
           ...styles.headerBackground,
           paddingTop: insets.top
@@ -229,7 +229,7 @@ const HomeScreen = () => {
                     </Text>
                     <TouchableOpacity style={styles.upgradeButtonContainer}>
                       <LinearGradient
-                        colors={['#CE72E3', '#8A2BE2']}
+                        colors={['#F053E0', '#8532E0', '#5592EF']}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 0 }}
                         style={styles.upgradeButton}
@@ -353,7 +353,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 0,
     top: 0,
-    opacity: 0.2,
+    opacity: 0.7,
   },
   safeArea: {
     flex: 1,
@@ -374,11 +374,11 @@ const styles = StyleSheet.create({
     width: 69.48,
     height: 69.48,
     borderRadius: 50,
-    backgroundColor: '#6B3BA6',
+    backgroundColor: '#6B3BA650',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 15,
-    opacity: 0.9,
+    opacity: 1,
   },
   avatar: {
     width: 46,
@@ -390,22 +390,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   welcomeText: {
-    ...FONTS.body5,
+    ...FONTS.h3,
     color: COLORS.textWhite,
-    opacity: 0.8,
-    fontSize: 16,
+    fontWeight: 'bold',
+    fontSize: 14,
   },
   userName: {
     ...FONTS.h3,
     color: COLORS.textWhite,
-    fontSize: 20,
+    fontSize: 14,
     fontWeight: 'bold',
   },
   planText: {
     ...FONTS.body5,
     color: COLORS.textWhite,
-    opacity: 0.8,
-    fontSize: 16,
+    fontSize: 12,
     marginTop: 5,
   },
   notificationButton: {
@@ -424,7 +423,7 @@ const styles = StyleSheet.create({
     borderRadius: 5.5,
     backgroundColor: 'red',
     position: 'absolute',
-    top: 8,
+    top: -2,
     right: 8,
   },
   scrollContent: {
@@ -443,11 +442,11 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     backgroundColor: COLORS.card,
     marginRight: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowColor: '#6943AF',
+    shadowOffset: { width: 0, height: 20 },
     shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
+    shadowRadius: 40,
+    elevation: 15,
     position: 'relative',
     overflow: 'hidden',
   },
@@ -551,9 +550,9 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   upgradeButton: {
-    paddingVertical: 12,
+    paddingVertical: 16,
     paddingHorizontal: 15,
-    borderRadius: 25,
+    borderRadius: 40,
     alignItems: 'center',
     justifyContent: 'center',
     width: 280,
@@ -602,10 +601,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     shadowColor: '#6943AF',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: 20 },
     shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 3,
+    shadowRadius: 40,
+    elevation: 15,
   },
   actionIconContainer: {
     marginRight: 12,
@@ -642,6 +641,11 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     overflow: 'hidden',
     position: 'relative',
+    shadowColor: '#6943AF',
+    shadowOffset: { width: 0, height: 20 },
+    shadowOpacity: 0.1,
+    shadowRadius: 40,
+    elevation: 15,
   },
   promotionBackground: {
     position: 'absolute',
