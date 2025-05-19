@@ -24,7 +24,7 @@ interface Props {
   size?: number;
 }
 
-const CIRCLE_SIZE = 136;
+const CIRCLE_SIZE = 150;
 const WAVE_AMPLITUDE_1 = 12;
 const WAVE_AMPLITUDE_2 = 10;
 const WAVE_FREQUENCY_1 = 1.2;
@@ -47,22 +47,23 @@ function getWavePath(
   phase: number,
   amplitude: number,
   frequency: number,
-  size: number
+  size: number,
+  offset: number
 ): string {
   'worklet';
   const width = size;
   const height = size;
   const waveHeight = height * (1 - percentage / 100);
 
-  let path = `M0,${waveHeight}`;
+  let path = `M${offset},${waveHeight + offset}`;
   for (let i = 0; i <= width; i++) {
     const y =
       waveHeight +
       amplitude * Math.sin(((i / width) * Math.PI * 2 * frequency) + phase);
-    path += ` L${i},${y}`;
+    path += ` L${i + offset},${y + offset}`;
   }
-  path += ` L${width},${height}`;
-  path += ` L0,${height} Z`;
+  path += ` L${width + offset},${height + offset}`;
+  path += ` L${offset},${height + offset} Z`;
   return path;
 }
 
@@ -74,6 +75,9 @@ const LiquidProgress: React.FC<Props> = ({
   const strokeWidth = 3; // Stroke width of the progress ring
   const radius = halfSize + 5; // Radius for the progress ring (to create a gap)
   const circumference = 2 * Math.PI * radius;
+  const padding = strokeWidth + 5; // Extra padding to account for stroke width and gap
+  const svgSize = size + 2 * padding; // Increase SVG size to fit the circle and stroke
+  const offset = padding; // Offset to center content within larger SVG
 
   // Shared values for animation
   const phase1 = useSharedValue(0);
@@ -104,7 +108,8 @@ const LiquidProgress: React.FC<Props> = ({
         phase1.value,
         WAVE_AMPLITUDE_1,
         WAVE_FREQUENCY_1,
-        size
+        size,
+        offset
       ),
     };
   });
@@ -117,7 +122,8 @@ const LiquidProgress: React.FC<Props> = ({
         phase2.value,
         WAVE_AMPLITUDE_2,
         WAVE_FREQUENCY_2,
-        size
+        size,
+        offset
       ),
     };
   });
@@ -132,8 +138,8 @@ const LiquidProgress: React.FC<Props> = ({
   });
 
   return (
-    <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
-      <Svg width={size} height={size}>
+    <View style={{ width: svgSize, height: svgSize, alignItems: 'center', justifyContent: 'center' }}>
+      <Svg width={svgSize} height={svgSize}>
         <Defs>
           {/* Two gradients for waves */}
           <LinearGradient id="gradient1" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -159,31 +165,31 @@ const LiquidProgress: React.FC<Props> = ({
           {/* ClipPath for circle */}
           <ClipPath id="clip">
             <Circle
-              cx={halfSize}
-              cy={halfSize}
+              cx={halfSize + offset}
+              cy={halfSize + offset}
               r={halfSize}
             />
           </ClipPath>
         </Defs>
         {/* Main background circle */}
         <Circle
-          cx={halfSize}
-          cy={halfSize}
+          cx={halfSize + offset}
+          cy={halfSize + offset}
           r={halfSize}
           fill={COLORS.background}
         />
         {/* Circular stroke - animated to show progress */}
         <AnimatedCircle
-          cx={halfSize}
-          cy={halfSize}
+          cx={halfSize + offset}
+          cy={halfSize + offset}
           r={radius}
           fill="none"
-          stroke="#6A0DAD"
+          stroke="#6B3BA6"
           strokeWidth={strokeWidth}
           strokeDasharray={circumference}
           strokeDashoffset={circumference} // Will be animated
           strokeLinecap="round"
-          transform={`rotate(-90 ${halfSize} ${halfSize})`} // Start from the top
+          transform={`rotate(-90 ${halfSize + offset} ${halfSize + offset})`} // Start from the top
           animatedProps={progressProps}
         />
         {/* Animated waves, clipped to circle */}

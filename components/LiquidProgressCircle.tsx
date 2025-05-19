@@ -30,15 +30,16 @@ const WAVE_FREQUENCY_2 = 2.2;
 
 const COLORS = {
   background: '#E7E3F2',
+  
   gradient1: [
-    { offset: '17.19%', color: '#8BB4F2', opacity: 1 },
-    { offset: '46.46%', color: '#974BEB', opacity: 0.887 },
-    { offset: '73.61%', color: '#DE52D0', opacity: 0.76 },
+    { offset: '0%', color: '#8BB4F2', opacity: 1 },
+    { offset: '50%', color: '#974BEB', opacity: 0.5 },
+    { offset: '100%', color: '#DE52D0', opacity: 0.5 },
   ],
   gradient2: [
-    { offset: '16.85%', color: '#8BB4F2', opacity: 1 },
-    { offset: '47.47%', color: '#974BEB', opacity: 0.887 },
-    { offset: '75.89%', color: '#DE52D0', opacity: 0.76 },
+    { offset: '0%', color: '#8BB4F2', opacity: 1 },
+    { offset: '50%', color: '#974BEB', opacity: 0.5 },
+    { offset: '100%', color: '#DE52D0', opacity: 0.5 },
   ],
 };
 
@@ -118,7 +119,7 @@ const LiquidProgressCircle: React.FC<Props> = ({
       <Svg width={size} height={size}>
         <Defs>
           {/* Two gradients for waves */}
-          <LinearGradient id="gradient1" x1="0" y1="0" x2="0" y2={size}>
+          <LinearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="0%">
             {COLORS.gradient1.map((stop, i) => (
               <Stop
                 key={i}
@@ -128,7 +129,7 @@ const LiquidProgressCircle: React.FC<Props> = ({
               />
             ))}
           </LinearGradient>
-          <LinearGradient id="gradient2" x1="0" y1="0" x2="0" y2={size}>
+          <LinearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="0%">
             {COLORS.gradient2.map((stop, i) => (
               <Stop
                 key={i}

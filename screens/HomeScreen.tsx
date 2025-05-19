@@ -198,7 +198,7 @@ const HomeScreen = () => {
               <View style={styles.card}>
                 <View style={styles.cardContent}>
                   <View style={{ flex: 1, justifyContent: 'center' }}>
-                    <LiquidProgress value={67} size={136} />
+                    <LiquidProgress value={67} size={150} />
                   </View>
 
 
