@@ -20,9 +20,6 @@ import { ChevronDown } from 'lucide-react-native';
 // @ts-ignore - Ignore the missing type declaration file
 import MaskedView from '@react-native-masked-view/masked-view';
 
-
-
-
 type PhoneNumberScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'PhoneNumber'>;
 
 const PhoneNumberScreen = () => {
@@ -75,9 +72,6 @@ const PhoneNumberScreen = () => {
         resizeMode="cover"
       />
 
-
-
-
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -85,7 +79,6 @@ const PhoneNumberScreen = () => {
         <View style={styles.contentContainer}>
           {/* Gradient Title */}
           {gradientText}
-
 
           {/* Subtitle */}
           <Text style={styles.subtitleText}>
@@ -126,22 +119,27 @@ const PhoneNumberScreen = () => {
           </View>
 
           {/* Submit Button */}
-          <TouchableOpacity onPress={handleSubmit} style={styles.submitButtonContainer}>
-            <LinearGradient
-              colors={['#D155FF', '#B532F2', '#A016E8', '#9406E2', '#8F00E0', '#921BE6', '#A08CFF']}
-              locations={[0, 0.15, 0.3, 0.45, 0.6, 0.75, 1]}
-              start={{ x: 0, y: 0.5 }}
-              end={{ x: 1, y: 0.5 }}
-              style={styles.submitButton}
-            >
-              <Text style={styles.submitButtonText}>SIGN-UP</Text>
-            </LinearGradient>
-          </TouchableOpacity>
+          <View style={styles.submitButtonWrapper}>
+            <TouchableOpacity onPress={handleSubmit} style={styles.submitButtonContainer}>
+              <LinearGradient
+                colors={['#D155FF', '#B532F2', '#A016E8', '#9406E2', '#8F00E0', '#921BE6', '#A08CFF']}
+                locations={[0, 0.15, 0.3, 0.45, 0.6, 0.75, 1]}
+                start={{ x: 0, y: 0.5 }}
+                end={{ x: 1, y: 0.5 }}
+                style={styles.submitButton}
+              >
+                <Text style={styles.submitButtonText}>SIGN-UP</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
 
-          {/* Sign In Link */}
-          <TouchableOpacity onPress={handleSignIn} style={styles.signInContainer}>
-            <Text style={styles.signInText}>I have another account</Text>
-          </TouchableOpacity>
+          {/* Sign In Link with dotted underline */}
+          <View style={styles.signInContainer}>
+            <TouchableOpacity onPress={handleSignIn}>
+              <Text style={styles.signInText}>I have another account</Text>
+              <View style={styles.dottedUnderline} />
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -183,7 +181,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 40,
     paddingHorizontal: 40,
-
   },
   inputContainer: {
     flexDirection: 'row',
@@ -240,7 +237,7 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     paddingHorizontal: 15,
     backgroundColor: '#FFFFFF',
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   phoneInput: {
     ...FONTS.medium(16),
@@ -262,20 +259,26 @@ const styles = StyleSheet.create({
   activeDot: {
     backgroundColor: COLORS.primary,
   },
-  submitButtonContainer: {
-    marginBottom: 20,
+
+  submitButtonWrapper: {
     shadowColor: '#391A73',
     shadowOffset: { width: 0, height: 15 },
-    shadowOpacity: 0.26,
+    shadowOpacity: 0.1,
     shadowRadius: 30,
-    elevation: 15, // For Android
+    elevation: 15,
+    marginBottom: 20,
+    backgroundColor: 'transparent',
+  },
+
+  submitButtonContainer: {
+    marginBottom: 20,
   },
   submitButton: {
     height: 55,
-    width: 340,
     borderRadius: 40,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'transparent',
   },
   submitButtonText: {
     color: 'white',
@@ -285,11 +288,19 @@ const styles = StyleSheet.create({
   signInContainer: {
     alignItems: 'center',
     marginBottom: 30,
+    // overflow: 'hidden'
   },
   signInText: {
     ...FONTS.body4,
-    color: COLORS.primary,
-    textDecorationLine: 'underline',
+    color: '#6D6E8A',
+  },
+  dottedUnderline: {
+    height: 1,
+    marginTop: 5,
+    borderRadius: 0.005,
+    borderStyle: 'dashed',
+    borderWidth: 1,
+    borderColor: '#6D6E8A',
   },
 });
 
