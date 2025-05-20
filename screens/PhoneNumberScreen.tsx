@@ -20,6 +20,9 @@ import { ChevronDown } from 'lucide-react-native';
 // @ts-ignore - Ignore the missing type declaration file
 import MaskedView from '@react-native-masked-view/masked-view';
 
+
+
+
 type PhoneNumberScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'PhoneNumber'>;
 
 const PhoneNumberScreen = () => {
@@ -38,27 +41,27 @@ const PhoneNumberScreen = () => {
   };
 
   const gradientText = (
-      <View style={{ padding: 20 }}>
-        <MaskedView
-          style={{ height: 90, width: 300 }}
-          maskElement={
-            <View style={{ flex: 1, backgroundColor: 'transparent', justifyContent: 'center', alignItems: 'center' }}>
-              <Text style={{...FONTS.body1, textAlign: 'center' }}>
+    <View style={{ padding: 20 }}>
+      <MaskedView
+        style={{ height: 90, width: 300 }}
+        maskElement={
+          <View style={{ flex: 1, backgroundColor: 'transparent', justifyContent: 'center', alignItems: 'center' }}>
+            <Text style={{ ...FONTS.body1, textAlign: 'center' }}>
               Powerhouse - Shariah Finance, Begins Now
-              </Text>
-            </View>
-          }
-        >
-          <LinearGradient
-            colors={['#80B2FF', '#7C27D9', '#FF68F0']}
-            locations={[0, 0.7155, 1]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 0, y: 1 }}
-            style={{ flex: 1 }}
-          />
-        </MaskedView>
-      </View>
-    );
+            </Text>
+          </View>
+        }
+      >
+        <LinearGradient
+          colors={['#80B2FF', '#7C27D9', '#FF68F0']}
+          locations={[0, 0.7155, 1]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
+          style={{ flex: 1 }}
+        />
+      </MaskedView>
+    </View>
+  );
 
   return (
     <KeyboardAvoidingView
@@ -71,6 +74,9 @@ const PhoneNumberScreen = () => {
         style={styles.patternImage}
         resizeMode="cover"
       />
+
+
+
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
@@ -92,7 +98,7 @@ const PhoneNumberScreen = () => {
             <TouchableOpacity style={styles.countryCodeContainer}>
               <View style={styles.flagContainer}>
                 <Image
-                  source={require('../assets/kyc/kenya-flag.png')}
+                  source={require('../assets/emirates.png')}
                   style={styles.flagIcon}
                   resizeMode="contain"
                 />
@@ -143,7 +149,7 @@ const styles = StyleSheet.create({
   },
   patternImage: {
     width: '100%',
-    height: 300,
+    height: 330,
   },
   scrollContent: {
     flexGrow: 1,
