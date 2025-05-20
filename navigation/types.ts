@@ -56,4 +56,5 @@ export type RootStackParamList = {
     Shop: undefined;
     Checkout: undefined;
     Payment: undefined;
+    FontDemo: undefined; // Added for font system demo
   };

@@ -1,6 +1,27 @@
-import { Dimensions, Platform } from 'react-native';
+
+import { Dimensions, Platform, TextStyle } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
+
+// Font family mapping for different weights
+export const FONT_FAMILY = {
+  regular: 'Poppins',
+  medium: 'Poppins_500Medium',
+  semibold: 'Poppins_600SemiBold',
+  bold: 'Poppins_700Bold',
+  black: 'Poppins_900Black',
+};
+
+// Helper function to get the correct font family based on weight
+export const getFontFamily = (weight?: '400' | '500' | '600' | '700' | '900'): string => {
+  switch (weight) {
+    case '500': return FONT_FAMILY.medium;
+    case '600': return FONT_FAMILY.semibold;
+    case '700': return FONT_FAMILY.bold;
+    case '900': return FONT_FAMILY.black;
+    default: return FONT_FAMILY.regular;
+  }
+};
 
 export const COLORS = {
   // Primary colors
@@ -12,11 +33,11 @@ export const COLORS = {
   secondary: '#FF6B6B', // Accent color
 
   // Background colors
-  background: '#F5F5F8', // Light background
+  background: '#FFFFFF', // Light background
   card: '#FFFFFF', // Card background
 
   // Text colors
-  text: '#333333', // Primary text
+  text: '#1B1C39', // Primary text
   textLight: '#666666', // Secondary text
   textDark: '#000000', // Dark text
   textWhite: '#FFFFFF', // White text
@@ -37,7 +58,7 @@ export const COLORS = {
   // Other colors
   border: '#E0E0E0',
   disabled: '#BDBDBD',
-  placeholder: '#9E9E9E',
+  placeholder: '#B3B4CE',
 
   // Specific UI elements
   progressBar: '#E91E63',
@@ -69,18 +90,73 @@ export const SIZES = {
   height,
 };
 
+// Helper function to create font styles with proper weight mapping
+export const createFontStyle = (
+  size: number,
+  weight: '400' | '500' | '600' | '700' | '900' = '400',
+  lineHeight?: number
+): TextStyle => {
+  return {
+    fontFamily: getFontFamily(weight),
+    fontSize: size,
+    ...(lineHeight ? { lineHeight } : {}),
+  };
+};
+
 export const FONTS = {
-  largeTitle: { fontFamily: 'Poppins', fontSize: SIZES.largeTitle, lineHeight: 40 },
-  h1: { fontFamily: 'Poppins', fontSize: SIZES.h1, lineHeight: 36, fontWeight: '700' as const },
-  h2: { fontFamily: 'Poppins', fontSize: SIZES.h2, lineHeight: 30, fontWeight: '700' as const },
-  h3: { fontFamily: 'Poppins', fontSize: SIZES.h3, lineHeight: 22, fontWeight: '700' as const },
-  h4: { fontFamily: 'Poppins', fontSize: SIZES.h4, lineHeight: 20, fontWeight: '700' as const },
-  h5: { fontFamily: 'Poppins', fontSize: SIZES.h5, lineHeight: 18, fontWeight: '700' as const },
-  body1: { fontFamily: 'Poppins', fontSize: SIZES.body1, lineHeight: 36 },
-  body2: { fontFamily: 'Poppins', fontSize: SIZES.body2, lineHeight: 30 },
-  body3: { fontFamily: 'Poppins', fontSize: SIZES.body3, lineHeight: 22 },
-  body4: { fontFamily: 'Poppins', fontSize: SIZES.body4, lineHeight: 20 },
-  body5: { fontFamily: 'Poppins', fontSize: SIZES.body5, lineHeight: 18 },
+  // Base styles with regular weight (400)
+  largeTitle: { fontFamily: FONT_FAMILY.regular, fontSize: SIZES.largeTitle, lineHeight: 40 },
+  h1: { fontFamily: FONT_FAMILY.bold, fontSize: SIZES.h1, lineHeight: 36 },
+  h2: { fontFamily: FONT_FAMILY.bold, fontSize: SIZES.h2, lineHeight: 30 },
+  h3: { fontFamily: FONT_FAMILY.bold, fontSize: SIZES.h3, lineHeight: 22 },
+  h4: { fontFamily: FONT_FAMILY.bold, fontSize: SIZES.h4, lineHeight: 20 },
+  h5: { fontFamily: FONT_FAMILY.bold, fontSize: SIZES.h5, lineHeight: 18 },
+  body1: { fontFamily: FONT_FAMILY.regular, fontSize: SIZES.body1, lineHeight: 36 },
+  body2: { fontFamily: FONT_FAMILY.regular, fontSize: SIZES.body2, lineHeight: 30 },
+  body3: { fontFamily: FONT_FAMILY.regular, fontSize: SIZES.body3, lineHeight: 22 },
+  body4: { fontFamily: FONT_FAMILY.regular, fontSize: SIZES.body4, lineHeight: 20 },
+  body5: { fontFamily: FONT_FAMILY.regular, fontSize: SIZES.body5, lineHeight: 18 },
+
+  // Helper method to get font style with specific weight
+  // Usage: {...FONTS.weight('600', 'body3')} or {...FONTS.weight('600', 16, 22)}
+  weight: (
+    weight: '400' | '500' | '600' | '700' | '900',
+    sizeOrType: number | keyof typeof SIZES | 'body1' | 'body2' | 'body3' | 'body4' | 'body5' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'largeTitle',
+    lineHeight?: number
+  ): TextStyle => {
+    // If sizeOrType is a string (predefined size name)
+    if (typeof sizeOrType === 'string') {
+      if (sizeOrType in SIZES) {
+        // If it's a SIZES key
+        return createFontStyle(SIZES[sizeOrType as keyof typeof SIZES], weight, lineHeight);
+      } else {
+        // If it's a predefined font style (body1, h1, etc.)
+        const baseStyle = FONTS[sizeOrType as keyof typeof FONTS] as TextStyle;
+        return {
+          ...baseStyle,
+          fontFamily: getFontFamily(weight),
+        };
+      }
+    }
+    // If sizeOrType is a number (custom font size)
+    return createFontStyle(sizeOrType, weight, lineHeight);
+  },
+
+  // Convenience methods for specific weights
+  medium: (
+    sizeOrType: number | keyof typeof SIZES | 'body1' | 'body2' | 'body3' | 'body4' | 'body5' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'largeTitle',
+    lineHeight?: number
+  ): TextStyle => FONTS.weight('500', sizeOrType, lineHeight),
+
+  semibold: (
+    sizeOrType: number | keyof typeof SIZES | 'body1' | 'body2' | 'body3' | 'body4' | 'body5' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'largeTitle',
+    lineHeight?: number
+  ): TextStyle => FONTS.weight('600', sizeOrType, lineHeight),
+
+  bold: (
+    sizeOrType: number | keyof typeof SIZES | 'body1' | 'body2' | 'body3' | 'body4' | 'body5' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'largeTitle',
+    lineHeight?: number
+  ): TextStyle => FONTS.weight('700', sizeOrType, lineHeight),
 };
 
 const appTheme = { COLORS, SIZES, FONTS };

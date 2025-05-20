@@ -53,6 +53,9 @@ import ShopScreen from './screens/ShopScreen';
 import CheckoutScreen from './screens/CheckoutScreen';
 import PaymentScreen from './screens/PaymentScreen';
 
+// Import Font Demo screen
+import FontDemoScreen from './screens/FontDemoScreen';
+
 // Import test component
 import './global.css';
 
@@ -103,6 +106,9 @@ function RootStack() {
       <Stack.Screen name="Shop" component={ShopScreen} />
       <Stack.Screen name="Checkout" component={CheckoutScreen} />
       <Stack.Screen name="Payment" component={PaymentScreen} />
+
+      {/* Font Demo Screen */}
+      <Stack.Screen name="FontDemo" component={FontDemoScreen} />
     </Stack.Navigator>
   );
 }

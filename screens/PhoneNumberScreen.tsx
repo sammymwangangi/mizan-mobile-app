@@ -28,7 +28,7 @@ type PhoneNumberScreenNavigationProp = NativeStackNavigationProp<RootStackParamL
 const PhoneNumberScreen = () => {
   const navigation = useNavigation<PhoneNumberScreenNavigationProp>();
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [countryCode, setCountryCode] = useState('254');
+  const [countryCode, setCountryCode] = useState('971');
 
   const handleSubmit = () => {
     // In a real app, you would validate the phone number here
@@ -41,12 +41,12 @@ const PhoneNumberScreen = () => {
   };
 
   const gradientText = (
-    <View style={{ padding: 20 }}>
+    <View style={{ padding: 10, justifyContent: 'center', alignItems: 'center' }}>
       <MaskedView
-        style={{ height: 90, width: 300 }}
+        style={{ height: 90, width: 390 }}
         maskElement={
           <View style={{ flex: 1, backgroundColor: 'transparent', justifyContent: 'center', alignItems: 'center' }}>
-            <Text style={{ ...FONTS.body1, textAlign: 'center' }}>
+            <Text style={{ fontFamily: 'Poppins_600SemiBold', fontSize: 30, textAlign: 'center' }}>
               Powerhouse - Shariah Finance, Begins Now
             </Text>
           </View>
@@ -95,17 +95,22 @@ const PhoneNumberScreen = () => {
           {/* Phone Input Section */}
           <View style={styles.inputContainer}>
             {/* Country Code Picker */}
-            <TouchableOpacity style={styles.countryCodeContainer}>
-              <View style={styles.flagContainer}>
-                <Image
-                  source={require('../assets/emirates.png')}
-                  style={styles.flagIcon}
-                  resizeMode="contain"
-                />
-              </View>
-              <Text style={styles.countryCodeText}>{countryCode}</Text>
-              <ChevronDown size={16} color={COLORS.textLight} />
-            </TouchableOpacity>
+            <View style={styles.countrySection}>
+              <TouchableOpacity style={styles.countryCodeContainer}>
+                <Text style={styles.countryLabel}>Country</Text>
+                <View style={styles.countryCodeRow}>
+                  <View style={styles.flagContainer}>
+                    <Image
+                      source={require('../assets/emirates.png')}
+                      style={styles.flagIcon}
+                      resizeMode="contain"
+                    />
+                  </View>
+                  <Text style={styles.countryCodeText}>{countryCode}</Text>
+                  <ChevronDown size={16} color={COLORS.textLight} />
+                </View>
+              </TouchableOpacity>
+            </View>
 
             {/* Phone Number Input */}
             <View style={styles.phoneInputContainer}>
@@ -123,9 +128,10 @@ const PhoneNumberScreen = () => {
           {/* Submit Button */}
           <TouchableOpacity onPress={handleSubmit} style={styles.submitButtonContainer}>
             <LinearGradient
-              colors={['#5592EF', '#8532E0', '#F053E0']}
-              start={{ x: 1, y: 0 }}
-              end={{ x: 0, y: 1 }}
+              colors={['#D155FF', '#B532F2', '#A016E8', '#9406E2', '#8F00E0', '#921BE6', '#A08CFF']}
+              locations={[0, 0.15, 0.3, 0.45, 0.6, 0.75, 1]}
+              start={{ x: 0, y: 0.5 }}
+              end={{ x: 1, y: 0.5 }}
               style={styles.submitButton}
             >
               <Text style={styles.submitButtonText}>SIGN-UP</Text>
@@ -176,21 +182,44 @@ const styles = StyleSheet.create({
     color: '#6D6E8A',
     textAlign: 'center',
     marginBottom: 40,
+    paddingHorizontal: 40,
 
   },
   inputContainer: {
     flexDirection: 'row',
     marginBottom: 30,
   },
+  countrySection: {
+    marginRight: 10,
+  },
+  phoneSection: {
+    flex: 1,
+  },
+  inputLabel: {
+    ...FONTS.medium(14),
+    color: '#6D6E8A',
+    marginBottom: 8,
+    marginLeft: 5,
+  },
   countryCodeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
     borderWidth: 1,
     borderColor: COLORS.border,
     borderRadius: 30,
     paddingHorizontal: 15,
-    paddingVertical: 12,
-    marginRight: 10,
+    paddingTop: 10,
+    paddingBottom: 12,
+    backgroundColor: '#FFFFFF',
+    width: 120,
+  },
+  countryLabel: {
+    ...FONTS.medium(10),
+    color: '#6D6E8A',
+    marginBottom: 5,
+    textAlign: 'left',
+  },
+  countryCodeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   flagContainer: {
     marginRight: 8,
@@ -200,7 +229,7 @@ const styles = StyleSheet.create({
     height: 16,
   },
   countryCodeText: {
-    ...FONTS.body3,
+    ...FONTS.medium(14),
     color: COLORS.text,
     marginRight: 5,
   },
@@ -210,9 +239,11 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
     borderRadius: 30,
     paddingHorizontal: 15,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center'
   },
   phoneInput: {
-    ...FONTS.body3,
+    ...FONTS.medium(16),
     color: COLORS.text,
     height: 50,
   },
@@ -233,17 +264,22 @@ const styles = StyleSheet.create({
   },
   submitButtonContainer: {
     marginBottom: 20,
+    shadowColor: '#391A73',
+    shadowOffset: { width: 0, height: 15 },
+    shadowOpacity: 0.26,
+    shadowRadius: 30,
+    elevation: 15, // For Android
   },
   submitButton: {
-    height: 56,
-    borderRadius: 28,
+    height: 55,
+    width: 340,
+    borderRadius: 40,
     justifyContent: 'center',
     alignItems: 'center',
   },
   submitButtonText: {
     color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
+    ...FONTS.semibold(15),
     letterSpacing: 1,
   },
   signInContainer: {

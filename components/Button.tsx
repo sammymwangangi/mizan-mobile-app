@@ -108,9 +108,7 @@ const Button: React.FC<ButtonProps> = ({
 
   const getTextStyles = (): TextStyle => {
     let textStyleObj: TextStyle = {
-      fontFamily: 'Poppins',
-      fontSize: 16,
-      fontWeight: '600',
+      ...FONTS.semibold(16),
       letterSpacing: 1,
       color: COLORS.textWhite
     };
@@ -118,13 +116,22 @@ const Button: React.FC<ButtonProps> = ({
     // Size styles
     switch (size) {
       case 'small':
-        textStyleObj = { ...textStyleObj, fontSize: 14 };
+        textStyleObj = {
+          ...textStyleObj,
+          ...FONTS.semibold(14)
+        };
         break;
       case 'large':
-        textStyleObj = { ...textStyleObj, fontSize: 18 };
+        textStyleObj = {
+          ...textStyleObj,
+          ...FONTS.semibold(18)
+        };
         break;
       default: // medium
-        textStyleObj = { ...textStyleObj, fontSize: 16 };
+        textStyleObj = {
+          ...textStyleObj,
+          ...FONTS.semibold(16)
+        };
     }
 
     // Variant styles
