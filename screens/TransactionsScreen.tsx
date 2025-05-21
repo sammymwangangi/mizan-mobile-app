@@ -33,9 +33,9 @@ const TransactionsScreen = () => {
 
   // Sample data for cards
   const cards = [
-    { id: '1', number: '**** **** **** 4012', validity: '10/2026', brand: 'Mastercard' },
-    { id: '2', number: '**** **** **** 7890', validity: '05/2025', brand: 'Visa' },
-    { id: '3', number: '**** **** **** 1234', validity: '12/2024', brand: 'Mastercard' },
+    { id: '1', number: '4777 8900 0134 5545', validity: '10/2026', brand: 'Mastercard' },
+    { id: '2', number: '4722 3300 0234 7890', validity: '05/2025', brand: 'Visa' },
+    { id: '3', number: '4453 1200 0334 1234', validity: '12/2024', brand: 'Mastercard' },
   ];
 
   // Sample data for transactions
@@ -46,7 +46,7 @@ const TransactionsScreen = () => {
       subtitle: 'UBER',
       amount: 8.48,
       time: '6:41 pm',
-      icon: <ShoppingBag size={20} color={COLORS.primary} />
+      icon:"cab.png"
     },
     {
       id: '2',
@@ -54,7 +54,7 @@ const TransactionsScreen = () => {
       subtitle: 'Arkam Ahmed',
       amount: 18.00,
       time: '6:41 pm',
-      icon: <ShoppingBag size={20} color={COLORS.primary} />
+      icon:"lunch.png"
     },
   ];
 
@@ -65,14 +65,14 @@ const TransactionsScreen = () => {
       title: 'Pay your electricity bill',
       amount: '$55.00',
       dueDate: '21st Mar 2022',
-      icon: <Clock size={20} color={COLORS.primary} />
+      icon: "reminders-icon-1.png"
     },
     {
       id: '2',
       title: 'Pay your electricity bill',
       amount: '$55.00',
       dueDate: '21st Mar 2022',
-      icon: <Clock size={20} color={COLORS.primary} />
+      icon: "reminders-icon-2.png"
     },
   ];
 
@@ -99,22 +99,36 @@ const TransactionsScreen = () => {
     setActiveCardIndex(index);
   };
 
-  // Render pagination dots
-  const renderPaginationDots = () => {
-    return (
-      <View style={styles.paginationContainer}>
-        {cards.map((_, index) => (
-          <View
-            key={index}
-            style={[
-              styles.paginationDot,
-              index === activeCardIndex ? styles.paginationDotActive : {}
-            ]}
-          />
-        ))}
-      </View>
-    );
+  // Reference to the ScrollView
+  const cardsScrollViewRef = React.useRef<ScrollView>(null);
+
+  // Scroll to the Balance Card (second card) when component mounts
+  React.useEffect(() => {
+    // Calculate the x position to scroll to (card width + margin)
+    const cardWidth = 320;
+    const cardMargin = 19; // Match the margin used in handlePaginationDotPress
+    const xOffset = activeCardIndex * (cardWidth + cardMargin);
+
+    // Add a small delay to ensure the ScrollView is properly rendered
+    const timer = setTimeout(() => {
+      cardsScrollViewRef.current?.scrollTo({ x: xOffset, animated: false });
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [activeCardIndex]);
+
+  // Function to handle pagination dot clicks
+  const handlePaginationDotPress = (index: number) => {
+    setActiveCardIndex(index);
+    // Calculate the x position to scroll to (card width + margin)
+    const cardWidth = 320;
+    const cardMargin = 19;
+    const xOffset = index * (cardWidth + cardMargin);
+
+    // Scroll to the selected card
+    cardsScrollViewRef.current?.scrollTo({ x: xOffset, animated: true });
   };
+
 
   return (
     <SafeAreaView style={[styles.container, { paddingTop: insets.top }]}>
@@ -132,6 +146,7 @@ const TransactionsScreen = () => {
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
+        ref={cardsScrollViewRef}
       >
         {/* Card Carousel */}
         <View style={styles.carouselContainer}>
@@ -152,7 +167,29 @@ const TransactionsScreen = () => {
               />
             )}
           />
-          {renderPaginationDots()}
+          {/* {renderPaginationDots()} */}
+
+          {/* Pagination Dots */}
+          <View style={styles.paginationContainer}>
+            {[0, 1, 2].map((index) => (
+              <TouchableOpacity
+                key={index}
+                style={styles.paginationDotContainer}
+                onPress={() => handlePaginationDotPress(index)}
+              >
+                {index === activeCardIndex ? (
+                  <LinearGradient
+                    colors={['#CE72E3', '#8A2BE2']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={[styles.paginationDot, styles.activePaginationDot]}
+                  />
+                ) : (
+                  <View style={styles.paginationDot} />
+                )}
+              </TouchableOpacity>
+            ))}
+          </View>
         </View>
 
         {/* Recent Transactions */}
@@ -173,27 +210,23 @@ const TransactionsScreen = () => {
 
         {/* Insight Banner */}
         <View style={styles.insightBannerContainer}>
-          <LinearGradient
-            colors={['#A276FF', '#9406E2']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.insightBanner}
-          >
-            <View style={styles.insightContent}>
-              <Text style={styles.insightTitle}>Mashallah!</Text>
-              <Text style={styles.insightText}>
-                Good Job! Your spending has reduced by 10% from last month
-              </Text>
-              <TouchableOpacity style={styles.viewDetailsButton}>
-                <Text style={styles.viewDetailsText}>View Details</Text>
-                <ChevronRight size={16} color="#FFFFFF" />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.insightImageContainer}>
-              {/* Placeholder for celebration image */}
-              <View style={styles.insightImagePlaceholder} />
-            </View>
-          </LinearGradient>
+          <View style={styles.insightImageWrapper}>
+            <Image
+              source={require('../assets/payments/mashallah.png')}
+              style={styles.insightImage}
+              resizeMode="cover"
+            />
+          </View>
+          <View style={styles.insightContent}>
+            <Text style={styles.insightTitle}>Mashallah!</Text>
+            <Text style={styles.insightText}>
+              Good Job! your spending have reduced by 10% from last month
+            </Text>
+            <TouchableOpacity style={styles.viewDetailsButton}>
+              <Text style={styles.viewDetailsText}>View Details</Text>
+              <ChevronRight size={16} color="#A276FF" />
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Reminders Section */}
@@ -313,7 +346,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerTitle: {
-    ...FONTS.h3,
+    ...FONTS.bold(20),
     color: COLORS.text,
   },
   carouselContainer: {
@@ -326,7 +359,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   card: {
-    width: '100%',
+    width: 280,
     height: 180,
     borderRadius: 20,
     padding: 20,
@@ -366,16 +399,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 15,
   },
-  paginationDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#D9D9D9',
-    marginHorizontal: 4,
+  paginationDotContainer: {
+    marginHorizontal: 5,
+    padding: 5, // Add padding for better touch target
   },
-  paginationDotActive: {
-    backgroundColor: COLORS.primary,
-    width: 16,
+  paginationDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#E6E6FF',
+  },
+  activePaginationDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
   },
   sectionContainer: {
     paddingHorizontal: SIZES.padding,
@@ -388,7 +425,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   sectionTitle: {
-    ...FONTS.h4,
+    ...FONTS.semibold(20),
     color: COLORS.text,
   },
   sectionSubtitle: {
@@ -441,50 +478,54 @@ const styles = StyleSheet.create({
     color: COLORS.textLight,
   },
   insightBannerContainer: {
-    paddingHorizontal: SIZES.padding,
-    marginTop: 25,
-  },
-  insightBanner: {
-    borderRadius: 20,
-    padding: 15,
     flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    backgroundColor: '#E0D2FF',
+    marginTop: 25,
+    width: '100%',
+    minHeight: 152,
     overflow: 'hidden',
+    paddingHorizontal: 0, // Remove horizontal padding
+    paddingVertical: 0, // Remove vertical padding
+  },
+  insightImageWrapper: {
+    width: 150,
+    height: 150,
+    justifyContent: 'flex-end',
+    alignItems: 'flex-start',
+    overflow: 'hidden',
+  },
+  insightImage: {
+    width: '100%',
+    height: '100%',
   },
   insightContent: {
     flex: 1,
     justifyContent: 'center',
+    paddingLeft: 18,
+    paddingRight: 18,
+    
   },
   insightTitle: {
-    ...FONTS.h3,
-    color: COLORS.textWhite,
-    marginBottom: 5,
+    ...FONTS.semibold(18),
+    color: COLORS.text,
+    marginBottom: 6,
   },
   insightText: {
     ...FONTS.body4,
-    color: COLORS.textWhite,
-    opacity: 0.9,
-    marginBottom: 10,
-  },
-  insightImageContainer: {
-    width: 80,
-    height: 80,
-    alignSelf: 'center',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  insightImagePlaceholder: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    color: COLORS.text,
+    opacity: 0.85,
+    marginBottom: 14,
+    width: 162
   },
   viewDetailsButton: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   viewDetailsText: {
-    ...FONTS.body5,
-    color: COLORS.textWhite,
+    ...FONTS.semibold(14),
+    color: '#A276FF',
     marginRight: 5,
   },
   addNewButton: {

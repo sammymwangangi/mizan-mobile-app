@@ -1,10 +1,15 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { COLORS, FONTS } from '../constants/theme';
 import { ChevronRight } from 'lucide-react-native';
 
+const ICONS: Record<string, any> = {
+  'reminders-icon-1.png': require('../assets/payments/reminders-icon-1.png'),
+  'reminders-icon-2.png': require('../assets/payments/reminders-icon-2.png'),
+};
+
 interface ReminderItemProps {
-  icon: React.ReactNode;
+  icon: string; // now expects image filename
   title: string;
   amount: string;
   dueDate: string;
@@ -25,7 +30,11 @@ const ReminderItem: React.FC<ReminderItemProps> = ({
       activeOpacity={0.7}
     >
       <View style={styles.iconContainer}>
-        {icon}
+        <Image
+          source={ICONS[icon]}
+          style={styles.iconImage}
+          resizeMode="contain"
+        />
       </View>
       <View style={styles.details}>
         <Text style={styles.title}>{title}</Text>
@@ -45,13 +54,17 @@ const styles = StyleSheet.create({
     borderBottomColor: COLORS.border,
   },
   iconContainer: {
-    width: 40,
-    height: 40,
+    width: 48,
+    height: 48,
     borderRadius: 20,
-    backgroundColor: '#F0F0F0',
+    backgroundColor: '#F3EDFF',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
+  },
+  iconImage: {
+    width: 24,
+    height: 24,
   },
   details: {
     flex: 1,

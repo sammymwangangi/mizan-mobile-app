@@ -151,9 +151,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerTitle: {
-    fontSize: 20,
-    fontFamily: 'Poppins_600SemiBold',
-    color: '#333',
+    ...FONTS.semibold(20),
+    color: COLORS.text,
   },
   scrollView: {
     flex: 1,
@@ -166,6 +165,7 @@ const styles = StyleSheet.create({
   profileImageContainer: {
     alignItems: 'center',
     marginTop: 20,
+    marginBottom: 120,
   },
   profileImage: {
     width: 150,
@@ -184,9 +184,9 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   uploadText: {
-    fontSize: 16,
+    fontSize: 18,
     fontFamily: 'Poppins',
-    color: '#333',
+    color: COLORS.text,
   },
   optionsContainer: {
     width: '100%',
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
   optionItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: 40,
   },
   optionIcon: {
     width: 24,
@@ -204,9 +204,8 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   optionText: {
-    fontSize: 16,
-    fontFamily: 'Poppins',
-    color: '#FFFFFF',
+    ...FONTS.medium(18),
+    color: COLORS.textWhite,
   },
   powerOffButton: {
     flexDirection: 'column',
@@ -221,9 +220,8 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   powerText: {
-    fontSize: 14,
-    fontFamily: 'Poppins',
-    color: '#FFFFFF',
+    ...FONTS.semibold(12),
+    color: COLORS.textWhite,
   },
 });
 

@@ -13,14 +13,12 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
-import { Bell, CreditCard, Send, Clock, Smartphone, Home, BarChart2, Clock3, User } from 'lucide-react-native';
+import { Bell } from 'lucide-react-native';
 import GradientBackground from '../components/GradientBackground';
 import { formatCurrency } from '../utils';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Circle, G, Text as SvgText } from 'react-native-svg';
 import LiquidProgress from '../components/home/LiquidProgress';
-import CircularProgress from 'components/home/CircularProgress';
-import LiquidProgressCircle from 'components/LiquidProgressCircle';
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
 
@@ -120,7 +118,7 @@ const HomeScreen = () => {
               onPress={() => navigation.navigate('Profile')}
             >
               <Image
-                source={require('../assets/home/user-avatar.png')}
+                source={require('../assets/profile/profile-image.png')}
                 style={styles.avatar}
               />
             </TouchableOpacity>
@@ -229,9 +227,10 @@ const HomeScreen = () => {
                     </Text>
                     <TouchableOpacity style={styles.upgradeButtonContainer}>
                       <LinearGradient
-                        colors={['#F053E0', '#8532E0', '#5592EF']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 0 }}
+                        colors={['#D155FF', '#B532F2', '#A016E8', '#9406E2', '#8F00E0', '#921BE6', '#A08CFF']}
+                        locations={[0, 0.15, 0.3, 0.45, 0.6, 0.75, 1]}
+                        start={{ x: 0, y: 0.5 }}
+                        end={{ x: 1, y: 0.5 }}
                         style={styles.upgradeButton}
                       >
                         <Text style={styles.upgradeButtonText}>MORE DETAILS</Text>
@@ -525,14 +524,13 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
   upgradeTitle: {
-    ...FONTS.h3,
+    ...FONTS.semibold(16),
     color: COLORS.text,
-    fontWeight: 'bold',
     marginBottom: 10,
     width: '80%',
   },
   upgradeDescription: {
-    ...FONTS.body4,
+    ...FONTS.medium(12),
     color: COLORS.textLight,
     marginBottom: 20,
     width: '90%',
@@ -554,10 +552,8 @@ const styles = StyleSheet.create({
     width: 280,
   },
   upgradeButtonText: {
-    ...FONTS.body4,
+    ...FONTS.semibold(15),
     color: COLORS.textWhite,
-    fontWeight: 'bold',
-    fontSize: 12,
   },
   paginationContainer: {
     flexDirection: 'row',
@@ -649,18 +645,14 @@ const styles = StyleSheet.create({
     top: 0,
   },
   promotionTitle: {
-    fontFamily: 'Poppins',
-    fontWeight: 'bold',
-    fontSize: 14,
+    ...FONTS.semibold(14),
     position: 'absolute',
     left: 10,
     top: 10,
     width: '100%',
   },
   gradientText: {
-    fontFamily: 'Poppins',
-    fontWeight: 'bold',
-    fontSize: 14,
+    ...FONTS.semibold(14),
     position: 'absolute',
     left: 10,
     top: 10,

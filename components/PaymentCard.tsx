@@ -1,7 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { COLORS, FONTS } from '../constants/theme';
+import { View, Text, StyleSheet, Image, ImageBackground } from 'react-native';
 
 interface PaymentCardProps {
   cardNumber: string;
@@ -16,38 +14,51 @@ const PaymentCard: React.FC<PaymentCardProps> = ({
   brand,
   isActive = false,
 }) => {
-  // Determine card logo based on brand
-  const getCardLogo = () => {
-    if (brand.toLowerCase().includes('visa')) {
-      return require('../assets/visa-logo.png');
-    } else if (brand.toLowerCase().includes('mastercard')) {
-      return require('../assets/mastercard-logo.png');
-    }
-    // Default to mastercard if brand is not recognized
-    return require('../assets/mastercard-logo.png');
-  };
-
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#D155FF', '#B532F2', '#A016E8']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
+      <ImageBackground
+        source={require('../assets/cards/card-gradient-background.png')}
         style={styles.card}
+        imageStyle={styles.cardBgImage}
       >
-        <View style={styles.cardContent}>
-          <Text style={styles.cardBrand}>mizan</Text>
-          <View style={styles.cardNumberContainer}>
-            <Text style={styles.cardNumber}>{cardNumber}</Text>
-            <Image 
-              source={getCardLogo()} 
-              style={styles.cardLogo}
-              resizeMode="contain"
-            />
-          </View>
-          <Text style={styles.cardValidity}>{validity}</Text>
+        {/* Pattern on the left side */}
+        <Image
+          source={require('../assets/cards/card-pattern.png')}
+          style={styles.pattern}
+          resizeMode="contain"
+        />
+        {/* Top row: logo and wifi */}
+        <View style={styles.topRow}>
+          <View style={{ flex: 1 }} />
+          <Image
+            source={require('../assets/cards/white-logo.png')}
+            style={styles.mizanLogo}
+            resizeMode="contain"
+          />
         </View>
-      </LinearGradient>
+        {/* Card number */}
+        <View style={styles.cardNumberRow}>
+          <Text style={styles.cardNumber}>{cardNumber}</Text>
+          <Image
+            source={require('../assets/cards/wifi.png')}
+            style={styles.wifi}
+            resizeMode="contain"
+          />
+        </View>
+        {/* Bottom row: validity and brand */}
+        <View style={styles.bottomRow}>
+          <View style={styles.validityBlock}>
+            <Text style={styles.validThruLabel}>VALID THRUss</Text>
+            <Text style={styles.validity}>{validity}</Text>
+          </View>
+          
+          <Image
+            source={require('../assets/cards/mastercard.png')}
+            style={styles.brandLogo}
+            resizeMode="contain"
+          />
+        </View>
+      </ImageBackground>
     </View>
   );
 };
@@ -58,39 +69,87 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   card: {
+    width: 286,
+    height: 166,
+    borderRadius: 18,
+    overflow: 'hidden',
+    padding: 0,
+    justifyContent: 'flex-start',
+  },
+  cardBgImage: {
     width: '100%',
-    height: 180,
-    borderRadius: 20,
-    padding: 20,
-    justifyContent: 'center',
+    height: '100%',
+    borderRadius: 18,
   },
-  cardContent: {
-    flex: 1,
-    justifyContent: 'space-between',
+  pattern: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    height: '100%',
+    width: 163.15,
+    zIndex: 1,
   },
-  cardBrand: {
-    ...FONTS.h3,
-    color: COLORS.textWhite,
-    opacity: 0.8,
+  topRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    marginTop: 18,
+    marginRight: 18,
+    zIndex: 2,
   },
-  cardNumberContainer: {
+  mizanLogo: {
+    width: 80,
+    height: 32,
+  },
+  cardNumberRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginTop: 20,
+    marginHorizontal: 20,
+    zIndex: 2,
   },
   cardNumber: {
-    ...FONTS.body3,
-    color: COLORS.textWhite,
+    color: '#fff',
+    fontSize: 12,
     letterSpacing: 2,
+    fontFamily: 'OCR-A',
+    fontWeight: '600',
   },
-  cardLogo: {
-    width: 40,
-    height: 30,
+  bottomRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    position: 'absolute',
+    bottom: 18,
+    left: 18,
+    right: 18,
+    zIndex: 2,
   },
-  cardValidity: {
-    ...FONTS.body4,
-    color: COLORS.textWhite,
-    alignSelf: 'flex-end',
+  validityBlock: {
+    flexDirection: 'column',
+  },
+  validThruLabel: {
+    color: '#fff',
+    fontSize: 10,
+    opacity: 0.8,
+    fontWeight: '400',
+  },
+  validity: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginTop: 2,
+  },
+  wifi: {
+    width: 28,
+    height: 28,
+    marginLeft: 10,
+    marginRight: 10,
+  },
+  brandLogo: {
+    width: 38,
+    height: 38,
   },
 });
 

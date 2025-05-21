@@ -3,8 +3,13 @@ import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { COLORS, FONTS } from '../constants/theme';
 import { formatCurrency } from '../utils';
 
+const ICONS: Record<string, any> = {
+  'cab.png': require('../assets/payments/cab.png'),
+  'lunch.png': require('../assets/payments/lunch.png'),
+};
+
 interface TransactionItemProps {
-  icon: React.ReactNode;
+  icon: string; // now expects image filename
   title: string;
   subtitle: string;
   amount: number;
@@ -27,7 +32,11 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
       activeOpacity={onPress ? 0.7 : 1}
     >
       <View style={styles.iconContainer}>
-        {icon}
+        <Image
+          source={ICONS[icon]}
+          style={styles.iconImage}
+          resizeMode="contain"
+        />
       </View>
       <View style={styles.details}>
         <Text style={styles.title}>{title}</Text>
@@ -58,13 +67,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 12,
   },
+  iconImage: {
+    width: 24,
+    height: 24,
+  },
   details: {
     flex: 1,
   },
   title: {
-    ...FONTS.body4,
+    ...FONTS.semibold(13),
     color: COLORS.text,
-    fontWeight: '500',
   },
   subtitle: {
     ...FONTS.body5,
@@ -74,9 +86,8 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   amount: {
-    ...FONTS.body4,
+    ...FONTS.semibold(13),
     color: COLORS.text,
-    fontWeight: '600',
   },
   time: {
     ...FONTS.body5,
