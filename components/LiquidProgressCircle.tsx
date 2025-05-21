@@ -14,6 +14,7 @@ import Animated, {
   withRepeat,
   withTiming,
 } from 'react-native-reanimated';
+import { FONTS } from 'constants/theme';
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 
@@ -115,7 +116,7 @@ const LiquidProgressCircle: React.FC<Props> = ({
   });
 
   return (
-    <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
+    <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center', alignSelf:'center' }}>
       <Svg width={size} height={size}>
         <Defs>
           {/* Two gradients for waves */}
@@ -185,8 +186,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   percentText: {
-    fontSize: 48,
-    fontWeight: 'bold',
+    ...FONTS.medium(48),
     color: 'white',
     textShadowColor: '#0001',
     textShadowOffset: { width: 0, height: 1 },

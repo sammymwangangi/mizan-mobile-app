@@ -15,6 +15,7 @@ import Animated, {
   withTiming,
   withSpring,
 } from 'react-native-reanimated';
+import { FONTS } from 'constants/theme';
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
@@ -73,9 +74,9 @@ const LiquidProgress: React.FC<Props> = ({
 }) => {
   const halfSize = size / 2;
   const strokeWidth = 3; // Stroke width of the progress ring
-  const radius = halfSize + 5; // Radius for the progress ring (to create a gap)
+  const radius = halfSize + 10 // Radius for the progress ring (to create a gap)
   const circumference = 2 * Math.PI * radius;
-  const padding = strokeWidth + 5; // Extra padding to account for stroke width and gap
+  const padding = strokeWidth + 10; // Extra padding to account for stroke width and gap
   const svgSize = size + 2 * padding; // Increase SVG size to fit the circle and stroke
   const offset = padding; // Offset to center content within larger SVG
 
@@ -209,7 +210,7 @@ const LiquidProgress: React.FC<Props> = ({
       <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
         <View style={styles.textContainer}>
           <Text style={styles.percentText}>{`${Math.round(value)}%`}</Text>
-          <Text style={styles.labelText}>next milestone</Text>
+          <Text style={styles.labelText}>Target 100%</Text>
         </View>
       </View>
     </View>
@@ -223,16 +224,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   percentText: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    ...FONTS.semibold(20),
     color: 'white',
     textShadowColor: '#0001',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
   },
   labelText: {
-    fontSize: 9,
-    fontWeight: '500',
+    ...FONTS.bold(9),
     color: 'white',
   },
 });

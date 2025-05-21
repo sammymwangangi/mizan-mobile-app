@@ -179,12 +179,12 @@ const styles = StyleSheet.create({
     ...FONTS.body3,
     color: '#6D6E8A',
     textAlign: 'center',
-    marginBottom: 40,
+    marginBottom: 43,
     paddingHorizontal: 40,
   },
   inputContainer: {
     flexDirection: 'row',
-    marginBottom: 30,
+    marginBottom: 57,
   },
   countrySection: {
     marginRight: 10,

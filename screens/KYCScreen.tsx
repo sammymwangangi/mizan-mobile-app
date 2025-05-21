@@ -483,7 +483,7 @@ const KYCScreen: React.FC = () => {
 
     // Format currency
     const formatCurrency = (amount: number) => {
-      return `$${amount.toFixed(0)}`;
+      return `$${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     };
 
     return (
@@ -607,108 +607,96 @@ const KYCScreen: React.FC = () => {
 
         <View style={styles.container}>
           <LiquidProgressCircle value={value} size={220} />
-          <Slider
-            style={{ width: 250, marginTop: 40 }}
-            minimumValue={0}
-            maximumValue={100}
-            value={value}
-            onValueChange={setValue}
-            minimumTrackTintColor="#974BEB"
-            maximumTrackTintColor="#ddd"
-            thumbTintColor="#974BEB"
-          />
-        </View>
-        <View style={styles.exposureContainer}>
-          {/* <View style={styles.exposureCircle}>
-            <Text style={styles.exposureValue}>{financialExposure}%</Text>
-          </View>
 
-          <View style={{
-            flexDirection: 'row',
-            width: '50%',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginVertical: 40,
-          }}>
-            <LinearGradient
-              colors={['#4B99DE', '#6B3BA6']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={{
-                position: 'absolute',
-                top: '50%',
-                left: 20,
-                right: 20,
-                height: 64,
-                borderRadius: 45,
-                padding: 1.5, // Border width
-                zIndex: 2,
-                width: 175,
-                transform: [{ translateY: -64 / 2 }],
-              }}
-            >
+          <View style={styles.exposureContainer}>
 
-              <View style={{
-                flex: 1,
-                backgroundColor: COLORS.background,
-                borderRadius: 45,
-                flexDirection: 'row',
-                overflow: 'hidden',
-                width: 174,
-              }}>
+            <View style={{
+              flexDirection: 'row',
+              width: '50%',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginVertical: 40,
+            }}>
+              <LinearGradient
+                colors={['#4B99DE', '#6B3BA6']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: 20,
+                  right: 20,
+                  height: 64,
+                  borderRadius: 45,
+                  padding: 1.5, // Border width
+                  zIndex: 2,
+                  width: 177,
+                  transform: [{ translateY: -64 / 2 }],
+                }}
+              >
+
                 <View style={{
                   flex: 1,
+                  backgroundColor: COLORS.background,
+                  borderRadius: 45,
                   flexDirection: 'row',
-                  justifyContent: 'center',
-                  alignItems: 'center',
+                  overflow: 'hidden',
+                  width: 174,
                 }}>
+                  <View style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
 
-                  <Text style={styles.portfolioText}>Moderate Portfolio</Text>
+                    <Text style={styles.portfolioText}>Moderate Portfolio</Text>
+                  </View>
                 </View>
-              </View>
-            </LinearGradient>
-          </View> */}
+              </LinearGradient>
+            </View>
 
-          {/* <View style={styles.sliderWrapper}>
-            <View style={styles.sliderTrackContainer}>
-              <View style={styles.sliderTrackBackground} />
+            <View style={styles.sliderWrapper}>
+              <View style={styles.sliderTrackContainer}>
+                <View style={styles.sliderTrackBackground} />
+                <View
+                  style={[
+                    styles.sliderTrackActive,
+                    { width: `${(value / 100) * 100}%` }
+                  ]}
+                />
+                <Slider
+                  style={styles.sliderAbsolute}
+                  minimumValue={0}
+                  maximumValue={100}
+                  value={value}
+                  onValueChange={setValue}
+                  minimumTrackTintColor="transparent"
+                  maximumTrackTintColor="transparent"
+                  thumbTintColor="transparent"
+                  tapToSeek={true}
+                />
+              </View>
+
               <View
                 style={[
-                  styles.sliderTrackActive,
-                  { width: `${(financialExposure / 100) * 100}%` }
+                  styles.sliderThumbContainer,
+                  { left: `${(value / 100) * 100}%` }
                 ]}
-              />
-              <Slider
-                style={styles.sliderAbsolute}
-                minimumValue={0}
-                maximumValue={100}
-                value={financialExposure}
-                onValueChange={(value) => setFinancialExposure(Math.round(value))}
-                minimumTrackTintColor="transparent"
-                maximumTrackTintColor="transparent"
-                thumbTintColor="transparent"
-                tapToSeek={true}
-              />
+              >
+                <LinearGradient
+                  colors={['#8BB4F2', '#7C27D9', '#F053E0']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.sliderThumbGradient}
+                />
+              </View>
             </View>
 
-            <View
-              style={[
-                styles.sliderThumbContainer,
-                { left: `${(financialExposure / 100) * 100}%` }
-              ]}
-            >
-              <LinearGradient
-                colors={['#8BB4F2', '#7C27D9', '#F053E0']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.sliderThumbGradient}
-              />
-            </View>
-          </View> */}
-
-          <Text style={styles.sliderHint}>
-            By sliding you will notice that your financial exposure becomes less severe.
-          </Text>
+            <Text style={styles.sliderHint}>
+              By sliding you will notice that your financial exposure becomes less severe.
+            </Text>
+          </View>
         </View>
       </View>
     );
@@ -831,13 +819,8 @@ const KYCScreen: React.FC = () => {
 
     return (
       <View className="flex-1 flex-col justify-between items-center px-2 py-20">
-        <Image
-          source={require('../assets/kyc/arabic-logo.png')}
-          className="w-[104px] h-[21.83px]"
-          resizeMode="contain"
-        />
 
-        <Text className="text-[25px] font-semibold text-[#1B1C39] text-center">That&apos;s it</Text>
+        <Text className="text-[#1B1C39] text-center" style={{...FONTS.semibold(25)}}>That&apos;s it</Text>
 
         <Image
           source={require('../assets/kyc/high_five.png')}
@@ -845,7 +828,7 @@ const KYCScreen: React.FC = () => {
           resizeMode="contain"
         />
 
-        <Text className="text-[#1B1C39] text-[20px] text-center">
+        <Text className="text-[#1B1C39] text-[20px] text-center" style={{fontFamily: 'Poppins'}}>
           That&apos;s it, start moving moolah
         </Text>
 
@@ -983,6 +966,7 @@ const styles = StyleSheet.create({
   stepContainer: {
     flex: 1,
     paddingBottom: 0,
+    paddingHorizontal: 25,
   },
   // Radio option card styles
   cardWrapper: {
@@ -1029,10 +1013,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   radioText: {
-    fontFamily: 'Poppins',
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#1B1C39',
+    ...FONTS.medium(12),
+    color: COLORS.text,
   },
   interestsContainer: {
     marginTop: 20,
@@ -1052,7 +1034,7 @@ const styles = StyleSheet.create({
   },
   hustleCard: {
     width: '100%',
-    height: 99,
+    paddingVertical: 36,
     borderRadius: 25,
     borderWidth: 1,
     borderColor: 'rgba(222, 222, 222, 0.48)',
@@ -1072,14 +1054,12 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   hustleText: {
-    fontFamily: 'Poppins',
-    fontSize: 18,
-    fontWeight: '500',
+    ...FONTS.medium(18),
     color: '#6D6E8A',
     textAlign: 'center',
   },
   hustleTextActive: {
-    color: '#1B1C39',
+    color: COLORS.text,
   },
   // Income step styles
   incomeContainer: {
@@ -1092,10 +1072,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   incomeOptionText: {
-    fontFamily: 'Poppins',
-    fontSize: 20,
-    fontWeight: '500',
-    color: '#1B1C39',
+    ...FONTS.medium(20),
+    color: COLORS.text,
     marginLeft: 10,
   },
   // Spending step styles
@@ -1123,10 +1101,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
   },
   totalAmountText: {
-    fontFamily: 'Poppins',
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1B1C39',
+    ...FONTS.medium(14),
+    color: COLORS.text,
   },
   categoryContainer: {
     flexDirection: 'row',
@@ -1140,25 +1116,20 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     paddingVertical: 10,
     paddingHorizontal: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 5,
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#DEDEDE7A',
     width: 140, // Reduced width for the category label
   },
   categoryName: {
-    fontFamily: 'Poppins',
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#1B1C39',
+    ...FONTS.medium(14),
+    color: COLORS.text,
   },
   sliderWrapper: {
     flex: 1,
     height: 40,
     position: 'relative',
     marginHorizontal: 8,
-    width: 150, // Set a fixed width for the slider
+    width: 327, // Set a fixed width for the slider
   },
   slider: {
     width: '100%',
@@ -1221,15 +1192,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   valueText: {
-    fontFamily: 'Poppins',
-    fontSize: 13,
-    fontWeight: '500',
+    ...FONTS.medium(13),
     color: '#9A9999',
   },
   customValueInput: {
     fontFamily: 'Poppins',
     fontSize: 13,
-    fontWeight: '500',
     color: '#9A9999',
     width: '100%',
     textAlign: 'center',
@@ -1242,17 +1210,18 @@ const styles = StyleSheet.create({
   },
   fullNameInput: {
     width: '100%',
+    ...FONTS.medium(18),
   },
   spacer: {
     flex: 1,
   },
 
   stepSubtitle: {
-    ...FONTS.body3,
-    fontWeight: 'bold',
+    ...FONTS.semibold(14),
     color: '#A276FF',
-    marginBottom: 45,
+    marginBottom: 60,
     textAlign: 'center',
+    paddingHorizontal: 20,
   },
   arabicStepTitle: {
     fontFamily: Platform.select({
@@ -1261,14 +1230,16 @@ const styles = StyleSheet.create({
     }),
     fontWeight: 400,
     fontSize: 18,
-    color: '#1B1C39',
+    color: COLORS.text,
     textAlign: 'center'
   },
   stepTitle: {
     ...FONTS.h1,
-    color: '#1B1C39',
-    marginBottom: 18,
+    color: COLORS.text,
+    marginBottom: 30,
     textAlign: 'center',
+    paddingHorizontal: 30,
+    paddingVertical: 20,
   },
   genderContainer: {
     flexDirection: 'row',
@@ -1301,11 +1272,11 @@ const styles = StyleSheet.create({
     height: 60,
   },
   genderText: {
-    ...FONTS.h3,
-    color: COLORS.textLight,
+    ...FONTS.medium(16),
+    color: '#BBBBC3',
   },
   selectedGenderText: {
-    color: COLORS.primary,
+    color: COLORS.text,
   },
   durationContainer: {
     flexDirection: 'row',
@@ -1329,16 +1300,17 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
   },
   durationValue: {
-    ...FONTS.h1,
+    ...FONTS.semibold(24),
     color: COLORS.text,
   },
   durationLabel: {
-    ...FONTS.body3,
-    color: COLORS.textLight,
+    ...FONTS.medium(18),
+    color: COLORS.text,
   },
   exposureContainer: {
     alignItems: 'center',
     marginTop: 20,
+    width: 327
   },
   exposureCircle: {
     width: 150,
@@ -1362,20 +1334,19 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   portfolioText: {
-    ...FONTS.body3,
+    ...FONTS.medium(15),
     color: COLORS.text,
+    lineHeight: 19
   },
   financialSlider: {
     width: '100%',
     height: 40,
   },
   sliderHint: {
-    ...FONTS.body4,
+    ...FONTS.body5,
     color: '#6D6E8A',
     textAlign: 'center',
-    marginTop: 40,
-    paddingLeft: 36,
-    paddingRight: 36,
+    marginTop: 70,
   },
   planContainer: {
     alignItems: 'center',
@@ -1420,7 +1391,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   cardInstructions: {
-    ...FONTS.body3,
+    ...FONTS.medium(16),
     color: COLORS.textLight,
     marginBottom: 20,
   },
@@ -1430,9 +1401,11 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   cardQuestion: {
-    ...FONTS.h3,
+    ...FONTS.medium(24),
     color: COLORS.text,
     marginBottom: 20,
+    textAlign: 'center',
+    width: 340,
   },
   completeLogo: {
     width: 80,
@@ -1481,7 +1454,7 @@ const styles = StyleSheet.create({
   swipeButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
     height: 60,
     borderRadius: 30,
     paddingHorizontal: 10,
@@ -1489,11 +1462,10 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   swipeButtonText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    letterSpacing: 1,
+    ...FONTS.semibold(15),
     color: 'white',
-    marginLeft: 20,
+    marginLeft: 70,
+    
   },
   arrowCircle: {
     width: 40,

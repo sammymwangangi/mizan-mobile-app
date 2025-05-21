@@ -40,7 +40,8 @@
     "react-native-svg": "15.11.2",
     "react-native-wheel-picker": "^1.2.0",
     "react-native-wheel-scrollview-picker": "^2.0.9",
-    "sonner-native": "0.19.1"
+    "sonner-native": "0.19.1",
+    "@shopify/react-native-skia": "v2.0.0-next.4"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

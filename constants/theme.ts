@@ -38,7 +38,7 @@ export const COLORS = {
 
   // Text colors
   text: '#1B1C39', // Primary text
-  textLight: '#666666', // Secondary text
+  textLight: '#6D6E8A', // Secondary text
   textDark: '#000000', // Dark text
   textWhite: '#FFFFFF', // White text
 
@@ -106,7 +106,7 @@ export const createFontStyle = (
 export const FONTS = {
   // Base styles with regular weight (400)
   largeTitle: { fontFamily: FONT_FAMILY.regular, fontSize: SIZES.largeTitle, lineHeight: 40 },
-  h1: { fontFamily: FONT_FAMILY.bold, fontSize: SIZES.h1, lineHeight: 36 },
+  h1: { fontFamily: FONT_FAMILY.semibold, fontSize: SIZES.h1, lineHeight: 36 },
   h2: { fontFamily: FONT_FAMILY.bold, fontSize: SIZES.h2, lineHeight: 30 },
   h3: { fontFamily: FONT_FAMILY.bold, fontSize: SIZES.h3, lineHeight: 22 },
   h4: { fontFamily: FONT_FAMILY.bold, fontSize: SIZES.h4, lineHeight: 20 },

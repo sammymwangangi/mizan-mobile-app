@@ -107,7 +107,7 @@ const OTPScreen = () => {
         style={{ height: 60, width: 300 }}
         maskElement={
           <View style={{ flex: 1, backgroundColor: 'transparent', justifyContent: 'center', alignItems: 'center' }}>
-            <Text style={{ fontSize: 40, fontWeight: 'bold' }}>
+            <Text style={{ ...FONTS.semibold(32) }}>
               6-digit code
             </Text>
           </View>
@@ -201,9 +201,10 @@ const OTPScreen = () => {
             onPress={handleVerifyOTP}
           >
             <LinearGradient
-              colors={['#5592EF', '#8532E0', '#F053E0']}
-              start={{ x: 1, y: 0 }}
-              end={{ x: 0, y: 1 }}
+              colors={['#D155FF', '#B532F2', '#A016E8', '#9406E2', '#8F00E0', '#921BE6', '#A08CFF']}
+              locations={[0, 0.15, 0.3, 0.45, 0.6, 0.75, 1]}
+              start={{ x: 0, y: 0.5 }}
+              end={{ x: 1, y: 0.5 }}
               style={styles.nextButton}
             >
               <Text style={styles.nextButtonText}>NEXT</Text>
@@ -231,7 +232,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingHorizontal: SIZES.padding,
+    paddingHorizontal: 25,
     paddingTop: 20,
     alignItems: 'center',
   },
@@ -249,9 +250,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   subtitle: {
-    ...FONTS.body3,
     fontFamily: 'Poppins',
-    fontWeight: '400',
+    fontSize: 16,
     color: '#6D6E8A',
     textAlign: 'center',
     marginBottom: 40,
@@ -293,11 +293,12 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   resendText: {
-    ...FONTS.body4,
+    fontFamily: 'Poppins',
+    color: '#6D6E8A',
     textAlign: 'center',
   },
   activeResendText: {
-    color: COLORS.primary,
+    color: '#6D6E8A',
     textDecorationLine: 'underline',
   },
   inactiveResendText: {

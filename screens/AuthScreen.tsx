@@ -145,9 +145,10 @@ const AuthScreen = () => {
                 onPress={handleSubmit}
               >
                 <LinearGradient
-                  colors={['#5592EF', '#8532E0', '#F053E0']}
-                  start={{ x: 1, y: 0 }}
-                  end={{ x: 0, y: 1 }}
+                  colors={['#D155FF', '#B532F2', '#A016E8', '#9406E2', '#8F00E0', '#921BE6', '#A08CFF']}
+                  locations={[0, 0.15, 0.3, 0.45, 0.6, 0.75, 1]}
+                  start={{ x: 0, y: 0.5 }}
+                  end={{ x: 1, y: 0.5 }}
                   style={styles.submitButton}
                 >
                   <Text style={styles.submitButtonText}>
@@ -234,7 +235,8 @@ const styles = StyleSheet.create({
   },
   forgotPasswordText: {
     ...FONTS.body4,
-    color: COLORS.primary,
+    color: '#705EE7',
+    textDecorationLine:'underline',
   },
   submitButtonContainer: {
     alignItems: 'flex-end',
@@ -264,8 +266,7 @@ const styles = StyleSheet.create({
   },
   submitButtonText: {
     color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
+    ...FONTS.semibold(15),
     letterSpacing: 1,
   },
   orContainer: {
@@ -276,7 +277,7 @@ const styles = StyleSheet.create({
   },
   orText: {
     ...FONTS.body4,
-    color: COLORS.textLight,
+    color: '#9797A6',
   },
   biometricsContainer: {
     flexDirection: 'row',
@@ -308,13 +309,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   footerText: {
-    ...FONTS.body4,
-    color: COLORS.textLight,
+    ...FONTS.medium(14),
+    color: COLORS.text,
   },
   footerLink: {
-    ...FONTS.body4,
-    color: COLORS.primary,
+    ...FONTS.semibold(14),
+    color: '#A276FF',
     fontWeight: 'bold',
+    textDecorationLine:'underline',
   },
 });
 

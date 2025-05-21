@@ -342,9 +342,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   itemText: {
-    ...FONTS.h2,
+    ...FONTS.medium(24),
     color: COLORS.text,
-    fontSize: 24,
   },
   highlightBorder: {
     position: 'absolute',
@@ -371,13 +370,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   highlightValue: {
-    ...FONTS.h2,
+    ...FONTS.semibold(24),
     color: COLORS.text,
     marginRight: 5,
     fontSize: 24,
   },
   highlightLabel: {
-    ...FONTS.body3,
+    ...FONTS.medium(18),
     color: COLORS.textLight,
   },
 });

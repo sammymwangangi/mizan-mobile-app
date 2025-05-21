@@ -54,9 +54,9 @@ const HomeScreen = () => {
   // Mock data
   const userData = {
     name: 'Robin Habibi',
-    plan: 'Ethics Basic',
+    plan: 'Noor',
     balance: 2433.45,
-    milestone: 3500,
+    milestone: 67,
   };
 
   const quickActions = [
@@ -198,7 +198,7 @@ const HomeScreen = () => {
               <View style={styles.card}>
                 <View style={styles.cardContent}>
                   <View style={{ flex: 1, justifyContent: 'center' }}>
-                    <LiquidProgress value={67} size={150} />
+                    <LiquidProgress value={67} size={117} />
                   </View>
 
 
@@ -207,7 +207,7 @@ const HomeScreen = () => {
                     <Text style={styles.balanceAmount}>{formatCurrency(userData.balance)}</Text>
 
                     <View style={styles.milestoneContainer}>
-                      <Text style={styles.milestoneLabel}>Milestone</Text>
+                      <Text style={styles.milestoneLabel}>Round-ups</Text>
                       <Text style={styles.milestoneAmount}>{formatCurrency(userData.milestone)}</Text>
                     </View>
                   </View>
@@ -390,16 +390,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   welcomeText: {
-    ...FONTS.h3,
+    ...FONTS.medium(14),
     color: COLORS.textWhite,
-    fontWeight: 'bold',
-    fontSize: 14,
   },
   userName: {
-    ...FONTS.h3,
+    ...FONTS.medium(14),
     color: COLORS.textWhite,
-    fontSize: 14,
-    fontWeight: 'bold',
   },
   planText: {
     ...FONTS.body5,
@@ -496,12 +492,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   balanceLabel: {
-    ...FONTS.body4,
+    ...FONTS.medium(14),
     color: COLORS.textLight,
     marginBottom: 5,
   },
   balanceAmount: {
-    ...FONTS.h2,
+    ...FONTS.semibold(20),
     color: COLORS.text,
     marginBottom: 15,
   },
@@ -509,11 +505,11 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   milestoneLabel: {
-    ...FONTS.body5,
+    ...FONTS.medium(14),
     color: COLORS.textLight,
   },
   milestoneAmount: {
-    ...FONTS.h3,
+    ...FONTS.semibold(20),
     color: COLORS.text,
   },
   progressContainer: {
@@ -594,7 +590,7 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     width: '47%',
-    height: 80,
+    height: 56,
     borderRadius: 25,
     backgroundColor: '#FFFFFF',
     flexDirection: 'row',
@@ -614,9 +610,7 @@ const styles = StyleSheet.create({
     height: 32,
   },
   actionText: {
-    fontFamily: 'Poppins',
-    fontWeight: '600',
-    fontSize: 16,
+    ...FONTS.medium(14),
     color: COLORS.text,
   },
   sectionContainer: {
@@ -625,10 +619,8 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   sectionTitle: {
-    fontFamily: "Poppins",
-    fontWeight: 'bold',
-    fontSize: 20,
-    color: "#1B1C39",
+    ...FONTS.semibold(20),
+    color: COLORS.text,
     marginBottom: 15,
   },
   promotionsGrid: {
