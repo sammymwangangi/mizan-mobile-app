@@ -21,6 +21,7 @@ import PaymentCard from '../components/PaymentCard';
 import TransactionItem from '../components/TransactionItem';
 import ReminderItem from '../components/ReminderItem';
 import OfferCard from '../components/OfferCard';
+import WeekendCard from 'components/WeekendCard';
 
 // Get screen dimensions
 const { width } = Dimensions.get('window');
@@ -89,6 +90,26 @@ const TransactionsScreen = () => {
       title: 'Special Ramadhan offers',
       subtitle: '50% discount on the Carrefour app',
       logo: 'offer-2.png'
+    },
+  ];
+
+  // Sample data for weekend offers
+  const weekendOffers = [
+    {
+      id: '1',
+      title: 'Special Ramadhan offers',
+      subtitle: 'Get heavy discount on the Carrefour app',
+      icon: 'bowl.png',
+      backgroundColor: '#6E59F7',
+      textColor: '#FFFFFF',
+    },
+    {
+      id: '2',
+      title: 'Special Ramadhan offers',
+      subtitle: 'Get heavy discount on the Carrefour app',
+      icon: 'bowl2.png',
+      backgroundColor: '#E0D2FF',
+      textColor: '#6E59F7',
     },
   ];
 
@@ -290,37 +311,22 @@ const TransactionsScreen = () => {
             Getting bored at home this weekend? Join in fun weekend and get exciting offers!
           </Text>
 
-          <View style={styles.weekendDealsContainer}>
-            <TouchableOpacity style={styles.weekendDealCard}>
-              <LinearGradient
-                colors={['#A276FF', '#9406E2']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.weekendDealGradient}
-              >
-                <Text style={styles.weekendDealTitle}>Fancy Dinner</Text>
-                <Text style={styles.weekendDealSubtitle}>
-                  Get heavy discount on the Carrefour app
-                </Text>
-                <Text style={styles.weekendDealTerms}>*T&C apply</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.weekendDealCard}>
-              <LinearGradient
-                colors={['#A276FF', '#9406E2']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.weekendDealGradient}
-              >
-                <Text style={styles.weekendDealTitle}>Fancy Dinner</Text>
-                <Text style={styles.weekendDealSubtitle}>
-                  Get heavy discount on the Carrefour app
-                </Text>
-                <Text style={styles.weekendDealTerms}>*T&C apply</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-          </View>
+          <FlatList
+            data={weekendOffers}
+            keyExtractor={(item) => item.id}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ gap: 16, paddingHorizontal: 16, paddingBottom: 30 }}
+            renderItem={({ item }) => (
+              <WeekendCard
+                icon={item.icon}
+                title={item.title}
+                subtitle={item.subtitle}
+                backgroundColor={item.backgroundColor}
+                textColor={item.textColor}
+              />
+            )}
+          />
         </View>
 
         {/* Bottom padding */}
@@ -582,65 +588,28 @@ const styles = StyleSheet.create({
   reminderTitle: {
     ...FONTS.semibold(13),
     color: COLORS.text,
-    fontWeight: '500',
   },
   reminderDueDate: {
     ...FONTS.body5,
     color: COLORS.textLight,
   },
   viewAllText: {
-    ...FONTS.body5,
-    color: COLORS.primary,
-    fontWeight: '500',
+    ...FONTS.semibold(14),
+    color: '#A276FF',
   },
-  offersRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    rowGap: 20
-  },
-  offerCard: {
-    width: '48%',
-    backgroundColor: COLORS.card,
-    borderRadius: 15,
-    padding: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  offerLogoContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#F0F0F0',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  offerLogo: {
-    width: 25,
-    height: 25,
-  },
-  offerTitle: {
-    ...FONTS.body4,
-    color: COLORS.text,
-    fontWeight: '500',
-    marginBottom: 5,
-  },
-  offerSubtitle: {
-    ...FONTS.body5,
-    color: COLORS.textLight,
-  },
-  weekendDealsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
+
   weekendDealCard: {
-    width: '48%',
-    height: 150,
-    borderRadius: 15,
+    backgroundColor: "#6E59F7",
+    width: 276,
+    height: 153,
+    borderRadius: 25,
+    padding: 15,
     overflow: 'hidden',
+    shadowColor: '#6943AF',
+    shadowOffset: { width: 0, height: 20 },
+    shadowOpacity: 0.4,
+    shadowRadius: 25,
+    elevation: 20,
   },
   weekendDealGradient: {
     flex: 1,

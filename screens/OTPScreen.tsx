@@ -260,6 +260,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     marginBottom: 40,
+    marginLeft: 40,
   },
   otpInputContainer: {
     width: 50,
