@@ -12,6 +12,7 @@ import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import Input from '../components/Input';
 import DurationPicker from '../components/DurationPicker';
 import LiquidProgressCircle from '../components/LiquidProgressCircle';
+import ConfettiCannon from 'react-native-confetti-cannon';
 
 type KYCScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'KYC'>;
 
@@ -763,6 +764,7 @@ const KYCScreen: React.FC = () => {
   const renderCongratulationsStep = () => {
     return (
       <View className="relative flex-1 flex-col justify-start items-center gap-[137px] px-10">
+        <ConfettiCannon count={120} origin={{x: 200, y: 0}} fadeOut={true} explosionSpeed={350} fallSpeed={3000} />
         <Image
           source={require('../assets/kyc/arabic-logo.png')}
           className="w-[104px] h-[21.83px]"
