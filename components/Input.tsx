@@ -64,6 +64,7 @@ const Input: React.FC<InputProps> = ({
             inputStyle,
           ]}
           placeholderTextColor={COLORS.placeholder}
+          {...FONTS.medium(14)}
           onFocus={handleFocus}
           onBlur={handleBlur}
           secureTextEntry={secureTextEntry && !isPasswordVisible}

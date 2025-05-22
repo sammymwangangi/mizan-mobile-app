@@ -58,7 +58,7 @@ export const COLORS = {
   // Other colors
   border: '#E0E0E0',
   disabled: '#BDBDBD',
-  placeholder: '#B3B4CE',
+  placeholder: '#ABACBE',
 
   // Specific UI elements
   progressBar: '#E91E63',

@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   forgotPasswordText: {
-    ...FONTS.body4,
+    ...FONTS.semibold(14),
     color: '#705EE7',
     textDecorationLine:'underline',
   },
@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 20 },
     shadowOpacity: 0.1,
     shadowRadius: 40,
-    elevation: 5,
+    elevation: 20,
   },
   biometricButton: {
     padding: 10,
@@ -315,7 +315,6 @@ const styles = StyleSheet.create({
   footerLink: {
     ...FONTS.semibold(14),
     color: '#A276FF',
-    fontWeight: 'bold',
     textDecorationLine:'underline',
   },
 });
