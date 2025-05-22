@@ -103,7 +103,7 @@ enum KYCStep {
   INCOME, // New step for "How much do you make per month"
   SPENDING, // New step for "How do you spend your mulah?"
   FINANCIAL_EXPOSURE,
-  PLAN,
+  // PLAN,
   CARD,
   CONGRATULATIONS,
   COMPLETE
@@ -217,7 +217,7 @@ const KYCScreen: React.FC = () => {
     if (currentStep < KYCStep.COMPLETE) {
       setCurrentStep(currentStep + 1);
     } else {
-      navigation.replace('Home');
+      navigation.replace('Home', {});
     }
   };
 
@@ -702,40 +702,40 @@ const KYCScreen: React.FC = () => {
     );
   };
 
-  const renderPlanStep = () => {
-    return (
-      <View style={styles.stepContainer}>
-        <Text style={styles.stepSubtitle}>Get a one month&apos;s free on any plan</Text>
-        <Text style={styles.stepTitle}>Slide to choose a plan</Text>
+  // const renderPlanStep = () => {
+  //   return (
+  //     <View style={styles.stepContainer}>
+  //       <Text style={styles.stepSubtitle}>Get a one month&apos;s free on any plan</Text>
+  //       <Text style={styles.stepTitle}>Slide to choose a plan</Text>
 
-        <View style={styles.planContainer}>
-          <View style={styles.planGraph}>
-            {/* Graph visualization would go here */}
-            <Text style={styles.planAmount}>$500</Text>
-          </View>
+  //       <View style={styles.planContainer}>
+  //         <View style={styles.planGraph}>
+  //           {/* Graph visualization would go here */}
+  //           <Text style={styles.planAmount}>$500</Text>
+  //         </View>
 
-          <View style={styles.planSelector}>
-            <Text style={styles.planPrice}>$3 p.m</Text>
-            <Text style={styles.planName}>{selectedPlan}</Text>
-          </View>
+  //         <View style={styles.planSelector}>
+  //           <Text style={styles.planPrice}>$3 p.m</Text>
+  //           <Text style={styles.planName}>{selectedPlan}</Text>
+  //         </View>
 
-          <Slider
-            style={styles.financialSlider}
-            minimumValue={0}
-            maximumValue={100}
-            value={50}
-            minimumTrackTintColor={COLORS.primary}
-            maximumTrackTintColor={COLORS.border}
-            thumbTintColor={COLORS.primary}
-          />
+  //         <Slider
+  //           style={styles.financialSlider}
+  //           minimumValue={0}
+  //           maximumValue={100}
+  //           value={50}
+  //           minimumTrackTintColor={COLORS.primary}
+  //           maximumTrackTintColor={COLORS.border}
+  //           thumbTintColor={COLORS.primary}
+  //         />
 
-          <Text style={styles.sliderHint}>
-            Use this tool to see how round-ups and depositing money each month can impact the long term value of your account.
-          </Text>
-        </View>
-      </View>
-    );
-  };
+  //         <Text style={styles.sliderHint}>
+  //           Use this tool to see how round-ups and depositing money each month can impact the long term value of your account.
+  //         </Text>
+  //       </View>
+  //     </View>
+  //   );
+  // };
 
   const renderCardStep = () => {
     return (
@@ -884,8 +884,8 @@ const KYCScreen: React.FC = () => {
         return renderSpendingStep();
       case KYCStep.FINANCIAL_EXPOSURE:
         return renderFinancialExposureStep();
-      case KYCStep.PLAN:
-        return renderPlanStep();
+      // case KYCStep.PLAN:
+      //   return renderPlanStep();
       case KYCStep.CARD:
         return renderCardStep();
       case KYCStep.CONGRATULATIONS:
