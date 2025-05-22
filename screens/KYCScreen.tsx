@@ -170,10 +170,10 @@ const KYCScreen: React.FC = () => {
 
   useEffect(() => {
     if (currentStep === KYCStep.CONGRATULATIONS) {
-      // Navigate to complete step after 2 seconds
+      // Navigate to complete step after 5 seconds
       const timer = setTimeout(() => {
         setCurrentStep(KYCStep.COMPLETE);
-      }, 2000);
+      }, 5000);
 
       return () => clearTimeout(timer);
     }
