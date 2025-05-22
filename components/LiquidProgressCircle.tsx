@@ -31,7 +31,7 @@ const WAVE_FREQUENCY_2 = 2.2;
 
 const COLORS = {
   background: '#E7E3F2',
-  
+
   gradient1: [
     { offset: '0%', color: '#8BB4F2', opacity: 1 },
     { offset: '50%', color: '#974BEB', opacity: 0.5 },
@@ -116,7 +116,15 @@ const LiquidProgressCircle: React.FC<Props> = ({
   });
 
   return (
-    <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center', alignSelf:'center' }}>
+    <View style={{
+      width: size, height: size, alignItems: 'center', justifyContent: 'center', alignSelf: 'center', backgroundColor: COLORS.background,
+      borderRadius: size / 2,
+      shadowColor: '#391A73',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.5,
+      shadowRadius: 4,
+      elevation: 20,
+    }}>
       <Svg width={size} height={size}>
         <Defs>
           {/* Two gradients for waves */}

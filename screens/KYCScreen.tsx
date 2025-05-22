@@ -643,6 +643,7 @@ const KYCScreen: React.FC = () => {
                   zIndex: 2,
                   width: 177,
                   transform: [{ translateY: -64 / 2 }],
+                  shadowColor: '#6943AF', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.5, shadowRadius: 4, elevation: 20
                 }}
               >
 
