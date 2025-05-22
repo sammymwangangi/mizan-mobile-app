@@ -292,7 +292,7 @@ const DurationPicker: React.FC<DurationPickerProps> = ({
         colors={['#5592EF', '#8532E0', '#F053E0']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
-        style={styles.highlightBorder}
+        style={[styles.highlightBorder, {shadowColor: '#6943AF', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.5, shadowRadius: 4, elevation: 20}]}
       >
         <View style={styles.highlightInner}>
           <View style={styles.highlightContent}>
