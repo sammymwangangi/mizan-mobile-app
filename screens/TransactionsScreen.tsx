@@ -114,7 +114,7 @@ const TransactionsScreen = () => {
   ];
 
   // Handle card scroll
-  const handleCardScroll = (event) => {
+  const handleCardScroll = (event: any) => {
     const contentOffsetX = event.nativeEvent.contentOffset.x;
     const index = Math.round(contentOffsetX / width);
     setActiveCardIndex(index);
