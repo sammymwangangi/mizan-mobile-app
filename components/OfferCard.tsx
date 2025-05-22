@@ -1,9 +1,14 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { COLORS, FONTS } from '../constants/theme';
 
+const LOGOS: Record<string, any> = {
+  'carrefour.png': require('../assets/payments/carrefour.png'),
+  'offer-2.png': require('../assets/payments/offer-2.png'),
+};
+
 interface OfferCardProps {
-  logo: React.ReactNode;
+  logo: string;
   title: string;
   subtitle: string;
   onPress?: () => void;
@@ -21,9 +26,11 @@ const OfferCard: React.FC<OfferCardProps> = ({
       onPress={onPress}
       activeOpacity={0.7}
     >
-      <View style={styles.logoContainer}>
-        {logo}
-      </View>
+      <Image
+        source={LOGOS[logo]}
+        style={styles.iconImage}
+        resizeMode="contain"
+      />
       <View style={styles.details}>
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.subtitle}>{subtitle}</Text>
@@ -34,24 +41,21 @@ const OfferCard: React.FC<OfferCardProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    width: '48%',
+    width: 276,
+    height: 153,
     backgroundColor: COLORS.card,
-    borderRadius: 15,
-    padding: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    borderRadius: 25,
+    padding: 15,
+    shadowColor: '#6943AF',
+    shadowOffset: { width: 0, height: 20 },
+    shadowOpacity: 0.4,
+    shadowRadius: 25,
+    elevation: 20,
   },
-  logoContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#F0F0F0',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 10,
+
+  iconImage: {
+    width: 42,
+    height: 32,
   },
   details: {
     flex: 1,

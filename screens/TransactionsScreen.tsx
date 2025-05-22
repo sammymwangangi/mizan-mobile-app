@@ -46,7 +46,7 @@ const TransactionsScreen = () => {
       subtitle: 'UBER',
       amount: 8.48,
       time: '6:41 pm',
-      icon:"cab.png"
+      icon: "cab.png"
     },
     {
       id: '2',
@@ -54,7 +54,7 @@ const TransactionsScreen = () => {
       subtitle: 'Arkam Ahmed',
       amount: 18.00,
       time: '6:41 pm',
-      icon:"lunch.png"
+      icon: "lunch.png"
     },
   ];
 
@@ -82,13 +82,13 @@ const TransactionsScreen = () => {
       id: '1',
       title: 'Special Ramadhan offers',
       subtitle: '50% discount on the Carrefour app',
-      logo: <CreditCard size={20} color={COLORS.primary} />
+      logo: 'carrefour.png'
     },
     {
       id: '2',
       title: 'Special Ramadhan offers',
       subtitle: '50% discount on the Carrefour app',
-      logo: <CreditCard size={20} color={COLORS.primary} />
+      logo: 'offer-2.png'
     },
   ];
 
@@ -250,25 +250,32 @@ const TransactionsScreen = () => {
         </View>
 
         {/* Offers Section */}
-        <View style={styles.sectionContainer}>
-          <View style={styles.sectionHeaderRow}>
-            <Text style={styles.sectionTitle}>Offers</Text>
-            <TouchableOpacity>
-              <Text style={styles.viewAllText}>View all</Text>
-            </TouchableOpacity>
-          </View>
-          <Text style={styles.sectionSubtitle}>Special offers handpicked for you</Text>
+        <View style={styles.offersSectionContainer}>
 
-          <View style={styles.offersRow}>
-            {offers.map((offer) => (
-              <OfferCard
-                key={offer.id}
-                logo={offer.logo}
-                title={offer.title}
-                subtitle={offer.subtitle}
-              />
-            ))}
+          <View style={styles.offersHeader}>
+            <View style={styles.sectionHeaderRow}>
+              <Text style={styles.sectionTitle}>Offers</Text>
+              <TouchableOpacity>
+                <Text style={styles.viewAllText}>View all</Text>
+              </TouchableOpacity>
+            </View>
+            <Text style={styles.sectionSubtitle}>Special offers handpicked for you</Text>
           </View>
+
+          <FlatList
+            data={offers}
+            keyExtractor={(item) => item.id}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ gap: 16, paddingHorizontal: 16, paddingBottom: 30 }}
+            renderItem={({ item }) => (
+              <OfferCard
+                logo={item.logo}
+                title={item.title}
+                subtitle={item.subtitle}
+              />
+            )}
+          />
         </View>
 
         {/* Fun Weekend Ahead */}
@@ -418,6 +425,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: SIZES.padding,
     marginTop: 25,
   },
+  offersSectionContainer: {
+    marginTop: 25,
+  },
+  offersHeader: {
+    paddingHorizontal: SIZES.padding,
+  },
   sectionHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -505,7 +518,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingLeft: 18,
     paddingRight: 18,
-    
+
   },
   insightTitle: {
     ...FONTS.semibold(18),
@@ -529,15 +542,19 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
   addNewButton: {
-    backgroundColor: COLORS.primary,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
+    backgroundColor: '#A276FF',
+    paddingHorizontal: 19,
+    paddingVertical: 14,
+    borderRadius: 40,
+    shadowColor: '#391A73',
+    shadowOffset: { width: 0, height: 15 },
+    shadowOpacity: 0.15,
+    shadowRadius: 40,
+    elevation: 15,
   },
   addNewText: {
-    ...FONTS.body5,
+    ...FONTS.semibold(12),
     color: COLORS.textWhite,
-    fontWeight: '500',
   },
   reminderItem: {
     flexDirection: 'row',
@@ -563,7 +580,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   reminderTitle: {
-    ...FONTS.body4,
+    ...FONTS.semibold(13),
     color: COLORS.text,
     fontWeight: '500',
   },
@@ -579,6 +596,7 @@ const styles = StyleSheet.create({
   offersRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    rowGap: 20
   },
   offerCard: {
     width: '48%',
