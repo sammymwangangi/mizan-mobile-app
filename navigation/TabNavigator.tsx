@@ -268,8 +268,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   tabIcon: {
-    width: 24,
+    width: 50,
     height: 24,
+    alignSelf: 'flex-start',
   },
   activeIcon: {
     tintColor: 'white', // Set active icon to white
