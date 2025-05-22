@@ -168,6 +168,11 @@ const KYCScreen: React.FC = () => {
   const arrowTranslateX = useRef(new Animated.Value(0)).current;
   const buttonOpacity = useRef(new Animated.Value(1)).current;
 
+  const flatListRef = useRef<FlatList>(null);
+  const handleSkip = () => {
+    navigation.replace('Congratulations');
+  };
+
   useEffect(() => {
     if (currentStep === KYCStep.CONGRATULATIONS) {
       // Navigate to complete step after 5 seconds
@@ -801,14 +806,21 @@ const KYCScreen: React.FC = () => {
                 resizeMode="contain"
               />
             )}
-          // contentContainerStyle={styles.cardList}
           />
-
-
 
           <Text style={styles.cardQuestion}>
             Would you like to customize your card?
           </Text>
+
+          {/* Add "Yes Please" and "Skip for now" navigation buttons */}
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 24, width: '100%', paddingHorizontal: 10 }}>
+            <TouchableOpacity disabled style={{ opacity: 0.4 }}>
+              <Text style={{ color: '#C7C7C7', fontSize: 18, fontFamily: 'Poppins' }}>Yes please</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setCurrentStep(KYCStep.CONGRATULATIONS)}>
+              <Text style={{ color: '#A276FF', ...FONTS.semibold(18) }}>Skip for now</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     );
@@ -1495,6 +1507,7 @@ const styles = StyleSheet.create({
     ...FONTS.medium(24),
     color: COLORS.text,
     marginBottom: 20,
+    marginTop: 50,
     textAlign: 'center',
     width: 340,
   },

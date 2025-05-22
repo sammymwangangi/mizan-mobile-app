@@ -54,7 +54,7 @@ const AuthScreen = () => {
   const handleSubmit = () => {
     if (validateForm()) {
       // In a real app, you would handle authentication here
-      navigation.navigate('Home');
+      navigation.navigate('Home', { screen: 'Home' });
     }
   };
 
