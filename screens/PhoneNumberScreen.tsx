@@ -51,7 +51,7 @@ const PhoneNumberScreen = () => {
       >
         <LinearGradient
           colors={['#80B2FF', '#7C27D9', '#FF68F0']}
-          locations={[0, 0.7155, 1]}
+          locations={[0, 0.7, 1]}
           start={{ x: 0, y: 0 }}
           end={{ x: 0, y: 1 }}
           style={{ flex: 1 }}
@@ -126,7 +126,7 @@ const PhoneNumberScreen = () => {
                 locations={[0, 0.15, 0.3, 0.45, 0.6, 0.75, 1]}
                 start={{ x: 0, y: 0.5 }}
                 end={{ x: 1, y: 0.5 }}
-                style={styles.submitButton}
+                style={[styles.submitButton, { shadowColor: '#6943AF', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.5, shadowRadius: 4, elevation: 20 }]}
               >
                 <Text style={styles.submitButtonText}>SIGN-UP</Text>
               </LinearGradient>
@@ -271,7 +271,10 @@ const styles = StyleSheet.create({
   },
 
   submitButtonContainer: {
-    marginBottom: 20,
+    marginBottom: 0,
+    backgroundColor: 'white',
+    borderRadius: 40,
+    shadowColor: '#391A73', shadowOffset: { width: 0, height: 2 }, shadowOpacity: .5, shadowRadius: 4, elevation: 20
   },
   submitButton: {
     height: 55,
