@@ -412,24 +412,28 @@ const KYCScreen: React.FC = () => {
 
         <View style={styles.hustleContainer}>
           {hustleOptions.map((option) => (
-            <TouchableOpacity
-              key={option.id}
-              style={[
-                styles.hustleCard,
-                selectedHustle === option.id && styles.hustleCardActive
-              ]}
-              activeOpacity={0.7}
-              onPress={() => selectHustle(option.id)}
-            >
-              <Text
-                style={[
-                  styles.hustleText,
-                  selectedHustle === option.id && styles.hustleTextActive
-                ]}
+            selectedHustle === option.id ? (
+              <LinearGradient
+                key={option.id}
+                colors={['#A276FF', '#F053E0']}
+                start={{ x: 0, y: 0.25 }}
+                end={{ x: 1, y: 0.75 }}
+                style={{ borderRadius: 25, padding: 1, marginBottom: 15, shadowColor: '#6943AF', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.5, shadowRadius: 4, elevation: 20 }}
               >
-                {option.text}
-              </Text>
-            </TouchableOpacity>
+                <View style={[styles.hustleCard, { borderWidth: 0, marginBottom: 1, width: '100%' }]}>  
+                  <Text style={[styles.hustleText, styles.hustleTextActive]}>{option.text}</Text>
+                </View>
+              </LinearGradient>
+            ) : (
+              <TouchableOpacity
+                key={option.id}
+                style={[styles.hustleCard]}
+                activeOpacity={0.7}
+                onPress={() => selectHustle(option.id)}
+              >
+                <Text style={styles.hustleText}>{option.text}</Text>
+              </TouchableOpacity>
+            )
           ))}
         </View>
       </View>
@@ -698,6 +702,7 @@ const KYCScreen: React.FC = () => {
                   style={styles.sliderThumbGradient}
                 />
               </View>
+
             </View>
 
             <Text style={styles.sliderHint}>
@@ -1052,15 +1057,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.card,
     paddingHorizontal: 20,
   },
-  hustleCardActive: {
-    borderColor: '#A276FF',
-    borderWidth: 1,
-    shadowColor: '#6943AF',
-    shadowOffset: { width: 0, height: 20 },
-    shadowOpacity: 0.1,
-    shadowRadius: 40,
-    elevation: 5,
-  },
+
   hustleText: {
     ...FONTS.medium(18),
     color: '#6D6E8A',
