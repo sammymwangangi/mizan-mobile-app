@@ -8,6 +8,7 @@ import {
   TextStyle,
   TouchableOpacityProps,
   View,
+  ColorValue,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
@@ -22,7 +23,7 @@ interface ButtonProps extends TouchableOpacityProps {
   style?: ViewStyle;
   textStyle?: TextStyle;
   gradient?: boolean;
-  gradientColors?: string[] | readonly string[];
+  gradientColors?: [ColorValue, ColorValue, ...ColorValue[]];
   gradientStart?: { x: number; y: number };
   gradientEnd?: { x: number; y: number };
   leftIcon?: React.ReactNode;
@@ -175,7 +176,7 @@ const Button: React.FC<ButtonProps> = ({
         {...rest}
       >
         <LinearGradient
-          colors={(gradientColors || ['#E9B8FF', '#A9C7FF']) as readonly string[]}
+          colors={gradientColors || ['#E9B8FF', '#A9C7FF']}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
           style={[getButtonStyles(), styles.gradientButton]}

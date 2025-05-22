@@ -284,12 +284,39 @@ const KYCScreen: React.FC = () => {
 
         <View style={styles.spacer} />
 
-        <Button
-          title="NEXT"
-          onPress={handleNext}
-          gradient={true}
-          style={styles.nextButton}
-        />
+        <View style={{
+          width: '100%',
+          paddingHorizontal: SIZES.padding,
+          paddingBottom: Platform.OS === 'ios' ? 40 : 30,
+          paddingTop: 20
+        }}>
+          <TouchableOpacity
+            style={{ width: '100%' }}
+            onPress={handleNext}
+          >
+            <LinearGradient
+              colors={['#D155FF', '#B532F2', '#A016E8', '#9406E2', '#8F00E0', '#921BE6', '#A08CFF']}
+              locations={[0, 0.15, 0.3, 0.45, 0.6, 0.75, 1]}
+              start={{ x: 0, y: 0.5 }}
+              end={{ x: 1, y: 0.5 }}
+              style={{
+                height: 56,
+                borderRadius: 28,
+                justifyContent: 'center',
+                alignItems: 'center',
+                paddingRight: 30
+              }}
+            >
+              <Text style={{
+                color: COLORS.textWhite,
+                fontSize: 16,
+                fontWeight: 'bold',
+                letterSpacing: 1,
+                textAlign: 'center'
+              }}>NEXT</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
       </View>
     );
   };
@@ -307,13 +334,15 @@ const KYCScreen: React.FC = () => {
                 colors={['#A276FF', '#F053E0']}
                 start={{ x: 0, y: 0.25 }}
                 end={{ x: 1, y: 0.75 }}
-                style={{ borderRadius: 25, padding: 1, shadowColor: '#6943AF',
+                style={{
+                  borderRadius: 25, padding: 1, shadowColor: '#6943AF',
                   shadowOffset: { width: 0, height: 20 },
                   shadowOpacity: 0.4,
                   shadowRadius: 25,
-                  elevation: 20, }}
+                  elevation: 20,
+                }}
               >
-                <View style={[styles.genderOption, { borderWidth: 0, borderRadius: 25, overflow: 'hidden' }]}>  
+                <View style={[styles.genderOption, { borderWidth: 0, borderRadius: 25, overflow: 'hidden' }]}>
                   <View style={styles.genderIconContainer}>
                     <Image
                       source={option.img}
@@ -420,7 +449,7 @@ const KYCScreen: React.FC = () => {
                 end={{ x: 1, y: 0.75 }}
                 style={{ borderRadius: 25, padding: 1, marginBottom: 15, shadowColor: '#6943AF', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.5, shadowRadius: 4, elevation: 20 }}
               >
-                <View style={[styles.hustleCard, { borderWidth: 0, marginBottom: 1, width: '100%' }]}>  
+                <View style={[styles.hustleCard, { borderWidth: 0, marginBottom: 1, width: '100%' }]}>
                   <Text style={[styles.hustleText, styles.hustleTextActive]}>{option.text}</Text>
                 </View>
               </LinearGradient>
@@ -753,8 +782,8 @@ const KYCScreen: React.FC = () => {
   const renderCardStep = () => {
     return (
       <View style={styles.stepContainer}>
-        <Text style={styles.stepSubtitle}>Make it yours, personalize your card</Text>
-        <Text style={styles.stepTitle}>Order a fancy card</Text>
+        <Text style={styles.fancyCardSubtitle}>Make it yours, personalize your card</Text>
+        <Text style={styles.fancyCardTitle}>Order a fancy card</Text>
 
         <View style={styles.cardContainer}>
           <Text style={styles.cardInstructions}>Slide to choose</Text>
@@ -767,14 +796,14 @@ const KYCScreen: React.FC = () => {
             keyExtractor={(item) => item.toString()}
             renderItem={({ item }) => (
               <Image
-                  source={require('../assets/kyc/fancy-card.png')}
-                  style={styles.cardImage}
-                  resizeMode="contain"
-                />
+                source={require('../assets/kyc/fancy-card.png')}
+                style={styles.cardImage}
+                resizeMode="contain"
+              />
             )}
-            // contentContainerStyle={styles.cardList}
+          // contentContainerStyle={styles.cardList}
           />
-          
+
 
 
           <Text style={styles.cardQuestion}>
@@ -789,11 +818,6 @@ const KYCScreen: React.FC = () => {
     return (
       <View className="relative flex-1 flex-col justify-start items-center gap-[137px] px-10">
         <ConfettiCannon count={120} origin={{ x: 200, y: 0 }} fadeOut={true} explosionSpeed={350} fallSpeed={3000} />
-        <Image
-          source={require('../assets/kyc/arabic-logo.png')}
-          className="w-[104px] h-[21.83px]"
-          resizeMode="contain"
-        />
         <Text className="text-[25px] font-semibold text-[#1B1C39] text-center">Congratulations</Text>
         <Image
           source={require('../assets/kyc/tick.png')}
@@ -936,13 +960,41 @@ const KYCScreen: React.FC = () => {
 
           {renderCurrentStep()}
 
-          {(currentStep < KYCStep.CONGRATULATIONS && currentStep !== KYCStep.FULL_NAME) && (
-            <Button
-              title="NEXT"
-              onPress={handleNext}
-              gradient={true}
-              style={styles.nextButton}
-            />
+          {(currentStep < KYCStep.CONGRATULATIONS && currentStep !== KYCStep.FULL_NAME && currentStep !== KYCStep.CARD) && (
+
+            <View style={{
+              width: '100%',
+              paddingHorizontal: SIZES.padding,
+              paddingBottom: Platform.OS === 'ios' ? 40 : 30,
+              paddingTop: 20
+            }}>
+              <TouchableOpacity
+                style={{ width: '100%' }}
+                onPress={handleNext}
+              >
+                <LinearGradient
+                  colors={['#D155FF', '#B532F2', '#A016E8', '#9406E2', '#8F00E0', '#921BE6', '#A08CFF']}
+                  locations={[0, 0.15, 0.3, 0.45, 0.6, 0.75, 1]}
+                  start={{ x: 0, y: 0.5 }}
+                  end={{ x: 1, y: 0.5 }}
+                  style={{
+                    height: 56,
+                    borderRadius: 28,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    paddingRight: 30
+                  }}
+                >
+                  <Text style={{
+                    color: COLORS.textWhite,
+                    fontSize: 16,
+                    fontWeight: 'bold',
+                    letterSpacing: 1,
+                    textAlign: 'center'
+                  }}>NEXT</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
           )}
         </>
       )}
@@ -1241,6 +1293,22 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingHorizontal: 20,
   },
+  fancyCardSubtitle: {
+    ...FONTS.semibold(14),
+    color: '#A276FF',
+    marginVertical: 18,
+    textAlign: 'center',
+  },
+
+  fancyCardTitle: {
+    ...FONTS.h1,
+    color: COLORS.text,
+    marginBottom: 0,
+    textAlign: 'center',
+    paddingHorizontal: 30,
+    paddingVertical: 0,
+  },
+
   arabicStepTitle: {
     fontFamily: Platform.select({
       android: 'Poppins_400Regular',

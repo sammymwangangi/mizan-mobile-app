@@ -182,12 +182,17 @@ const OTPScreen = () => {
             style={styles.resendContainer}
             disabled={!isResendActive}
           >
-            <Text style={[
-              styles.resendText,
-              isResendActive ? styles.activeResendText : styles.inactiveResendText
-            ]}>
-              Resend your code if it doesnt arrive in {formatTime(timer)}
-            </Text>
+            <View style={{flexDirection: 'row', justifyContent: 'center'}}>
+              <Text style={[
+                styles.resendText,
+                isResendActive ? styles.activeResendText : styles.inactiveResendText
+              ]}>
+                Resend {''}
+              </Text>
+              <Text style={styles.resendText}>
+                 your code if it doesnt arrive in {formatTime(timer)}
+              </Text>
+            </View>
           </TouchableOpacity>
 
           {/* Display entered OTP for demo */}
@@ -299,6 +304,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   activeResendText: {
+    fontFamily: 'Poppins',
     color: '#6D6E8A',
     textDecorationLine: 'underline',
   },
