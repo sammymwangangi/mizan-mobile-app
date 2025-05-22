@@ -300,45 +300,48 @@ const KYCScreen: React.FC = () => {
         <Text style={styles.stepTitle}>And what&apos;s your gender?</Text>
 
         <View style={styles.genderContainer}>
-          <TouchableOpacity
-            style={[
-              styles.genderOption,
-              gender === 'male' && styles.selectedGenderOption,
-            ]}
-            onPress={() => setGender('male')}
-          >
-            <View style={styles.genderIconContainer}>
-              <Image
-                source={require('../assets/kyc/male.png')}
-                style={styles.genderIcon}
-                resizeMode="contain"
-              />
-            </View>
-            <Text style={[
-              styles.genderText,
-              gender === 'male' && styles.selectedGenderText,
-            ]}>Male</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.genderOption,
-              gender === 'female' && styles.selectedGenderOption,
-            ]}
-            onPress={() => setGender('female')}
-          >
-            <View style={styles.genderIconContainer}>
-              <Image
-                source={require('../assets/kyc/female.png')}
-                style={styles.genderIcon}
-                resizeMode="contain"
-              />
-            </View>
-            <Text style={[
-              styles.genderText,
-              gender === 'female' && styles.selectedGenderText,
-            ]}>Female</Text>
-          </TouchableOpacity>
+          {[{ key: 'male', label: 'Male', img: require('../assets/kyc/male.png') }, { key: 'female', label: 'Female', img: require('../assets/kyc/female.png') }].map(option => (
+            gender === option.key ? (
+              <LinearGradient
+                key={option.key}
+                colors={['#A276FF', '#F053E0']}
+                start={{ x: 0, y: 0.25 }}
+                end={{ x: 1, y: 0.75 }}
+                style={{ borderRadius: 25, padding: 1, shadowColor: '#6943AF',
+                  shadowOffset: { width: 0, height: 20 },
+                  shadowOpacity: 0.4,
+                  shadowRadius: 25,
+                  elevation: 20, }}
+              >
+                <View style={[styles.genderOption, { borderWidth: 0, borderRadius: 25, overflow: 'hidden' }]}>  
+                  <View style={styles.genderIconContainer}>
+                    <Image
+                      source={option.img}
+                      style={styles.genderIcon}
+                      resizeMode="contain"
+                    />
+                  </View>
+                  <Text style={[styles.genderText, styles.selectedGenderText]}>{option.label}</Text>
+                </View>
+              </LinearGradient>
+            ) : (
+              <TouchableOpacity
+                key={option.key}
+                style={[styles.genderOption, { borderRadius: 25 }]}
+                onPress={() => setGender(option.key as 'male' | 'female')}
+                activeOpacity={0.7}
+              >
+                <View style={styles.genderIconContainer}>
+                  <Image
+                    source={option.img}
+                    style={styles.genderIcon}
+                    resizeMode="contain"
+                  />
+                </View>
+                <Text style={styles.genderText}>{option.label}</Text>
+              </TouchableOpacity>
+            )
+          ))}
         </View>
       </View>
     );
@@ -764,7 +767,7 @@ const KYCScreen: React.FC = () => {
   const renderCongratulationsStep = () => {
     return (
       <View className="relative flex-1 flex-col justify-start items-center gap-[137px] px-10">
-        <ConfettiCannon count={120} origin={{x: 200, y: 0}} fadeOut={true} explosionSpeed={350} fallSpeed={3000} />
+        <ConfettiCannon count={120} origin={{ x: 200, y: 0 }} fadeOut={true} explosionSpeed={350} fallSpeed={3000} />
         <Image
           source={require('../assets/kyc/arabic-logo.png')}
           className="w-[104px] h-[21.83px]"
@@ -806,7 +809,7 @@ const KYCScreen: React.FC = () => {
             duration: 200,
             useNativeDriver: true
           }).start(() => {
-            navigation.replace('Home');
+            navigation.replace('Home', {});
           });
         } else {
           // Reset the position
@@ -822,7 +825,7 @@ const KYCScreen: React.FC = () => {
     return (
       <View className="flex-1 flex-col justify-between items-center px-2 py-20">
 
-        <Text className="text-[#1B1C39] text-center" style={{...FONTS.semibold(25)}}>That&apos;s it</Text>
+        <Text className="text-[#1B1C39] text-center" style={{ ...FONTS.semibold(25) }}>That&apos;s it</Text>
 
         <Image
           source={require('../assets/kyc/high_five.png')}
@@ -830,7 +833,7 @@ const KYCScreen: React.FC = () => {
           resizeMode="contain"
         />
 
-        <Text className="text-[#1B1C39] text-[20px] text-center" style={{fontFamily: 'Poppins'}}>
+        <Text className="text-[#1B1C39] text-[20px] text-center" style={{ fontFamily: 'Poppins' }}>
           That&apos;s it, start moving moolah
         </Text>
 
@@ -1261,6 +1264,11 @@ const styles = StyleSheet.create({
   selectedGenderOption: {
     borderColor: COLORS.primary,
     borderWidth: 2,
+    shadowColor: '#6943AF',
+    shadowOffset: { width: 0, height: 20 },
+    shadowOpacity: 0.4,
+    shadowRadius: 25,
+    elevation: 20,
   },
   genderIconContainer: {
     width: 80,
@@ -1467,7 +1475,7 @@ const styles = StyleSheet.create({
     ...FONTS.semibold(15),
     color: 'white',
     marginLeft: 70,
-    
+
   },
   arrowCircle: {
     width: 40,
