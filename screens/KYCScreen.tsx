@@ -348,10 +348,13 @@ const KYCScreen: React.FC = () => {
   };
 
   const renderInterestsStep = () => {
-    // Function to select a single interest (radio button behavior)
+    // Function to select or deselect an interest (multi-select behavior)
     const toggleInterest = (id: string) => {
-      // Set only the selected interest (radio button behavior)
-      setSelectedInterests([id]);
+      setSelectedInterests((prev) =>
+        prev.includes(id)
+          ? prev.filter((item) => item !== id)
+          : [...prev, id]
+      );
     };
 
     // Get the icon component based on the icon name
