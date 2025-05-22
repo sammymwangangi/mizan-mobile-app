@@ -8,7 +8,7 @@ import Button from '../components/Button';
 import { ArrowLeft, ArrowRight, Clock, Wrench, BarChart2, TrendingUp, Umbrella, HelpCircle } from 'lucide-react-native';
 import Slider from '@react-native-community/slider';
 import { LinearGradient } from 'expo-linear-gradient';
-import { PanGestureHandler, State } from 'react-native-gesture-handler';
+import { FlatList, PanGestureHandler, State } from 'react-native-gesture-handler';
 import Input from '../components/Input';
 import DurationPicker from '../components/DurationPicker';
 import LiquidProgressCircle from '../components/LiquidProgressCircle';
@@ -759,11 +759,23 @@ const KYCScreen: React.FC = () => {
         <View style={styles.cardContainer}>
           <Text style={styles.cardInstructions}>Slide to choose</Text>
 
-          <Image
-            source={require('../assets/kyc/fancy-card.png')}
-            style={styles.cardImage}
-            resizeMode="contain"
+          {/* Use FlatList to make cards scroll horizontally */}
+          <FlatList
+            data={[1, 2, 3]} // Dummy data for card options
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(item) => item.toString()}
+            renderItem={({ item }) => (
+              <Image
+                  source={require('../assets/kyc/fancy-card.png')}
+                  style={styles.cardImage}
+                  resizeMode="contain"
+                />
+            )}
+            // contentContainerStyle={styles.cardList}
           />
+          
+
 
           <Text style={styles.cardQuestion}>
             Would you like to customize your card?
