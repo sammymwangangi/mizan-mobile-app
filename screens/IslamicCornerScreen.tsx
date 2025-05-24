@@ -172,7 +172,10 @@ const IslamicCornerScreen = () => {
               const centerAngle = startAngle + segmentAngle / 2;
               // Convert to radians
               const angleRad = (centerAngle - 90) * (Math.PI / 180); // -90 to start from top
-              const labelRadius = 110;
+              const labelRadius = 80; // try 90, 92, or 95 for best fit
+              const labelWidth = 76;  // match your minWidth in styles
+              const labelHeight = 40; // estimate based on your style
+
               const x = 90 + labelRadius * Math.cos(angleRad);
               const y = 90 + labelRadius * Math.sin(angleRad);
 
@@ -183,8 +186,12 @@ const IslamicCornerScreen = () => {
                     styles.segmentLabel,
                     {
                       backgroundColor: segment.color,
-                      left: x - 35, // adjust for label width
-                      top: y - 20,  // adjust for label height
+                      left: x,
+                      top: y,
+                      transform: [
+                        { translateX: -labelWidth / 2 },
+                        { translateY: -labelHeight / 2 },
+                      ],
                     }
                   ]}
                 >
@@ -376,10 +383,10 @@ const styles = StyleSheet.create({
   },
   segmentLabel: {
     position: 'absolute',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 20,
-    minWidth: 70,
+    paddingHorizontal: 8,
+    paddingVertical: 8,
+    borderRadius: 40,
+    minWidth: 76,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',

@@ -78,62 +78,62 @@ const DonationConfirmationScreen = () => {
 
       {/* Contribution Circle */}
       <View style={styles.contributionCircleContainer}>
-        <Svg height="200" width="200" viewBox="0 0 200 200">
+        <Svg height="180" width="180" viewBox="0 0 180 180">
           {/* Background Circle */}
           <Circle
-            cx="100"
-            cy="100"
+            cx="90"
+            cy="90"
             r="80"
             stroke="#F5F5F8"
-            strokeWidth="16"
+            strokeWidth="6"
             fill="transparent"
           />
 
           {/* Progress Segments */}
           {/* T Segment */}
           <Circle
-            cx="100"
-            cy="100"
+            cx="90"
+            cy="90"
             r="80"
             stroke="#F5A9F2"
-            strokeWidth="16"
+            strokeWidth="6"
             fill="transparent"
             strokeDasharray={`${0.25 * 2 * Math.PI * 80} ${2 * Math.PI * 80}`}
             strokeDashoffset={0}
-            transform="rotate(-90, 100, 100)"
+            transform="rotate(-90, 90, 90)"
           />
 
           {/* B Segment */}
           <Circle
-            cx="100"
-            cy="100"
+            cx="90"
+            cy="90"
             r="80"
             stroke="#69DBFF"
-            strokeWidth="16"
+            strokeWidth="6"
             fill="transparent"
             strokeDasharray={`${0.25 * 2 * Math.PI * 80} ${2 * Math.PI * 80}`}
             strokeDashoffset={-0.25 * 2 * Math.PI * 80}
-            transform="rotate(-90, 100, 100)"
+            transform="rotate(-90, 90, 90)"
           />
 
           {/* A Segment */}
           <Circle
-            cx="100"
-            cy="100"
+            cx="90"
+            cy="90"
             r="80"
             stroke="#8336E6"
-            strokeWidth="16"
+            strokeWidth="6"
             fill="transparent"
             strokeDasharray={`${0.25 * 2 * Math.PI * 80} ${2 * Math.PI * 80}`}
             strokeDashoffset={-0.5 * 2 * Math.PI * 80}
-            transform="rotate(-90, 100, 100)"
+            transform="rotate(-90, 90, 90)"
           />
 
           {/* Center Text */}
           <G>
             <SvgText
-              x="100"
-              y="90"
+              x="90"
+              y="80"
               textAnchor="middle"
               fontSize="14"
               fontWeight="500"
@@ -142,8 +142,8 @@ const DonationConfirmationScreen = () => {
               Added
             </SvgText>
             <SvgText
-              x="100"
-              y="120"
+              x="90"
+              y="110"
               textAnchor="middle"
               fontSize="24"
               fontWeight="700"
@@ -154,30 +154,61 @@ const DonationConfirmationScreen = () => {
           </G>
         </Svg>
 
-        {/* Segment Labels */}
-        <View style={[styles.segmentLabel, { backgroundColor: '#F5A9F2', top: 40, left: 50 }]}>
-          <Image
-            source={require('../assets/islamic-corner/shade-icon.png')}
-            style={styles.segmentIcon}
-          />
-          <Text style={styles.segmentLabelText}>${contributionsData.previousContributions.t}</Text>
-        </View>
-
-        <View style={[styles.segmentLabel, { backgroundColor: '#69DBFF', top: 100, left: 30 }]}>
-          <Image
-            source={require('../assets/islamic-corner/mosque-icon.png')}
-            style={styles.segmentIcon}
-          />
-          <Text style={styles.segmentLabelText}>${contributionsData.previousContributions.b}</Text>
-        </View>
-
-        <View style={[styles.segmentLabel, { backgroundColor: '#8336E6', top: 70, right: 50 }]}>
-          <Image
-            source={require('../assets/islamic-corner/graph-donate-icon.png')}
-            style={styles.segmentIcon}
-          />
-          <Text style={styles.segmentLabelText}>${contributionsData.previousContributions.a}</Text>
-        </View>
+        {/* Segment Labels - improved alignment */}
+        {[
+          {
+            color: '#F5A9F2',
+            icon: require('../assets/islamic-corner/shade-icon.png'),
+            value: contributionsData.previousContributions.t,
+            percent: 0.25,
+          },
+          {
+            color: '#69DBFF',
+            icon: require('../assets/islamic-corner/mosque-icon.png'),
+            value: contributionsData.previousContributions.b,
+            percent: 0.25,
+          },
+          {
+            color: '#8336E6',
+            icon: require('../assets/islamic-corner/graph-donate-icon.png'),
+            value: contributionsData.previousContributions.a,
+            percent: 0.25,
+          },
+        ].map((segment, index, arr) => {
+          // Calculate start angle
+          const prevPercent = arr.slice(0, index).reduce((acc, curr) => acc + curr.percent, 0);
+          const segmentAngle = segment.percent * 360;
+          const startAngle = prevPercent * 360;
+          const centerAngle = startAngle + segmentAngle / 2;
+          const angleRad = (centerAngle - 90) * (Math.PI / 180); // -90 to start from top
+          const labelRadius = 92; // slightly outside the arc
+          const x = 90 + labelRadius * Math.cos(angleRad);
+          const y = 90 + labelRadius * Math.sin(angleRad);
+          return (
+            <View
+              key={index}
+              style={[
+                styles.segmentLabel,
+                {
+                  backgroundColor: segment.color,
+                  position: 'absolute',
+                  left: x,
+                  top: y,
+                  transform: [
+                    { translateX: -35 }, // half of label width
+                    { translateY: -20 }, // half of label height
+                  ],
+                }
+              ]}
+            >
+              <Image
+                source={segment.icon}
+                style={styles.segmentIcon}
+              />
+              <Text style={styles.segmentLabelText}>${segment.value}</Text>
+            </View>
+          );
+        })}
       </View>
 
       {/* Share Section */}
