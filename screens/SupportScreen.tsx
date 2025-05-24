@@ -78,7 +78,7 @@ const subscriptionPlans = [
   },
 ];
 
-const SubscriptionScreen = () => {
+const SupportScreen = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const [activePlanIndex, setActivePlanIndex] = useState(0);
@@ -224,4 +224,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SubscriptionScreen;
+export default SupportScreen;
