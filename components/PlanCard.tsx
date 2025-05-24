@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Image, ImageSourcePropType } from 'react-native';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
 import { LinearGradient } from 'expo-linear-gradient';
+import MaskedView from '@react-native-masked-view/masked-view';
 
 interface BulletPointProps {
   text: string;
@@ -36,17 +37,36 @@ const PlanCard: React.FC<PlanCardProps> = ({
   isActive = false,
 }) => {
   return (
-    <View style={[styles.container, isActive && styles.activeContainer]}>
+    <View style={[styles.container]}>
       <View style={styles.avatarContainer}>
-        <LinearGradient
-          colors={avatarColor}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
+        <Image
+          source={require('../assets/subscription-user.png')}
           style={styles.avatar}
+          resizeMode="contain"
         />
       </View>
 
-      <Text style={styles.planName}>{planName}</Text>
+      <View style={{ marginTop: 60 }}>
+        <MaskedView
+          style={{ height: 60, width: 300 }}
+          maskElement={
+            <View style={{ flex: 1, backgroundColor: 'transparent', justifyContent: 'center', alignItems: 'center' }}>
+              <Text style={{ ...FONTS.h2 }}>
+                {planName}
+              </Text>
+            </View>
+          }
+        >
+          <LinearGradient
+            colors={['#80B2FF', '#7C27D9', '#FF68F0']}
+            locations={[0, 0.5155, 1]}
+            start={{ x: 0, y: 1 }}
+            end={{ x: 1, y: 0 }}
+            style={{ flex: 1 }}
+          />
+        </MaskedView>
+      </View>
+
       <Text style={styles.price}>{price}</Text>
       <Text style={styles.trialInfo}>{trialInfo}</Text>
 
@@ -69,6 +89,7 @@ const PlanCard: React.FC<PlanCardProps> = ({
 
 const styles = StyleSheet.create({
   container: {
+    position: 'relative',
     width: SIZES.width - 40,
     backgroundColor: COLORS.card,
     borderRadius: 20,
@@ -77,31 +98,32 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 5,
+    shadowRadius: 20,
+    elevation: 20,
   },
-  activeContainer: {
-    borderWidth: 2,
-    borderColor: COLORS.primary,
-  },
+
   avatarContainer: {
     alignItems: 'center',
+    position: 'absolute',
+    top: -40,
+    left: '50%',
+    right: '50%',
     marginBottom: 15,
   },
   avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#F0E6FF',
+    width: 100,
+    height: 100,
+    borderRadius: 155,
   },
   planName: {
-    ...FONTS.h2,
+    ...FONTS.h3,
     color: COLORS.primary,
     textAlign: 'center',
     marginBottom: 5,
+    marginTop: 80,
   },
   price: {
-    ...FONTS.body3,
+    ...FONTS.semibold(14),
     color: COLORS.text,
     textAlign: 'center',
     fontWeight: '600',
@@ -117,7 +139,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   sectionTitle: {
-    ...FONTS.h3,
+    ...FONTS.semibold(20),
     color: COLORS.text,
     marginBottom: 10,
     textAlign: 'center',
@@ -130,8 +152,10 @@ const styles = StyleSheet.create({
   bulletPoint: {
     width: 8,
     height: 8,
+    borderWidth: 1.5,
+    borderColor: '#A276FF',
     borderRadius: 4,
-    backgroundColor: COLORS.primary,
+    backgroundColor: 'white',
     marginTop: 6,
     marginRight: 10,
   },

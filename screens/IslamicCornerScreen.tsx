@@ -37,19 +37,19 @@ const IslamicCornerScreen = () => {
       {
         label: 'T',
         percentage: 32,
-        color: '#F5A9F2',
+        color: '#F9ACFF',
         icon: require('../assets/islamic-corner/shade-icon.png')
       },
       {
         label: 'B',
         percentage: 36,
-        color: '#8336E6',
+        color: '#A276FF',
         icon: require('../assets/islamic-corner/graph-donate-icon.png')
       },
       {
         label: 'A',
         percentage: 32,
-        color: '#69DBFF',
+        color: '#75CCFD',
         icon: require('../assets/islamic-corner/mosque-icon.png')
       },
     ]
@@ -92,7 +92,7 @@ const IslamicCornerScreen = () => {
           <Text style={styles.periodLabel}>Charity contributions</Text>
           <TouchableOpacity style={styles.periodButton}>
             <Text style={styles.periodText}>{selectedPeriod}</Text>
-            <ChevronDown size={16} color={COLORS.primary} />
+            <ChevronDown size={16} color={COLORS.primaryAccent} />
           </TouchableOpacity>
         </View>
 
@@ -106,7 +106,7 @@ const IslamicCornerScreen = () => {
                 cy="90"
                 r="80"
                 stroke="#F5F5F8"
-                strokeWidth="16"
+                strokeWidth="6"
                 fill="transparent"
               />
 
@@ -126,7 +126,7 @@ const IslamicCornerScreen = () => {
                     cy="90"
                     r="80"
                     stroke={segment.color}
-                    strokeWidth="16"
+                    strokeWidth="6"
                     fill="transparent"
                     strokeDasharray={`${segmentPercentage * circumference} ${circumference}`}
                     strokeDashoffset={-offset * circumference}
@@ -141,36 +141,40 @@ const IslamicCornerScreen = () => {
                   x="90"
                   y="80"
                   textAnchor="middle"
-                  fontSize="14"
-                  fontWeight="500"
-                  fill="#666666"
+                  fontSize="12"
+                  fontWeight="400"
+                  fill="#6D6E8A"
                 >
                   My Jannah
                 </SvgText>
                 <SvgText
-                  x="90"
+                  x="65"
                   y="105"
                   textAnchor="middle"
                   fontSize="20"
-                  fontWeight="700"
-                  fill="#333333"
+                  fontWeight="600"
+                  fill="#1B1C39"
                 >
-                  ${contributionsData.total}
+                  ${'    '}{contributionsData.total}
                 </SvgText>
               </G>
             </Svg>
 
             {/* Segment Labels */}
             {contributionsData.breakdown.map((segment, index) => {
-              // Position labels around the circle
-              const angle = (segment.percentage / 100) * Math.PI * 2 * 0.5 +
-                contributionsData.breakdown
-                  .slice(0, index)
-                  .reduce((acc, curr) => acc + curr.percentage, 0) / 100 * Math.PI * 2;
-
+              // Calculate the start angle for this segment
+              const prevPercent = contributionsData.breakdown
+                .slice(0, index)
+                .reduce((acc, curr) => acc + curr.percentage, 0);
+              const segmentAngle = (segment.percentage / 100) * 360;
+              const startAngle = (prevPercent / 100) * 360;
+              // Center angle for label
+              const centerAngle = startAngle + segmentAngle / 2;
+              // Convert to radians
+              const angleRad = (centerAngle - 90) * (Math.PI / 180); // -90 to start from top
               const labelRadius = 110;
-              const x = 90 + labelRadius * Math.cos(angle - Math.PI / 2);
-              const y = 90 + labelRadius * Math.sin(angle - Math.PI / 2);
+              const x = 90 + labelRadius * Math.cos(angleRad);
+              const y = 90 + labelRadius * Math.sin(angleRad);
 
               return (
                 <View
@@ -179,8 +183,8 @@ const IslamicCornerScreen = () => {
                     styles.segmentLabel,
                     {
                       backgroundColor: segment.color,
-                      left: x - 35,
-                      top: y - 20,
+                      left: x - 35, // adjust for label width
+                      top: y - 20,  // adjust for label height
                     }
                   ]}
                 >
@@ -228,17 +232,21 @@ const IslamicCornerScreen = () => {
         {/* White Overlay for Content */}
         <View style={styles.campaignOverlay}>
           {/* Icon Circle */}
-          <View style={styles.campaignIconContainer}>
-            <Image
-              source={require('../assets/islamic-corner/graph-donate-icon.png')}
-              style={styles.campaignIcon}
-            />
-          </View>
 
           {/* Campaign Info */}
           <View style={styles.campaignContent}>
-            <Text style={styles.campaignTitle}>{item.title}</Text>
-            <Text style={styles.campaignCause}>Cause : {item.cause}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 11, marginBottom: 20 }}>
+              <View style={styles.campaignIconContainer}>
+                <Image
+                  source={require('../assets/islamic-corner/graph-donate-icon.png')}
+                  style={styles.campaignIcon}
+                />
+              </View>
+              <View>
+                <Text style={styles.campaignTitle}>{item.title}</Text>
+                <Text style={styles.campaignCause}>Cause : {item.cause}</Text>
+              </View>
+            </View>
 
             <View style={styles.campaignProgressContainer}>
               <Text style={styles.campaignAmount}>$ {item.amountRaised.toLocaleString()} USD raised</Text>
@@ -269,7 +277,7 @@ const IslamicCornerScreen = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar barStyle="dark-content" backgroundColor={COLORS.background2} />
 
       <SafeAreaView style={styles.safeArea}>
         {/* Header */}
@@ -308,7 +316,7 @@ const IslamicCornerScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.background2,
   },
   safeArea: {
     flex: 1,
@@ -316,31 +324,31 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: 20,
     paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
   },
   headerTitle: {
     ...FONTS.h2,
     color: COLORS.text,
+    textAlign: 'center',
   },
   scrollView: {
     flex: 1,
   },
   contributionCard: {
     backgroundColor: COLORS.card,
-    borderRadius: 20,
+    borderRadius: 25,
     padding: 20,
     margin: 20,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 20 },
     shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
+    shadowRadius: 25,
+    elevation: 20,
   },
   periodSelector: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     alignItems: 'center',
+    gap: 8,
     marginBottom: 15,
   },
   periodLabel: {
@@ -352,8 +360,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   periodText: {
-    ...FONTS.body4,
-    color: COLORS.primary,
+    ...FONTS.semibold(14),
+    color: COLORS.primaryAccent,
     marginRight: 5,
   },
   contributionCircleContainer: {
@@ -388,33 +396,36 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   contributionBreakdown: {
-    marginTop: 20,
+    marginTop: 30,
   },
   contributionItem: {
     flexDirection: 'row',
     alignItems: 'center',
+
     marginBottom: 10,
   },
   contributionDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#CCCCCC',
+    width: 10,
+    height: 10,
+    borderRadius: 40,
+    borderWidth: 2,
+    borderColor: '#6D6E8A',
+    backgroundColor: COLORS.textWhite,
     marginRight: 10,
   },
   contributionItemText: {
-    ...FONTS.body4,
+    ...FONTS.body5,
     color: COLORS.textLight,
   },
   contributionItemHighlight: {
-    ...FONTS.body4,
+    ...FONTS.body5,
     color: COLORS.primary,
     textDecorationLine: 'underline',
   },
   contributionItemAmount: {
-    ...FONTS.body4,
+    ...FONTS.semibold(10),
     color: COLORS.text,
-    marginLeft: 'auto',
+    marginLeft: 16,
   },
   campaignsSection: {
     marginBottom: 20,
@@ -457,37 +468,25 @@ const styles = StyleSheet.create({
     paddingTop: 5,
   },
   campaignIconContainer: {
-    width: 60,
-    height: 60,
+    width: 50,
+    height: 50,
     borderRadius: 30,
-    backgroundColor: '#8336E6',
+    backgroundColor: '#A276FF',
     justifyContent: 'center',
     alignItems: 'center',
-    position: 'absolute',
-    top: -30,
-    left: 20,
-    zIndex: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 4,
   },
   campaignIcon: {
-    width: 28,
-    height: 28,
+    width: 24,
+    height: 19,
     tintColor: COLORS.textWhite,
   },
   campaignTitle: {
-    ...FONTS.h3,
+    ...FONTS.semibold(12),
     color: COLORS.text,
-    marginTop: 15,
-    marginBottom: 5,
   },
   campaignCause: {
-    ...FONTS.body4,
-    color: '#B39DDB',
-    marginBottom: 20,
+    ...FONTS.semibold(12),
+    color: '#A276FF',
   },
   campaignProgressContainer: {
     flexDirection: 'row',
@@ -496,24 +495,22 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   campaignAmount: {
-    ...FONTS.body3,
-    fontWeight: '600',
+    ...FONTS.semibold(12),
     color: COLORS.text,
   },
   campaignPercentage: {
-    ...FONTS.body3,
-    fontWeight: '600',
+    ...FONTS.h6,
     color: COLORS.text,
   },
   progressBar: {
-    height: 8,
-    backgroundColor: '#F0E6FF',
+    height: 6,
+    backgroundColor: '#E9DDFA',
     borderRadius: 4,
     marginBottom: 15,
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: '#8336E6',
+    backgroundColor: '#6B3BA6',
     borderRadius: 4,
   },
   campaignTimeContainer: {
@@ -522,14 +519,14 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   clockIcon: {
-    width: 20,
-    height: 20,
+    width: 14,
+    height: 14,
     marginRight: 8,
-    tintColor: '#9E9E9E',
+    tintColor: '#A4A5C3',
   },
   campaignTimeText: {
-    ...FONTS.body4,
-    color: '#9E9E9E',
+    ...FONTS.body5,
+    color: '#6D6E8A',
   },
 });
 

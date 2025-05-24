@@ -28,12 +28,14 @@ export const COLORS = {
   primary: '#8A2BE2', // Main purple
   primaryLight: '#9370DB', // Lighter purple
   primaryDark: '#6A1B9A', // Darker purple
+  primaryAccent: '#A276FF', // Accent purple
 
   // Secondary colors
   secondary: '#FF6B6B', // Accent color
 
   // Background colors
   background: '#FFFFFF', // Light background
+  background2: '#F5F5F8', // Slightly darker background
   card: '#FFFFFF', // Card background
 
   // Text colors
@@ -79,6 +81,7 @@ export const SIZES = {
   h3: 18,
   h4: 16,
   h5: 14,
+  h6: 12,
   body1: 30,
   body2: 22,
   body3: 16,
@@ -111,6 +114,7 @@ export const FONTS = {
   h3: { fontFamily: FONT_FAMILY.bold, fontSize: SIZES.h3, lineHeight: 22 },
   h4: { fontFamily: FONT_FAMILY.bold, fontSize: SIZES.h4, lineHeight: 20 },
   h5: { fontFamily: FONT_FAMILY.bold, fontSize: SIZES.h5, lineHeight: 18 },
+  h6: { fontFamily: FONT_FAMILY.semibold, fontSize: SIZES.h6, lineHeight: 16 },
   body1: { fontFamily: FONT_FAMILY.regular, fontSize: SIZES.body1, lineHeight: 36 },
   body2: { fontFamily: FONT_FAMILY.regular, fontSize: SIZES.body2, lineHeight: 30 },
   body3: { fontFamily: FONT_FAMILY.regular, fontSize: SIZES.body3, lineHeight: 22 },

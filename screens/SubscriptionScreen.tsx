@@ -7,6 +7,7 @@ import {
   Dimensions,
   TouchableOpacity,
   StatusBar,
+  ScrollView,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -104,75 +105,70 @@ const SubscriptionScreen = () => {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { paddingTop: insets.top }]}>
-      <StatusBar barStyle="dark-content" />
+    <View style={{ flex: 1, paddingTop: 10 }}>
+      <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
+      <SafeAreaView style={[styles.container]}>
 
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
-          <ArrowLeft size={24} color={COLORS.text} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Subscription</Text>
-        <View style={{ width: 24 }} />
-      </View>
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
+            <ArrowLeft size={24} color={COLORS.text} />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Subscription</Text>
+          <View style={{ width: 24 }} />
+        </View>
 
-      {/* Plan Carousel */}
-      <FlatList
-        ref={flatListRef}
-        data={subscriptionPlans}
-        keyExtractor={(item) => item.id}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        onScroll={handlePlanScroll}
-        snapToInterval={width}
-        decelerationRate="fast"
-        contentContainerStyle={styles.carouselContainer}
-        renderItem={({ item, index }) => (
-          <PlanCard
-            avatarColor={item.avatarColor}
-            planName={item.planName}
-            price={item.price}
-            trialInfo={item.trialInfo}
-            bankingPoints={item.bankingPoints}
-            savingsPoints={item.savingsPoints}
-            isActive={index === activePlanIndex}
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        >
+
+          {/* Plan Carousel */}
+          <FlatList
+            ref={flatListRef}
+            data={subscriptionPlans}
+            keyExtractor={(item) => item.id}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            onScroll={handlePlanScroll}
+            snapToInterval={width}
+            decelerationRate="fast"
+            contentContainerStyle={styles.carouselContainer}
+            renderItem={({ item, index }) => (
+              <PlanCard
+                avatarColor={item.avatarColor}
+                planName={item.planName}
+                price={item.price}
+                trialInfo={item.trialInfo}
+                bankingPoints={item.bankingPoints}
+                savingsPoints={item.savingsPoints}
+                isActive={index === activePlanIndex}
+              />
+            )}
           />
-        )}
-      />
 
-      {/* Pagination Dots */}
-      <View style={styles.paginationContainer}>
-        {subscriptionPlans.map((_, index) => (
-          <View
-            key={index}
-            style={[
-              styles.paginationDot,
-              index === activePlanIndex ? styles.paginationDotActive : {}
-            ]}
-          />
-        ))}
-      </View>
-
-      {/* Choose Plan Button */}
-      <View style={styles.buttonContainer}>
-        <Button
-          title="CHOOSE THIS PLAN"
-          onPress={handleChoosePlan}
-          gradient={true}
-          gradientColors={['#A276FF', '#8336E6']}
-          size="large"
-          style={styles.chooseButton}
-        />
-      </View>
-    </SafeAreaView>
+          {/* Choose Plan Button */}
+          <View style={styles.buttonContainer}>
+            <Button
+              title="CHOOSE THIS PLAN"
+              onPress={handleChoosePlan}
+              gradient={true}
+              gradientColors={['#A276FF', '#8336E6']}
+              size="large"
+              style={styles.chooseButton}
+            />
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.background
   },
   header: {
     flexDirection: 'row',
@@ -193,34 +189,18 @@ const styles = StyleSheet.create({
     color: COLORS.text,
   },
   carouselContainer: {
-    paddingVertical: 20,
-  },
-  paginationContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginVertical: 20,
-  },
-  paginationDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#D9D9D9',
-    marginHorizontal: 4,
-  },
-  paginationDotActive: {
-    backgroundColor: COLORS.primary,
-    width: 16,
+    paddingVertical: 40,
   },
   buttonContainer: {
-    position: 'absolute',
-    bottom: 30,
-    left: 0,
-    right: 0,
-    paddingHorizontal: SIZES.padding,
+    padding: SIZES.padding,
+    marginBottom: 30,
   },
   chooseButton: {
+    ...FONTS.semibold(15),
     width: '100%',
+  },
+  scrollContent: {
+    paddingBottom: 60,
   },
 });
 

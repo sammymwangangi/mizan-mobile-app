@@ -1,3 +1,4 @@
+import { COLORS, FONTS } from 'constants/theme';
 import React from 'react';
 import { View, Text, StyleSheet, Image, ImageBackground } from 'react-native';
 
@@ -39,19 +40,26 @@ const PaymentCard: React.FC<PaymentCardProps> = ({
         {/* Card number */}
         <View style={styles.cardNumberRow}>
           <Text style={styles.cardNumber}>{cardNumber}</Text>
-          <Image
-            source={require('../assets/cards/wifi.png')}
-            style={styles.wifi}
-            resizeMode="contain"
-          />
+          <View className='flex-row justify-items-end gap-2'>
+            <Image
+              source={require('../assets/cards/sim-card.png')}
+              style={styles.wifi}
+              resizeMode="contain"
+            />
+            <Image
+              source={require('../assets/cards/wifi.png')}
+              style={styles.wifi}
+              resizeMode="contain"
+            />
+          </View>
         </View>
         {/* Bottom row: validity and brand */}
         <View style={styles.bottomRow}>
           <View style={styles.validityBlock}>
-            <Text style={styles.validThruLabel}>VALID THRUss</Text>
+            <Text style={styles.validThruLabel}>VALID THRU</Text>
             <Text style={styles.validity}>{validity}</Text>
           </View>
-          
+
           <Image
             source={require('../assets/cards/mastercard.png')}
             style={styles.brandLogo}
@@ -75,6 +83,14 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     padding: 0,
     justifyContent: 'flex-start',
+    shadowColor: '#6943AF',
+    shadowOffset: { width: 0, height: 20 },
+    shadowOpacity: 1.5,
+    shadowRadius: 18,
+    elevation: 20,
+    backgroundColor: COLORS.card,
+    marginBottom: 20,
+    
   },
   cardBgImage: {
     width: '100%',
@@ -130,22 +146,18 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
   validThruLabel: {
-    color: '#fff',
-    fontSize: 10,
+    ...FONTS.semibold(6.8),
+    color: COLORS.textWhite,
     opacity: 0.8,
-    fontWeight: '400',
   },
   validity: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+    ...FONTS.semibold(16),
+    color: COLORS.textWhite,
     marginTop: 2,
   },
   wifi: {
-    width: 28,
-    height: 28,
-    marginLeft: 10,
-    marginRight: 10,
+    width: 25,
+    height: 25,
   },
   brandLogo: {
     width: 38,

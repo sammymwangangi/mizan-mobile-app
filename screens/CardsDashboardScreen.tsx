@@ -1,12 +1,14 @@
-import React from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  ScrollView, 
+import React, { useRef, useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
   TouchableOpacity,
   StatusBar,
-  SafeAreaView
+  SafeAreaView,
+  FlatList,
+  Dimensions
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -16,27 +18,35 @@ import { ArrowLeft } from 'lucide-react-native';
 import CardCarousel from '../components/cards/CardCarousel';
 import CardActionButton from '../components/cards/CardActionButton';
 import QuickFunctionItem from '../components/cards/QuickFunctionItem';
+import PaymentCard from 'components/PaymentCard';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 
 type CardsDashboardScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'CardsDashboard'>;
 
+const { width } = Dimensions.get('window');
+
 const CardsDashboardScreen = () => {
   const navigation = useNavigation<CardsDashboardScreenNavigationProp>();
+  const flatListRef = useRef(null);
+  const insets = useSafeAreaInsets();
+  const [activeCardIndex, setActiveCardIndex] = useState(0);
 
   // Mock data for cards
   const cards = [
     {
       id: '1',
-      cardNumber: '4242 4242 4242 4242',
-      validThru: '12/25',
+      number: '**** **** **** 4242',
+      validity: '12/25',
       cardholderName: 'ROBIN HABIBI',
-      type: 'visa' as const,
+      brand: 'visa' as const,
     },
     {
       id: '2',
-      cardNumber: '5353 5353 5353 5353',
-      validThru: '10/26',
+      number: '**** **** **** 5353',
+      validity: '10/26',
       cardholderName: 'ROBIN HABIBI',
-      type: 'mastercard' as const,
+      brand: 'mastercard' as const,
     },
   ];
 
@@ -96,56 +106,121 @@ const CardsDashboardScreen = () => {
     },
   ];
 
+  // Handle card scroll
+  const handleCardScroll = (event: any) => {
+    const contentOffsetX = event.nativeEvent.contentOffset.x;
+    const index = Math.round(contentOffsetX / width);
+    setActiveCardIndex(index);
+  };
+
+  // Reference to the ScrollView
+  const cardsScrollViewRef = React.useRef<ScrollView>(null);
+
+  // Function to handle pagination dot clicks
+  const handlePaginationDotPress = (index: number) => {
+    setActiveCardIndex(index);
+    // Calculate the x position to scroll to (card width + margin)
+    const cardWidth = 320;
+    const cardMargin = 19;
+    const xOffset = index * (cardWidth + cardMargin);
+
+    // Scroll to the selected card
+    cardsScrollViewRef.current?.scrollTo({ x: xOffset, animated: true });
+  };
+
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={{ flex: 1, paddingTop: insets.top }}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
-      
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
+
+      <SafeAreaView style={styles.container}>
+        <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
+
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
+            <ArrowLeft size={24} color={COLORS.text} />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Mizan Cards</Text>
+          <View style={styles.placeholder} />
+        </View>
+
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
         >
-          <ArrowLeft size={24} color={COLORS.text} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Mizan Cards</Text>
-        <View style={styles.placeholder} />
-      </View>
-      
-      <ScrollView 
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
-        {/* Card Carousel */}
-        <CardCarousel cards={cards} />
-        
-        {/* Card Actions */}
-        <View style={styles.actionsContainer}>
-          {cardActions.map((action) => (
-            <CardActionButton
-              key={action.id}
-              title={action.title}
-              icon={action.icon}
-              onPress={action.onPress}
-            />
-          ))}
-        </View>
-        
-        {/* Quick Functions */}
-        <View style={styles.quickFunctionsContainer}>
-          <Text style={styles.sectionTitle}>Quick Functions</Text>
-          
-          {quickFunctions.map((function_) => (
-            <QuickFunctionItem
-              key={function_.id}
-              title={function_.title}
-              icon={function_.icon}
-              onPress={function_.onPress}
-            />
-          ))}
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+          {/* Card Carousel */}
+          {/* <CardCarousel cards={cards} /> */}
+          <FlatList
+            ref={flatListRef}
+            data={cards}
+            keyExtractor={(item) => item.id}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            onScroll={handleCardScroll}
+            renderItem={({ item, index }) => (
+              <PaymentCard
+                cardNumber={item.number}
+                validity={item.validity}
+                brand={item.brand}
+                isActive={index === activeCardIndex}
+              />
+            )}
+          />
+
+          {/* Pagination Dots */}
+          <View style={styles.paginationContainer}>
+            {[0, 1, 2].map((index) => (
+              <TouchableOpacity
+                key={index}
+                style={styles.paginationDotContainer}
+                onPress={() => handlePaginationDotPress(index)}
+              >
+                {index === activeCardIndex ? (
+                  <LinearGradient
+                    colors={['#CE72E3', '#8A2BE2']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={[styles.paginationDot, styles.activePaginationDot]}
+                  />
+                ) : (
+                  <View style={styles.paginationDot} />
+                )}
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          {/* Card Actions */}
+          <View style={styles.actionsContainer}>
+            {cardActions.map((action) => (
+              <CardActionButton
+                key={action.id}
+                title={action.title}
+                icon={action.icon}
+                onPress={action.onPress}
+              />
+            ))}
+          </View>
+
+          {/* Quick Functions */}
+          <View style={styles.quickFunctionsContainer}>
+            <Text style={styles.sectionTitle}>Quick Functions</Text>
+
+            {quickFunctions.map((function_) => (
+              <QuickFunctionItem
+                key={function_.id}
+                title={function_.title}
+                icon={function_.icon}
+                onPress={function_.onPress}
+              />
+            ))}
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    </View>
   );
 };
 
@@ -180,6 +255,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 30,
   },
+  
   actionsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -190,9 +266,31 @@ const styles = StyleSheet.create({
     paddingHorizontal: SIZES.padding,
   },
   sectionTitle: {
-    ...FONTS.h3,
+    ...FONTS.semibold(20),
     color: COLORS.text,
     marginBottom: 16,
+  },
+  paginationContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 15,
+    marginBottom: 30,
+  },
+  paginationDotContainer: {
+    marginHorizontal: 5,
+    padding: 5, // Add padding for better touch target
+  },
+  paginationDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#E6E6FF',
+  },
+  activePaginationDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
   },
 });
 
