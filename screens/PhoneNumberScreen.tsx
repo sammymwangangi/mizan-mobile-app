@@ -15,6 +15,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
+import { normalize, getResponsiveWidth } from '../utils';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ChevronDown } from 'lucide-react-native';
 // @ts-ignore - Ignore the missing type declaration file
@@ -149,6 +150,8 @@ const PhoneNumberScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'space-between',
     backgroundColor: COLORS.background,
   },
   patternImage: {
@@ -277,8 +280,8 @@ const styles = StyleSheet.create({
     shadowColor: '#391A73', shadowOffset: { width: 0, height: 2 }, shadowOpacity: .5, shadowRadius: 4, elevation: 20
   },
   submitButton: {
-    height: 55,
-    borderRadius: 40,
+    height: normalize(55),
+    borderRadius: normalize(40),
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'transparent',

@@ -1,5 +1,6 @@
 
 import { Dimensions, Platform, TextStyle } from 'react-native';
+import { normalize, getResponsiveWidth, getResponsiveHeight, getResponsivePadding } from '../utils';
 
 const { width, height } = Dimensions.get('window');
 
@@ -68,29 +69,34 @@ export const COLORS = {
 };
 
 export const SIZES = {
-  // Global sizes
-  base: 8,
-  font: 14,
-  radius: 40,
-  padding: 24,
+  // Global sizes (responsive)
+  base: normalize(8),
+  font: normalize(14),
+  radius: normalize(40),
+  padding: getResponsivePadding(24),
 
-  // Font sizes
-  largeTitle: 32,
-  h1: 32,
-  h2: 22,
-  h3: 18,
-  h4: 16,
-  h5: 14,
-  h6: 12,
-  body1: 30,
-  body2: 22,
-  body3: 16,
-  body4: 14,
-  body5: 12,
+  // Font sizes (responsive)
+  largeTitle: normalize(32),
+  h1: normalize(32),
+  h2: normalize(22),
+  h3: normalize(18),
+  h4: normalize(16),
+  h5: normalize(14),
+  h6: normalize(12),
+  body1: normalize(30),
+  body2: normalize(22),
+  body3: normalize(16),
+  body4: normalize(14),
+  body5: normalize(12),
 
   // App dimensions
   width,
   height,
+
+  // Responsive helper functions
+  responsiveWidth: getResponsiveWidth,
+  responsiveHeight: getResponsiveHeight,
+  responsivePadding: getResponsivePadding,
 };
 
 // Helper function to create font styles with proper weight mapping

@@ -291,7 +291,6 @@ const KYCScreen: React.FC = () => {
 
         <View style={{
           width: '100%',
-          paddingHorizontal: SIZES.padding,
           paddingBottom: Platform.OS === 'ios' ? 40 : 30,
           paddingTop: 20
         }}>
@@ -309,15 +308,11 @@ const KYCScreen: React.FC = () => {
                 borderRadius: 28,
                 justifyContent: 'center',
                 alignItems: 'center',
-                paddingRight: 30
               }}
             >
               <Text style={{
+                ...FONTS.semibold(15),
                 color: COLORS.textWhite,
-                fontSize: 16,
-                fontWeight: 'bold',
-                letterSpacing: 1,
-                textAlign: 'center'
               }}>NEXT</Text>
             </LinearGradient>
           </TouchableOpacity>
@@ -994,14 +989,11 @@ const KYCScreen: React.FC = () => {
                     borderRadius: 28,
                     justifyContent: 'center',
                     alignItems: 'center',
-                    paddingRight: 30
                   }}
                 >
                   <Text style={{
+                    ...FONTS.semibold(15),
                     color: COLORS.textWhite,
-                    fontSize: 16,
-                    fontWeight: 'bold',
-                    letterSpacing: 1,
                     textAlign: 'center'
                   }}>NEXT</Text>
                 </LinearGradient>

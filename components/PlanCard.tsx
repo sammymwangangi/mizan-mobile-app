@@ -18,6 +18,7 @@ const BulletPoint: React.FC<BulletPointProps> = ({ text }) => {
 };
 
 interface PlanCardProps {
+  avatar?: ImageSourcePropType;
   avatarColor?: string[];
   planName: string;
   price: string;
@@ -28,6 +29,7 @@ interface PlanCardProps {
 }
 
 const PlanCard: React.FC<PlanCardProps> = ({
+  avatar,
   avatarColor = ['#D155FF', '#A276FF'],
   planName,
   price,
@@ -40,7 +42,7 @@ const PlanCard: React.FC<PlanCardProps> = ({
     <View style={[styles.container]}>
       <View style={styles.avatarContainer}>
         <Image
-          source={require('../assets/subscription-user.png')}
+          source={avatar ? avatar : require('../assets/avatars/noor.png')}
           style={styles.avatar}
           resizeMode="contain"
         />

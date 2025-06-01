@@ -61,7 +61,7 @@ const HomeScreen = () => {
     { id: '1', icon: require('../assets/home/icons/cards.png'), title: 'Cards' },
     { id: '2', icon: require('../assets/home/icons/pay-later.png'), title: 'Pay Later' },
     { id: '3', icon: require('../assets/home/icons/send.png'), title: 'Send' },
-    { id: '4', icon: require('../assets/home/icons/m-pesa.png'), title: 'M-Pesa' },
+    { id: '4', icon: require('../assets/home/icons/m-pesa.png'), title: 'Round Ups' },
   ];
 
   const promotions = [

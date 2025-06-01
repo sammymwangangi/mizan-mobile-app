@@ -330,13 +330,12 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingRight: 30,
+    alignSelf: 'center',
+    width: 340,
   },
   nextButtonText: {
+    ...FONTS.semibold(15),
     color: COLORS.textWhite,
-    fontSize: 16,
-    fontWeight: 'bold',
-    letterSpacing: 1,
     textAlign: 'center',
   },
 });

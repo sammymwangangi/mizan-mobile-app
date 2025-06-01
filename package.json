@@ -21,12 +21,14 @@
     "@react-navigation/bottom-tabs": "7.3.12",
     "@react-navigation/native": "^7.1.8",
     "@react-navigation/native-stack": "7.3.12",
+    "@react-navigation/stack": "^7.3.2",
     "@shopify/react-native-skia": "v2.0.0-next.4",
     "expo": "^53.0.9",
-    "expo-camera": "16.1.6",
+    "expo-camera": "~16.1.6",
     "expo-dev-client": "~5.1.8",
     "expo-font": "~13.3.1",
     "expo-linear-gradient": "~14.1.4",
+    "expo-media-library": "~17.1.6",
     "expo-splash-screen": "~0.30.8",
     "expo-status-bar": "~2.2.3",
     "lucide-react-native": "0.509.0",
@@ -42,7 +44,10 @@
     "react-native-svg": "15.11.2",
     "react-native-wheel-picker": "^1.2.0",
     "react-native-wheel-scrollview-picker": "^2.0.9",
-    "sonner-native": "0.19.1"
+    "sonner-native": "0.19.1",
+    "react-dom": "19.0.0",
+    "react-native-web": "^0.20.0",
+    "@expo/metro-runtime": "~5.0.4"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

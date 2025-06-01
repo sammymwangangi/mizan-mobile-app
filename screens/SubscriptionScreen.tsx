@@ -23,12 +23,13 @@ const { width } = Dimensions.get('window');
 const subscriptionPlans = [
   {
     id: '1',
+    avatar: require('../assets/avatars/noor.png'),
     avatarColor: ['#D155FF', '#A276FF'],
-    planName: 'Basic Ethics',
+    planName: 'Noor',
     price: '$1 Subscription fee',
     trialInfo: '(One month completely free)',
     bankingPoints: [
-      'Early Salo - Get Paid 1 day earlier when you setup a direct deposit with MizanMoney.',
+      'Early Salary - Get Paid 1 day earlier when you setup a direct deposit with MizanMoney.',
       'Automatically commit to a savings plan.',
       'Open a Free Bank Account in minutes',
       'Virtual Debit Card',
@@ -41,16 +42,17 @@ const subscriptionPlans = [
   },
   {
     id: '2',
+    avatar: require('../assets/avatars/qamar.png'),
     avatarColor: ['#8336E6', '#69DBFF'],
-    planName: 'Premium Ethics',
+    planName: 'Qamar',
     price: '$3 Subscription fee',
     trialInfo: '(One month completely free)',
     bankingPoints: [
-      'All Basic Ethics features',
+      'All Noor features',
       'Priority customer support',
       'Higher transaction limits',
       'Free international transfers',
-      'Premium metal card',
+      'Premium Qamar card',
     ],
     savingsPoints: [
       'Advanced investment options',
@@ -60,13 +62,14 @@ const subscriptionPlans = [
   },
   {
     id: '3',
+    avatar: require('../assets/avatars/shams.png'),
     avatarColor: ['#F053E0', '#5592EF'],
-    planName: 'Metal',
-    price: '$5 Subscription fee',
+    planName: 'Shams',
+    price: '$9 Subscription fee',
     trialInfo: '(One month completely free)',
     bankingPoints: [
-      'All Premium Ethics features',
-      'Exclusive metal card design',
+      'All Qamar features',
+      'Exclusive Shams card design',
       'Concierge service',
       'Unlimited ATM withdrawals',
       'Travel insurance included',
@@ -137,6 +140,7 @@ const SubscriptionScreen = () => {
             contentContainerStyle={styles.carouselContainer}
             renderItem={({ item, index }) => (
               <PlanCard
+                avatar={item.avatar}
                 avatarColor={item.avatarColor}
                 planName={item.planName}
                 price={item.price}

@@ -80,3 +80,75 @@ export function calculatePercentage(value: number, total: number): number {
 export function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+// Additional responsive design utilities
+
+/**
+ * Get responsive width based on screen width
+ * @param percentage - Percentage of screen width (0-100)
+ * @returns Width in pixels
+ */
+export function getResponsiveWidth(percentage: number): number {
+  return (SCREEN_WIDTH * percentage) / 100;
+}
+
+/**
+ * Get responsive height based on screen height
+ * @param percentage - Percentage of screen height (0-100)
+ * @returns Height in pixels
+ */
+export function getResponsiveHeight(percentage: number): number {
+  return (SCREEN_HEIGHT * percentage) / 100;
+}
+
+/**
+ * Get responsive font size based on screen width
+ * @param size - Base font size
+ * @returns Responsive font size
+ */
+export function getResponsiveFontSize(size: number): number {
+  return normalize(size, 'width');
+}
+
+/**
+ * Check if device is tablet (width > 768)
+ * @returns Boolean indicating if device is tablet
+ */
+export function isTablet(): boolean {
+  return SCREEN_WIDTH >= 768;
+}
+
+/**
+ * Check if device is small phone (width < 375)
+ * @returns Boolean indicating if device is small phone
+ */
+export function isSmallPhone(): boolean {
+  return SCREEN_WIDTH < 375;
+}
+
+/**
+ * Get device type
+ * @returns Device type string
+ */
+export function getDeviceType(): 'small' | 'medium' | 'large' | 'tablet' {
+  if (SCREEN_WIDTH >= 768) return 'tablet';
+  if (SCREEN_WIDTH >= 414) return 'large';
+  if (SCREEN_WIDTH >= 375) return 'medium';
+  return 'small';
+}
+
+/**
+ * Get responsive padding based on device type
+ * @param base - Base padding value
+ * @returns Responsive padding
+ */
+export function getResponsivePadding(base: number): number {
+  const deviceType = getDeviceType();
+  switch (deviceType) {
+    case 'tablet': return base * 1.5;
+    case 'large': return base * 1.2;
+    case 'medium': return base;
+    case 'small': return base * 0.8;
+    default: return base;
+  }
+}
