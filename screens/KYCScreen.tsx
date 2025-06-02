@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
+import { normalize, getResponsiveWidth, getResponsiveHeight, getResponsivePadding, isTablet } from '../utils';
 import Button from '../components/Button';
 import { ArrowLeft, ArrowRight, Clock, Wrench, BarChart2, TrendingUp, Umbrella, HelpCircle } from 'lucide-react-native';
 import Slider from '@react-native-community/slider';
@@ -291,8 +292,8 @@ const KYCScreen: React.FC = () => {
 
         <View style={{
           width: '100%',
-          paddingBottom: Platform.OS === 'ios' ? 40 : 30,
-          paddingTop: 20
+          paddingBottom: Platform.OS === 'ios' ? normalize(40) : normalize(30),
+          paddingTop: normalize(20)
         }}>
           <TouchableOpacity
             style={{ width: '100%' }}
@@ -304,8 +305,8 @@ const KYCScreen: React.FC = () => {
               start={{ x: 0, y: 0.5 }}
               end={{ x: 1, y: 0.5 }}
               style={{
-                height: 56,
-                borderRadius: 28,
+                height: normalize(56),
+                borderRadius: normalize(28),
                 justifyContent: 'center',
                 alignItems: 'center',
               }}
@@ -447,7 +448,7 @@ const KYCScreen: React.FC = () => {
                 colors={['#A276FF', '#F053E0']}
                 start={{ x: 0, y: 0.25 }}
                 end={{ x: 1, y: 0.75 }}
-                style={{ borderRadius: 25, padding: 1, marginBottom: 15, shadowColor: '#6943AF', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.5, shadowRadius: 4, elevation: 20 }}
+                style={{ borderRadius: normalize(25), padding: 1, marginBottom: 15, shadowColor: '#6943AF', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.5, shadowRadius: 4, elevation: 20 }}
               >
                 <View style={[styles.hustleCard, { borderWidth: 0, marginBottom: 1, width: '100%' }]}>
                   <Text style={[styles.hustleText, styles.hustleTextActive]}>{option.text}</Text>
@@ -655,7 +656,7 @@ const KYCScreen: React.FC = () => {
               width: '50%',
               justifyContent: 'center',
               alignItems: 'center',
-              marginVertical: 40,
+              marginVertical: normalize(40),
             }}>
               <LinearGradient
                 colors={['#4B99DE', '#6B3BA6']}
@@ -664,25 +665,25 @@ const KYCScreen: React.FC = () => {
                 style={{
                   position: 'absolute',
                   top: '50%',
-                  left: 20,
-                  right: 20,
-                  height: 64,
-                  borderRadius: 45,
+                  left: normalize(20),
+                  right: normalize(20),
+                  height: normalize(64),
+                  borderRadius: normalize(45),
                   padding: 1.5, // Border width
                   zIndex: 2,
-                  width: 177,
-                  transform: [{ translateY: -64 / 2 }],
-                  shadowColor: '#6943AF', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.5, shadowRadius: 4, elevation: 20
+                  width: normalize(177),
+                  transform: [{ translateY: normalize(-64) / 2 }],
+                  shadowColor: '#6943AF', shadowOffset: { width: 0, height: normalize(2) }, shadowOpacity: 0.5, shadowRadius: normalize(4), elevation: 20
                 }}
               >
 
                 <View style={{
                   flex: 1,
                   backgroundColor: COLORS.background,
-                  borderRadius: 45,
+                  borderRadius: normalize(45),
                   flexDirection: 'row',
                   overflow: 'hidden',
-                  width: 174,
+                  width: normalize(174),
                 }}>
                   <View style={{
                     flex: 1,
@@ -808,9 +809,9 @@ const KYCScreen: React.FC = () => {
           </Text>
 
           {/* Add "Yes Please" and "Skip for now" navigation buttons */}
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 24, width: '100%', paddingHorizontal: 10 }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: normalize(24), width: '100%', paddingHorizontal: normalize(10) }}>
             <TouchableOpacity disabled style={{ opacity: 0.4 }}>
-              <Text style={{ color: '#C7C7C7', fontSize: 18, fontFamily: 'Poppins' }}>Yes please</Text>
+              <Text style={{ color: '#C7C7C7', fontSize: normalize(18), fontFamily: 'Poppins' }}>Yes please</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => setCurrentStep(KYCStep.CONGRATULATIONS)}>
               <Text style={{ color: '#A276FF', ...FONTS.semibold(18) }}>Skip for now</Text>
@@ -825,13 +826,13 @@ const KYCScreen: React.FC = () => {
     return (
       <View className="relative flex-1 flex-col justify-start items-center gap-[137px] px-10">
         <ConfettiCannon count={120} origin={{ x: 200, y: 0 }} fadeOut={true} explosionSpeed={350} fallSpeed={3000} />
-        <Text className="text-[25px] font-semibold text-[#1B1C39] text-center">Congratulations</Text>
+        <Text className="text-[#1B1C39] text-center" style={{ ...FONTS.semibold(25) }}>Congratulations</Text>
         <Image
           source={require('../assets/kyc/tick.png')}
           className="w-20 h-20"
           resizeMode="contain"
         />
-        <Text className="text-lg text-[#1B1C39] text-center">
+        <Text className="text-[#1B1C39] text-center" style={{ fontFamily: 'Poppins' }}>
           Great job Habibi, your account is being setup, sabr In Shaa Allah
         </Text>
         <Image
@@ -972,8 +973,8 @@ const KYCScreen: React.FC = () => {
             <View style={{
               width: '100%',
               paddingHorizontal: SIZES.padding,
-              paddingBottom: Platform.OS === 'ios' ? 40 : 30,
-              paddingTop: 20
+              paddingBottom: Platform.OS === 'ios' ? normalize(40) : normalize(30),
+              paddingTop: normalize(20)
             }}>
               <TouchableOpacity
                 style={{ width: '100%' }}
@@ -985,8 +986,8 @@ const KYCScreen: React.FC = () => {
                   start={{ x: 0, y: 0.5 }}
                   end={{ x: 1, y: 0.5 }}
                   style={{
-                    height: 56,
-                    borderRadius: 28,
+                    height: normalize(56),
+                    borderRadius: normalize(28),
                     justifyContent: 'center',
                     alignItems: 'center',
                   }}
@@ -1011,33 +1012,34 @@ const KYCScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    flexDirection: 'column',
     backgroundColor: COLORS.background,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: SIZES.padding,
-    paddingTop: 50,
-    paddingBottom: 18,
+    paddingTop: normalize(50),
+    paddingBottom: normalize(18),
   },
   backButton: {
-    marginRight: 10,
+    marginRight: normalize(10),
   },
   progressContainer: {
     flex: 1,
-    marginLeft: 10,
+    marginLeft: normalize(10),
   },
   progressStepsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     width: '100%',
-    height: 5,
+    height: normalize(5),
   },
   progressStep: {
-    width: 35,
-    height: 5,
-    borderRadius: 2.5,
+    width: normalize(35),
+    height: normalize(5),
+    borderRadius: normalize(2.5),
   },
   progressStepActive: {
     backgroundColor: '#A276FF',
@@ -1048,30 +1050,30 @@ const styles = StyleSheet.create({
   stepContainer: {
     flex: 1,
     paddingBottom: 0,
-    paddingHorizontal: 25,
+    paddingHorizontal: normalize(25),
   },
   // Radio option card styles
   cardWrapper: {
-    marginBottom: 10,
+    marginBottom: normalize(10),
   },
   radioOptionCard: {
-    width: 340,
-    height: 57,
-    borderRadius: 25,
+    width: getResponsiveWidth(85), // 85% of screen width instead of fixed 340px
+    height: normalize(57),
+    borderRadius: normalize(40),
     borderWidth: 1,
     borderColor: 'rgba(222, 222, 222, 0.48)',
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 15,
+    paddingHorizontal: normalize(15),
     backgroundColor: COLORS.card,
   },
   radioContainer: {
-    marginRight: 15,
+    marginRight: normalize(15),
   },
   radioOuter: {
-    width: 35,
-    height: 35,
-    borderRadius: 40,
+    width: normalize(35),
+    height: normalize(35),
+    borderRadius: normalize(40),
     borderWidth: 2,
     borderColor: '#BABBD2',
     justifyContent: 'center',
@@ -1082,14 +1084,14 @@ const styles = StyleSheet.create({
     borderColor: '#BABBD2',
   },
   radioInner: {
-    width: 21,
-    height: 21,
-    borderRadius: 40,
+    width: normalize(21),
+    height: normalize(21),
+    borderRadius: normalize(40),
   },
   radioIconContainer: {
-    width: 24,
-    height: 24,
-    marginRight: 15,
+    width: normalize(24),
+    height: normalize(24),
+    marginRight: normalize(15),
   },
   radioTextContainer: {
     flex: 1,
@@ -1099,32 +1101,32 @@ const styles = StyleSheet.create({
     color: COLORS.text,
   },
   interestsContainer: {
-    marginTop: 20,
+    marginTop: normalize(20),
     alignItems: 'center',
   },
   interestsSubtitle: {
     ...FONTS.body4,
     color: '#969696',
     textAlign: 'center',
-    marginTop: -30,
-    marginBottom: 30,
+    marginTop: normalize(-30),
+    marginBottom: normalize(30),
   },
   // Hustle step styles
   hustleContainer: {
-    marginTop: 30,
-    paddingHorizontal: 20,
+    marginTop: normalize(30),
+    paddingHorizontal: normalize(20),
   },
   hustleCard: {
     width: '100%',
-    paddingVertical: 36,
-    borderRadius: 25,
+    paddingVertical: normalize(36),
+    borderRadius: normalize(25),
     borderWidth: 1,
     borderColor: 'rgba(222, 222, 222, 0.48)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 15,
+    marginBottom: normalize(15),
     backgroundColor: COLORS.card,
-    paddingHorizontal: 20,
+    paddingHorizontal: normalize(20),
   },
 
   hustleText: {
@@ -1137,42 +1139,42 @@ const styles = StyleSheet.create({
   },
   // Income step styles
   incomeContainer: {
-    marginTop: 20,
-    paddingHorizontal: 20,
+    marginTop: normalize(20),
+    paddingHorizontal: normalize(20),
   },
   incomeOptionContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: normalize(20),
   },
   incomeOptionText: {
     ...FONTS.medium(20),
     color: COLORS.text,
-    marginLeft: 10,
+    marginLeft: normalize(10),
   },
   // Spending step styles
   spendingContainer: {
-    marginTop: 20,
-    paddingHorizontal: 10,
+    marginTop: normalize(20),
+    paddingHorizontal: normalize(10),
     flex: 1,
   },
   categoriesScrollView: {
     flex: 1,
-    marginBottom: 20,
+    marginBottom: normalize(20),
   },
   totalAmountContainer: {
     alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: normalize(30),
   },
   totalAmountBorder: {
-    borderRadius: 25,
+    borderRadius: normalize(25),
     padding: 1,
   },
   totalAmountInner: {
     backgroundColor: COLORS.card,
-    borderRadius: 25,
-    paddingVertical: 10,
-    paddingHorizontal: 30,
+    borderRadius: normalize(25),
+    paddingVertical: normalize(10),
+    paddingHorizontal: normalize(30),
   },
   totalAmountText: {
     ...FONTS.medium(14),
@@ -1181,18 +1183,18 @@ const styles = StyleSheet.create({
   categoryContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 25,
+    marginBottom: normalize(25),
     justifyContent: 'space-between',
     width: '100%',
   },
   categoryLabelContainer: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 25,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
+    borderRadius: normalize(25),
+    paddingVertical: normalize(10),
+    paddingHorizontal: normalize(15),
     borderWidth: 1,
     borderColor: '#DEDEDE7A',
-    width: 140, // Reduced width for the category label
+    width: normalize(140), // Responsive width for the category label
   },
   categoryName: {
     ...FONTS.medium(14),
@@ -1200,66 +1202,66 @@ const styles = StyleSheet.create({
   },
   sliderWrapper: {
     flex: 1,
-    height: 40,
+    height: normalize(40),
     position: 'relative',
-    marginHorizontal: 8,
-    width: 327, // Set a fixed width for the slider
+    marginHorizontal: normalize(8),
+    width: getResponsiveWidth(80), // Responsive width instead of fixed 327px
   },
   slider: {
     width: '100%',
-    height: 40,
+    height: normalize(40),
     zIndex: 1,
   },
   sliderTrackContainer: {
     width: '100%',
-    height: 4,
+    height: normalize(4),
     backgroundColor: 'transparent',
-    borderRadius: 2,
+    borderRadius: normalize(2),
     position: 'relative',
-    marginTop: 18,
+    marginTop: normalize(18),
   },
   sliderTrackBackground: {
     position: 'absolute',
     width: '100%',
     height: '100%',
     backgroundColor: '#EEEFF5',
-    borderRadius: 2,
+    borderRadius: normalize(2),
   },
   sliderTrackActive: {
     position: 'absolute',
     height: '100%',
     backgroundColor: '#6B3BA6',
-    borderRadius: 2,
+    borderRadius: normalize(2),
   },
   sliderAbsolute: {
     position: 'absolute',
     width: '100%',
-    height: 40,
-    top: -18,
+    height: normalize(40),
+    top: normalize(-18),
     zIndex: 2,
   },
   sliderThumbContainer: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+    width: normalize(20),
+    height: normalize(20),
+    borderRadius: normalize(10),
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
     position: 'absolute',
-    top: 10,
-    marginLeft: -4, // Center the thumb on the track
+    top: normalize(10),
+    marginLeft: normalize(-4), // Center the thumb on the track
     zIndex: 2,
   },
   sliderThumbGradient: {
     width: '100%',
     height: '100%',
-    borderRadius: 10,
+    borderRadius: normalize(10),
   },
   valueContainer: {
-    width: 60,
-    height: 24,
+    width: normalize(60),
+    height: normalize(24),
     backgroundColor: '#FFFFFF',
-    borderRadius: 8,
+    borderRadius: normalize(8),
     borderWidth: 1,
     borderColor: '#E0D2FF',
     justifyContent: 'center',
@@ -1293,14 +1295,14 @@ const styles = StyleSheet.create({
   stepSubtitle: {
     ...FONTS.semibold(14),
     color: '#A276FF',
-    marginBottom: 60,
+    marginBottom: normalize(60),
     textAlign: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: normalize(20),
   },
   fancyCardSubtitle: {
     ...FONTS.semibold(14),
     color: '#A276FF',
-    marginVertical: 18,
+    marginVertical: normalize(18),
     textAlign: 'center',
   },
 
@@ -1309,7 +1311,7 @@ const styles = StyleSheet.create({
     color: COLORS.text,
     marginBottom: 0,
     textAlign: 'center',
-    paddingHorizontal: 30,
+    paddingHorizontal: normalize(30),
     paddingVertical: 0,
   },
 
@@ -1319,26 +1321,26 @@ const styles = StyleSheet.create({
       ios: 'Poppins_400Regular',
     }),
     fontWeight: 400,
-    fontSize: 18,
+    fontSize: normalize(18),
     color: COLORS.text,
     textAlign: 'center'
   },
   stepTitle: {
     ...FONTS.h1,
     color: COLORS.text,
-    marginBottom: 30,
+    marginBottom: normalize(30),
     textAlign: 'center',
-    paddingHorizontal: 30,
-    paddingVertical: 20,
+    paddingHorizontal: normalize(30),
+    paddingVertical: normalize(20),
   },
   genderContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginTop: 20,
+    marginTop: normalize(20),
   },
   genderOption: {
-    width: 150,
-    height: 180,
+    width: getResponsiveWidth(35), // Responsive width instead of fixed 150px
+    height: normalize(180),
     borderRadius: SIZES.radius,
     borderWidth: 1,
     borderColor: COLORS.border,
@@ -1350,21 +1352,21 @@ const styles = StyleSheet.create({
     borderColor: COLORS.primary,
     borderWidth: 2,
     shadowColor: '#6943AF',
-    shadowOffset: { width: 0, height: 20 },
+    shadowOffset: { width: 0, height: normalize(20) },
     shadowOpacity: 0.4,
-    shadowRadius: 25,
+    shadowRadius: normalize(25),
     elevation: 20,
   },
   genderIconContainer: {
-    width: 80,
-    height: 80,
+    width: normalize(80),
+    height: normalize(80),
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: normalize(20),
   },
   genderIcon: {
-    width: 60,
-    height: 60,
+    width: normalize(60),
+    height: normalize(60),
   },
   genderText: {
     ...FONTS.medium(16),
@@ -1377,22 +1379,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: normalize(20),
     borderWidth: 1,
     borderColor: COLORS.border,
     borderRadius: SIZES.radius,
-    padding: 15,
+    padding: normalize(15),
     backgroundColor: COLORS.card,
   },
   durationPickerContainer: {
-    marginTop: 40,
-    height: 250,
+    marginTop: normalize(40),
+    height: normalize(250),
     alignItems: 'center',
     justifyContent: 'center',
   },
   durationSelector: {
     alignItems: 'center',
-    marginHorizontal: 20,
+    marginHorizontal: normalize(20),
   },
   durationValue: {
     ...FONTS.semibold(24),
@@ -1404,8 +1406,8 @@ const styles = StyleSheet.create({
   },
   exposureContainer: {
     alignItems: 'center',
-    marginTop: 20,
-    width: 327
+    marginTop: normalize(20),
+    width: getResponsiveWidth(80), // Responsive width instead of fixed 327px
   },
   exposureCircle: {
     width: 150,
@@ -1483,67 +1485,67 @@ const styles = StyleSheet.create({
   },
   cardContainer: {
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: normalize(20),
   },
   cardInstructions: {
     ...FONTS.medium(16),
     color: COLORS.textLight,
-    marginBottom: 20,
+    marginBottom: normalize(20),
   },
   cardImage: {
-    width: 250,
-    height: 350,
-    marginBottom: 30,
+    width: getResponsiveWidth(60), // Responsive width instead of fixed 250px
+    height: normalize(350),
+    marginBottom: normalize(30),
   },
   cardQuestion: {
     ...FONTS.medium(24),
     color: COLORS.text,
-    marginBottom: 20,
-    marginTop: 50,
+    marginBottom: normalize(20),
+    marginTop: normalize(50),
     textAlign: 'center',
-    width: 340,
+    width: getResponsiveWidth(85), // Responsive width instead of fixed 340px
   },
   completeLogo: {
-    width: 80,
-    height: 80,
-    marginBottom: 20,
+    width: normalize(80),
+    height: normalize(80),
+    marginBottom: normalize(20),
     alignSelf: 'center',
   },
   tickImage: {
-    width: 80,
-    height: 80,
-    marginBottom: 137,
-    marginTop: 123,
+    width: normalize(80),
+    height: normalize(80),
+    marginBottom: normalize(137),
+    marginTop: normalize(123),
     alignSelf: 'center',
   },
 
   arabicLogo: {
-    width: 104,
-    height: 21.83,
-    marginBottom: 137,
+    width: normalize(104),
+    height: normalize(21.83),
+    marginBottom: normalize(137),
     alignSelf: 'center',
   },
   completeTitle: {
     ...FONTS.h1,
     color: COLORS.text,
     textAlign: 'center',
-    marginBottom: 40
+    marginBottom: normalize(40)
   },
   completeImage: {
-    width: 150,
-    height: 150,
-    marginBottom: 30,
+    width: normalize(150),
+    height: normalize(150),
+    marginBottom: normalize(30),
     alignSelf: 'center',
   },
   completeText: {
     ...FONTS.body3,
     color: COLORS.text,
     textAlign: 'center',
-    marginBottom: 50,
+    marginBottom: normalize(50),
   },
   nextButton: {
     marginHorizontal: SIZES.padding,
-    marginBottom: 30,
+    marginBottom: normalize(30),
     alignSelf: 'center',
     width: '85%',
   },
@@ -1551,22 +1553,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    height: 60,
-    borderRadius: 30,
-    paddingHorizontal: 10,
+    height: normalize(60),
+    borderRadius: normalize(30),
+    paddingHorizontal: normalize(10),
     width: '90%',
     overflow: 'hidden',
   },
   swipeButtonText: {
     ...FONTS.semibold(15),
     color: 'white',
-    marginLeft: 70,
+    marginLeft: normalize(70),
 
   },
   arrowCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: normalize(40),
+    height: normalize(40),
+    borderRadius: normalize(20),
     backgroundColor: 'white',
     alignItems: 'center',
     justifyContent: 'center',
@@ -1576,7 +1578,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginHorizontal: SIZES.padding,
-    marginBottom: 30,
+    marginBottom: normalize(30),
   },
   swipeContent: {
     flexDirection: 'row',

@@ -15,7 +15,7 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { COLORS, FONTS, SIZES } from '../constants/theme';
 import { Bell } from 'lucide-react-native';
 import GradientBackground from '../components/GradientBackground';
-import { formatCurrency } from '../utils';
+import { formatCurrency, normalize, getResponsiveWidth } from '../utils';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Circle, G, Text as SvgText } from 'react-native-svg';
 import LiquidProgress from '../components/home/LiquidProgress';
@@ -37,8 +37,8 @@ const HomeScreen = () => {
   // Scroll to the Balance Card (second card) when component mounts
   React.useEffect(() => {
     // Calculate the x position to scroll to (card width + margin)
-    const cardWidth = 320;
-    const cardMargin = 19; // Match the margin used in handlePaginationDotPress
+    const cardWidth = getResponsiveWidth(82); // Use responsive width
+    const cardMargin = normalize(19); // Match the margin used in handlePaginationDotPress
     const xOffset = activeCardIndex * (cardWidth + cardMargin);
 
     // Add a small delay to ensure the ScrollView is properly rendered
@@ -79,8 +79,8 @@ const HomeScreen = () => {
   const handlePaginationDotPress = (index: number) => {
     setActiveCardIndex(index);
     // Calculate the x position to scroll to (card width + margin)
-    const cardWidth = 320;
-    const cardMargin = 19;
+    const cardWidth = getResponsiveWidth(82); // Use responsive width
+    const cardMargin = normalize(19);
     const xOffset = index * (cardWidth + cardMargin);
 
     // Scroll to the selected card
@@ -340,15 +340,15 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     top: 0,
-    width: 390,
-    height: 231,
-    borderBottomLeftRadius: 40,
-    borderBottomRightRadius: 40,
+    width: '100%', // Use full width instead of fixed 390px
+    height: normalize(231),
+    borderBottomLeftRadius: normalize(40),
+    borderBottomRightRadius: normalize(40),
     zIndex: 0,
   },
   topPattern: {
-    width: 214,
-    height: 208,
+    width: normalize(214),
+    height: normalize(208),
     position: 'absolute',
     right: 0,
     top: 0,
@@ -362,27 +362,27 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: SIZES.padding,
-    paddingTop: 60,
-    paddingBottom: 20,
+    paddingTop: normalize(60),
+    paddingBottom: normalize(20),
   },
   headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   avatarContainer: {
-    width: 69.48,
-    height: 69.48,
-    borderRadius: 50,
+    width: normalize(69.48),
+    height: normalize(69.48),
+    borderRadius: normalize(50),
     backgroundColor: '#6B3BA650',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 15,
+    marginRight: normalize(15),
     opacity: 1,
   },
   avatar: {
-    width: 46,
-    height: 46,
-    borderRadius: 50,
+    width: normalize(46),
+    height: normalize(46),
+    borderRadius: normalize(50),
     opacity: 1,
   },
   headerInfo: {
@@ -399,13 +399,13 @@ const styles = StyleSheet.create({
   planText: {
     ...FONTS.body5,
     color: COLORS.textWhite,
-    fontSize: 12,
-    marginTop: 5,
+    fontSize: normalize(12),
+    marginTop: normalize(5),
   },
   notificationButton: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
+    width: normalize(46),
+    height: normalize(46),
+    borderRadius: normalize(23),
     backgroundColor: '#5921D0',
     justifyContent: 'center',
     alignItems: 'center',
@@ -413,48 +413,48 @@ const styles = StyleSheet.create({
 
   },
   notificationDot: {
-    width: 11,
-    height: 11,
-    borderRadius: 5.5,
+    width: normalize(11),
+    height: normalize(11),
+    borderRadius: normalize(5.5),
     backgroundColor: 'red',
     position: 'absolute',
-    top: -2,
-    right: 8,
+    top: normalize(-2),
+    right: normalize(8),
   },
   scrollContent: {
-    paddingBottom: 20,
+    paddingBottom: normalize(20),
   },
   cardsSection: {
-    marginTop: 20,
+    marginTop: normalize(20),
   },
   cardsScrollContainer: {
     paddingHorizontal: SIZES.padding,
-    paddingBottom: 10,
+    paddingBottom: normalize(10),
   },
   card: {
-    width: 320,
-    height: 190,
-    borderRadius: 25,
+    width: getResponsiveWidth(82), // Responsive width instead of fixed 320px
+    height: normalize(190),
+    borderRadius: normalize(25),
     backgroundColor: COLORS.card,
-    marginRight: 15,
+    marginRight: normalize(15),
     shadowColor: '#6943AF',
-    shadowOffset: { width: 0, height: 20 },
+    shadowOffset: { width: 0, height: normalize(20) },
     shadowOpacity: 0.1,
-    shadowRadius: 40,
+    shadowRadius: normalize(40),
     elevation: 15,
     position: 'relative',
     overflow: 'hidden',
   },
   cardContent: {
     flex: 1,
-    padding: 20,
+    padding: normalize(20),
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
   chartContainer: {
     position: 'relative',
-    width: 120,
-    height: 130,
+    width: normalize(120),
+    height: normalize(130),
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -475,12 +475,12 @@ const styles = StyleSheet.create({
   cardTextContainer: {
     flex: 1,
     justifyContent: 'center',
-    marginLeft: 20,
+    marginLeft: normalize(20),
   },
   cardTitle: {
     ...FONTS.body3,
     color: "#6D6E8A",
-    marginBottom: 5,
+    marginBottom: normalize(5),
   },
   cardValue: {
     ...FONTS.h2,
@@ -493,15 +493,15 @@ const styles = StyleSheet.create({
   balanceLabel: {
     ...FONTS.medium(14),
     color: COLORS.textLight,
-    marginBottom: 5,
+    marginBottom: normalize(5),
   },
   balanceAmount: {
     ...FONTS.semibold(20),
     color: COLORS.text,
-    marginBottom: 15,
+    marginBottom: normalize(15),
   },
   milestoneContainer: {
-    marginTop: 10,
+    marginTop: normalize(10),
   },
   milestoneLabel: {
     ...FONTS.medium(14),
@@ -519,20 +519,20 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     right: 0,
-    width: 120,
-    height: 120,
+    width: normalize(120),
+    height: normalize(120),
     opacity: 0.8,
   },
   upgradeTitle: {
     ...FONTS.semibold(16),
     color: COLORS.text,
-    marginBottom: 10,
+    marginBottom: normalize(10),
     width: '80%',
   },
   upgradeDescription: {
     ...FONTS.medium(12),
     color: COLORS.textLight,
-    marginBottom: 20,
+    marginBottom: normalize(20),
     width: '90%',
   },
   upgradeCardContent: {
@@ -540,16 +540,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   upgradeButtonContainer: {
-    marginTop: 10,
+    marginTop: normalize(10),
     alignSelf: 'flex-start',
   },
   upgradeButton: {
-    paddingVertical: 16,
-    paddingHorizontal: 15,
-    borderRadius: 40,
+    paddingVertical: normalize(16),
+    paddingHorizontal: normalize(15),
+    borderRadius: normalize(40),
     alignItems: 'center',
     justifyContent: 'center',
-    width: 280,
+    width: getResponsiveWidth(70), // Responsive width instead of fixed 280px
   },
   upgradeButtonText: {
     ...FONTS.semibold(15),
@@ -559,65 +559,65 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 15,
+    marginTop: normalize(15),
   },
   paginationDotContainer: {
-    marginHorizontal: 5,
-    padding: 5, // Add padding for better touch target
+    marginHorizontal: normalize(5),
+    padding: normalize(5), // Add padding for better touch target
   },
   paginationDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+    width: normalize(10),
+    height: normalize(10),
+    borderRadius: normalize(5),
     backgroundColor: '#E6E6FF',
   },
   activePaginationDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+    width: normalize(10),
+    height: normalize(10),
+    borderRadius: normalize(5),
   },
   quickActionsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
     marginHorizontal: SIZES.padding,
-    marginTop: 20,
-    gap: 16,
+    marginTop: normalize(20),
+    gap: normalize(16),
   },
   actionButton: {
     width: '47%',
-    height: 56,
-    borderRadius: 25,
+    height: normalize(56),
+    borderRadius: normalize(25),
     backgroundColor: '#FFFFFF',
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: normalize(20),
     shadowColor: '#6943AF',
-    shadowOffset: { width: 0, height: 20 },
+    shadowOffset: { width: 0, height: normalize(20) },
     shadowOpacity: 0.1,
-    shadowRadius: 40,
+    shadowRadius: normalize(40),
     elevation: 15,
   },
   actionIconContainer: {
-    marginRight: 12,
+    marginRight: normalize(12),
   },
   actionIcon: {
-    width: 32,
-    height: 32,
+    width: normalize(32),
+    height: normalize(32),
   },
   actionText: {
     ...FONTS.medium(14),
     color: COLORS.text,
   },
   sectionContainer: {
-    marginTop: 30,
+    marginTop: normalize(30),
     paddingHorizontal: SIZES.padding,
-    paddingBottom: 100,
+    paddingBottom: normalize(100),
   },
   sectionTitle: {
     ...FONTS.semibold(20),
     color: COLORS.text,
-    marginBottom: 15,
+    marginBottom: normalize(15),
   },
   promotionsGrid: {
     flexDirection: 'row',
@@ -625,16 +625,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   promotionCard: {
-    width: 160,
-    height: 199,
-    borderRadius: 14,
-    marginBottom: 15,
+    width: '48%', // Fixed 48% width for 2 columns with space between
+    height: normalize(199),
+    borderRadius: normalize(14),
+    marginBottom: normalize(15),
     overflow: 'hidden',
     position: 'relative',
     shadowColor: '#6943AF',
-    shadowOffset: { width: 0, height: 20 },
+    shadowOffset: { width: 0, height: normalize(20) },
     shadowOpacity: 0.1,
-    shadowRadius: 40,
+    shadowRadius: normalize(40),
     elevation: 15,
   },
   promotionBackground: {
@@ -647,17 +647,19 @@ const styles = StyleSheet.create({
   promotionTitle: {
     ...FONTS.semibold(14),
     position: 'absolute',
-    left: 10,
-    top: 10,
-    width: '100%',
+    left: normalize(10),
+    top: normalize(10),
+    width: '90%', // Ensure text doesn't overflow
+    paddingRight: normalize(5),
   },
   gradientText: {
     ...FONTS.semibold(14),
     position: 'absolute',
-    left: 10,
-    top: 10,
-    width: '100%',
-    borderRadius: 4,
+    left: normalize(10),
+    top: normalize(10),
+    width: '90%', // Ensure text doesn't overflow
+    borderRadius: normalize(4),
+    paddingRight: normalize(5),
   },
 
 });
