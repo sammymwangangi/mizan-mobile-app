@@ -57,4 +57,12 @@ export type RootStackParamList = {
     Checkout: undefined;
     Payment: undefined;
     FontDemo: undefined; // Added for font system demo
+
+    // Round-Ups Feature Screens
+    RoundUps: undefined;
+    RoundUpsSettings: undefined;
+    RoundUpsHistory: undefined;
+    InvestmentPortfolio: undefined;
+    CharitySelection: undefined;
+    RoundUpsOnboarding: undefined;
   };

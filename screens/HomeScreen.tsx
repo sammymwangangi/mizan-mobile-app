@@ -279,6 +279,8 @@ const HomeScreen = () => {
                     navigation.navigate('SendMoney');
                   } else if (action.title === 'Pay Later') {
                     navigation.navigate('Shop');
+                  } else if (action.title === 'Round Ups') {
+                    navigation.navigate('RoundUps');
                   } else {
                     console.log(`${action.title} pressed`);
                   }

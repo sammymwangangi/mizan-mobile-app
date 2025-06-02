@@ -56,6 +56,13 @@ import PaymentScreen from './screens/PaymentScreen';
 // Import Font Demo screen
 import FontDemoScreen from './screens/FontDemoScreen';
 
+// Import Round-Ups screens
+import RoundUpsScreen from './screens/RoundUpsScreen';
+import RoundUpsSettingsScreen from './screens/RoundUpsSettingsScreen';
+import InvestmentPortfolioScreen from './screens/InvestmentPortfolioScreen';
+import RoundUpsHistoryScreen from './screens/RoundUpsHistoryScreen';
+import { RoundUpsProvider } from './contexts/RoundUpsContext';
+
 // Import test component
 import './global.css';
 
@@ -109,6 +116,12 @@ function RootStack() {
 
       {/* Font Demo Screen */}
       <Stack.Screen name="FontDemo" component={FontDemoScreen} />
+
+      {/* Round-Ups Screens */}
+      <Stack.Screen name="RoundUps" component={RoundUpsScreen} />
+      <Stack.Screen name="RoundUpsSettings" component={RoundUpsSettingsScreen} />
+      <Stack.Screen name="InvestmentPortfolio" component={InvestmentPortfolioScreen} />
+      <Stack.Screen name="RoundUpsHistory" component={RoundUpsHistoryScreen} />
     </Stack.Navigator>
   );
 }
@@ -152,10 +165,12 @@ export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayoutRootView}>
       <SafeAreaProvider style={styles.container}>
-        <Toaster />
-        <NavigationContainer>
-          <RootStack />
-        </NavigationContainer>
+        <RoundUpsProvider>
+          <Toaster />
+          <NavigationContainer>
+            <RootStack />
+          </NavigationContainer>
+        </RoundUpsProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );
