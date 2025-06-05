@@ -15,33 +15,36 @@ import { useNavigation, CommonActions } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { Alert } from 'react-native';
+import { auth } from '../firebaseConfig';
+import { signOut } from 'firebase/auth';
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Profile'>;
 
 const ProfileScreen = () => {
   const navigation = useNavigation<ProfileScreenNavigationProp>();
 
-  const handleLogout = () => {
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: 'Auth' }],
+        })
+      );
+    } catch (error: any) {
+      console.error('Sign out error:', error);
+      Alert.alert('Sign Out Error', error.message);
+    }
+  };
+
+  const confirmSignOut = () => {
     Alert.alert(
-      'Logout',
-      'Are you sure you want to logout?',
+      "Sign Out",
+      "Are you sure you want to sign out?",
       [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Logout',
-          onPress: () => {
-            // Reset navigation stack and navigate to Auth screen
-            navigation.dispatch(
-              CommonActions.reset({
-                index: 0,
-                routes: [{ name: 'Auth' }],
-              })
-            );
-          },
-        },
+        { text: "Cancel", style: "cancel" },
+        { text: "Sign Out", onPress: handleSignOut, style: "destructive" }
       ],
       { cancelable: true }
     );
@@ -114,13 +117,13 @@ const ProfileScreen = () => {
           {/* Power Off Button */}
           <TouchableOpacity 
             style={styles.powerOffButton}
-            onPress={handleLogout}
+            onPress={confirmSignOut} // Changed to confirmSignOut
           >
             <Image
-              source={require('../assets/profile/power.png')}
+              source={require('../assets/profile/power.png')} // Assuming this is a sign out icon
               style={styles.powerIcon}
             />
-            <Text style={styles.powerText}>Power-off</Text>
+            <Text style={styles.powerText}>Sign Out</Text> {/* Changed text to Sign Out */}
           </TouchableOpacity>
         </ScrollView>
       </SafeAreaView>

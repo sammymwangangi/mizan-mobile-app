@@ -1,9 +1,12 @@
 
-import React, { useCallback, useEffect, useState } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
+import { NavigationContainer, NavigationContainerRef } from '@react-navigation/native';
+import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { StyleSheet } from 'react-native';
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import * as SecureStore from 'expo-secure-store';
+import { auth } from './firebaseConfig'; // Assuming firebaseConfig is in the root
+import { onAuthStateChanged, User } from 'firebase/auth';
 import { Toaster } from 'sonner-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { RootStackParamList } from './navigation/types';
@@ -71,15 +74,25 @@ SplashScreen.preventAutoHideAsync();
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-function RootStack() {
+interface RootStackProps {
+  isCheckingAuth: boolean;
+  isUserLoggedIn: boolean;
+}
+
+function RootStack({ isCheckingAuth, isUserLoggedIn }: RootStackProps) {
+  if (isCheckingAuth) {
+    return <SplashScreenComponent />;
+  }
+
   return (
     <Stack.Navigator
-      initialRouteName="Splash"
+      initialRouteName={isUserLoggedIn ? 'Home' : 'Intro'}
       screenOptions={{
         headerShown: false,
         animation: 'fade',
       }}
     >
+      {/* Common screens always available */}
       <Stack.Screen name="Splash" component={SplashScreenComponent} />
       <Stack.Screen name="Intro" component={IntroScreen} />
       <Stack.Screen name="Onboarding" component={OnboardingScreen} />
@@ -128,10 +141,15 @@ function RootStack() {
 
 export default function App() {
   const [appIsReady, setAppIsReady] = useState(false);
+  const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const navigationRef = useRef<NavigationContainerRef<RootStackParamList>>(null);
 
   useEffect(() => {
     async function prepare() {
       try {
+        await SplashScreen.preventAutoHideAsync(); // Keep splash visible
+
         // Load fonts
         await Font.loadAsync({
           'Poppins': Poppins_400Regular,
@@ -140,11 +158,49 @@ export default function App() {
           'Poppins_700Bold': Poppins_700Bold,
           'Poppins_900Black': Poppins_900Black,
         });
+
+        // Check auth state
+        const unsubscribeAuth = onAuthStateChanged(auth, async (user: User | null) => {
+          try {
+            if (user) {
+              const token = await SecureStore.getItemAsync('userToken');
+              if (token) {
+                setIsUserLoggedIn(true);
+                console.log('User is logged in, token found.');
+              } else {
+                // Inconsistent state: Firebase has user, but no token in SecureStore
+                console.log('User in Firebase, but no token. Signing out.');
+                await auth.signOut();
+                await SecureStore.deleteItemAsync('userToken'); // Clean up
+                await SecureStore.deleteItemAsync('userUID'); // Clean up
+                setIsUserLoggedIn(false);
+              }
+            } else {
+              console.log('No user in Firebase. Ensuring local state is cleared.');
+              await SecureStore.deleteItemAsync('userToken'); // Clean up
+              await SecureStore.deleteItemAsync('userUID'); // Clean up
+              setIsUserLoggedIn(false);
+            }
+          } catch (e) {
+            console.error("Error during auth state check:", e);
+            setIsUserLoggedIn(false); // Default to not logged in on error
+          } finally {
+            setIsCheckingAuth(false);
+          }
+        });
+        // This is often desired for real-time auth state changes.
+        // If only initial check is needed, it should be unsubscribed.
+        return () => {
+          console.log("Unsubscribing auth listener");
+          unsubscribeAuth();
+        };
       } catch (e) {
-        console.warn(e);
+        console.warn("Error in prepare function:", e);
+        setIsCheckingAuth(false); // Ensure checking is false even if fonts fail
+        setIsUserLoggedIn(false);
       } finally {
-        // Tell the application to render
         setAppIsReady(true);
+        console.log("App is ready.");
       }
     }
 
@@ -152,23 +208,53 @@ export default function App() {
   }, []);
 
   const onLayoutRootView = useCallback(async () => {
-    if (appIsReady) {
-      // This tells the splash screen to hide immediately
+    console.log(`onLayoutRootView called. appIsReady: ${appIsReady}, isCheckingAuth: ${isCheckingAuth}`);
+    if (appIsReady && !isCheckingAuth) {
       await SplashScreen.hideAsync();
+      console.log("Splash screen hidden.");
     }
-  }, [appIsReady]);
+  }, [appIsReady, isCheckingAuth]);
 
-  if (!appIsReady) {
+  // This effect handles navigation after auth check is complete and navigation is ready
+  useEffect(() => {
+    if (!isCheckingAuth && navigationRef.current) {
+      const currentRoute = navigationRef.current.getCurrentRoute();
+      console.log("Auth check complete. Current route:", currentRoute?.name, "User logged in:", isUserLoggedIn);
+      if (isUserLoggedIn) {
+        // Only navigate if not already on a screen within the 'Home' (TabNavigator) flow
+        if (currentRoute?.name !== 'Home' && currentRoute?.name !== 'Profile' /* add other main screens */) {
+           console.log("Navigating to Home");
+          navigationRef.current.reset({ index: 0, routes: [{ name: 'Home' }] });
+        }
+      } else {
+        // Only navigate if not already on an auth flow screen
+        if (currentRoute?.name !== 'Intro' && currentRoute?.name !== 'Auth' /* add other auth screens */) {
+          console.log("Navigating to Intro");
+          navigationRef.current.reset({ index: 0, routes: [{ name: 'Intro' }] });
+        }
+      }
+    }
+  }, [isUserLoggedIn, isCheckingAuth, appIsReady]);
+
+
+  if (!appIsReady) { // Potentially show a native splash screen or null
     return null;
   }
+
+  // When isCheckingAuth is true, RootStack will render SplashScreenComponent
+  // When false, it will choose initialRouteName based on isUserLoggedIn.
+  // However, the useEffect above will then try to navigate.
+  // A more robust way is to not set initialRouteName dynamically if using navigationRef.reset
+  // For now, the RootStack's dynamic initialRouteName will determine the first screen,
+  // and the useEffect will adjust if needed (e.g. if direct linking lands on a wrong stack).
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayoutRootView}>
       <SafeAreaProvider style={styles.container}>
         <RoundUpsProvider>
           <Toaster />
-          <NavigationContainer>
-            <RootStack />
+          <NavigationContainer ref={navigationRef}>
+            <RootStack isCheckingAuth={isCheckingAuth} isUserLoggedIn={isUserLoggedIn} />
           </NavigationContainer>
         </RoundUpsProvider>
       </SafeAreaProvider>

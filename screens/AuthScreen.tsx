@@ -9,12 +9,17 @@ import {
   KeyboardAvoidingView,
   Platform,
   ImageBackground,
+  Alert,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { auth } from '../firebaseConfig';
+import { UserCredential, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import * as SecureStore from 'expo-secure-store';
+import * as LocalAuthentication from 'expo-local-authentication';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
-import Button from '../components/Button';
+// import Button from '../components/Button'; // Not used
 import Input from '../components/Input';
 import { User } from 'lucide-react-native';
 import { validateEmail, validatePassword } from '../utils';
@@ -51,10 +56,32 @@ const AuthScreen = () => {
     return isValid;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (validateForm()) {
-      // In a real app, you would handle authentication here
-      navigation.navigate('Home', { screen: 'Home' });
+      try {
+        let userCredential: UserCredential;
+        if (isLogin) {
+          userCredential = await signInWithEmailAndPassword(auth, email, password);
+          console.log('User signed in!');
+        } else {
+          userCredential = await createUserWithEmailAndPassword(auth, email, password);
+          console.log('User account created & signed in!');
+        }
+
+        const user = userCredential.user;
+        if (user) {
+          const idToken = await user.getIdToken();
+          await SecureStore.setItemAsync('userToken', idToken);
+          await SecureStore.setItemAsync('userUID', user.uid);
+          console.log('User token and UID stored securely.');
+        }
+
+        navigation.navigate('Home', { screen: 'Home' });
+
+      } catch (error: any) {
+        Alert.alert('Authentication Error', error.message);
+        console.error(error);
+      }
     }
   };
 
@@ -72,6 +99,54 @@ const AuthScreen = () => {
       // Clear form when switching modes
       setEmailError('');
       setPasswordError('');
+    }
+  };
+
+  const handleBiometricAuth = async () => {
+    try {
+      const hasHardware = await LocalAuthentication.hasHardwareAsync();
+      if (!hasHardware) {
+        Alert.alert('Error', 'Biometric hardware not available on this device.');
+        return;
+      }
+
+      const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+      if (!isEnrolled) {
+        Alert.alert('Error', 'No biometrics enrolled on this device. Please set up Face ID or Fingerprint.');
+        return;
+      }
+
+      const result = await LocalAuthentication.authenticateAsync({
+        promptMessage: 'Authenticate to sign in',
+        fallbackLabel: 'Enter Password', // Fallback for iOS
+      });
+
+      if (result.success) {
+        console.log('Biometric authentication successful.');
+        // Simplified approach: Assume token is still valid or will be handled by onAuthStateChanged
+        const userToken = await SecureStore.getItemAsync('userToken');
+        const userUID = await SecureStore.getItemAsync('userUID');
+
+        if (userToken && userUID) {
+          console.log('Stored token and UID found, navigating to Home.');
+          // Navigate to Home. App.tsx's onAuthStateChanged will handle session validity.
+          navigation.navigate('Home', { screen: 'Home' });
+        } else {
+          Alert.alert(
+            'Login Required',
+            'Biometric authentication successful, but no stored credentials found. Please log in with your email and password first to enable biometric sign-in for future sessions.'
+          );
+        }
+      } else {
+        console.log('Biometric authentication failed or cancelled:', result.error);
+        // Don't show an alert if user cancelled, as result.error might be 'user_cancel'
+        if (result.error && result.error !== 'user_cancel' && result.error !== 'system_cancel' && result.error !== 'app_cancel') {
+          Alert.alert('Authentication Failed', 'Biometric authentication failed. Please try again or use your password.');
+        }
+      }
+    } catch (error: any) {
+      console.error('Biometric authentication error:', error);
+      Alert.alert('Authentication Error', 'An unexpected error occurred during biometric authentication.');
     }
   };
 
@@ -164,7 +239,7 @@ const AuthScreen = () => {
           </View>
 
           <View style={styles.biometricsContainer}>
-            <TouchableOpacity style={styles.biometricButton}>
+            <TouchableOpacity style={styles.biometricButton} onPress={handleBiometricAuth}>
               <Image
                 source={require('../assets/FaceID.png')}
                 style={styles.biometricIcon}
@@ -172,7 +247,7 @@ const AuthScreen = () => {
               />
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.biometricButton}>
+            <TouchableOpacity style={styles.biometricButton} onPress={handleBiometricAuth}>
               <Image
                 source={require('../assets/fingerprint.png')}
                 style={styles.biometricIcon}
