@@ -210,7 +210,7 @@ const InvestmentPortfolioScreen = () => {
 
             <View style={styles.allocationContainer}>
               <View style={styles.allocationItem}>
-                <View style={styles.allocationDot} style={[styles.allocationDot, { backgroundColor: COLORS.primary }]} />
+                <View style={[styles.allocationDot, { backgroundColor: COLORS.primary }]} />
                 <Text style={styles.allocationLabel}>Stocks</Text>
                 <Text style={styles.allocationPercentage}>60%</Text>
               </View>

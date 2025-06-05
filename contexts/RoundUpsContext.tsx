@@ -10,6 +10,7 @@ import {
   BankAccount,
 } from '../types/roundups';
 import { generateMockTransactions, getRoundUpStatistics, getDefaultPortfolioAllocation } from '../utils/roundups';
+import { roundUpsApiService } from '../services/api/RoundUpsApiService';
 
 // Initial state
 const initialState: RoundUpsUIState = {
@@ -81,10 +82,51 @@ export const RoundUpsProvider: React.FC<RoundUpsProviderProps> = ({ children }) 
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
 
-      // Load settings from AsyncStorage
-      const savedSettings = await AsyncStorage.getItem('roundup_settings');
-      let settings: RoundUpSettings;
+      // Check if user is authenticated
+      const authToken = await AsyncStorage.getItem('auth_token');
 
+      if (authToken) {
+        // Load data from API
+        try {
+          const [settings, summary, portfolio, accounts] = await Promise.all([
+            roundUpsApiService.getRoundUpSettings(),
+            roundUpsApiService.getRoundUpSummary(),
+            roundUpsApiService.getInvestmentPortfolio(),
+            roundUpsApiService.getBankAccounts(),
+          ]);
+
+          dispatch({ type: 'SET_SETTINGS', payload: settings });
+          dispatch({ type: 'SET_SUMMARY', payload: summary });
+          dispatch({ type: 'SET_PORTFOLIO', payload: portfolio });
+          dispatch({ type: 'SET_CONNECTED_ACCOUNTS', payload: accounts });
+
+          // Load recent transactions
+          const transactionsData = await roundUpsApiService.getTransactions(1, 20);
+          dispatch({ type: 'SET_TRANSACTIONS', payload: transactionsData.transactions });
+
+        } catch (apiError) {
+          console.warn('API data loading failed, using mock data:', apiError);
+          await loadMockData();
+        }
+      } else {
+        // User not authenticated, use mock data for demo
+        await loadMockData();
+      }
+
+    } catch (error) {
+      dispatch({ type: 'SET_ERROR', payload: 'Failed to initialize round-ups data' });
+      console.error('Round-ups initialization error:', error);
+    } finally {
+      dispatch({ type: 'SET_LOADING', payload: false });
+    }
+  };
+
+  // Load mock data for demo/offline mode
+  const loadMockData = async () => {
+    // Load settings from AsyncStorage or create default
+    const savedSettings = await AsyncStorage.getItem('roundup_settings');
+    let settings: RoundUpSettings;
+try{
       if (savedSettings) {
         settings = JSON.parse(savedSettings);
       } else {
@@ -118,6 +160,7 @@ export const RoundUpsProvider: React.FC<RoundUpsProviderProps> = ({ children }) 
         };
         await AsyncStorage.setItem('roundup_settings', JSON.stringify(settings));
       }
+      
 
       dispatch({ type: 'SET_SETTINGS', payload: settings });
 
@@ -212,14 +255,23 @@ export const RoundUpsProvider: React.FC<RoundUpsProviderProps> = ({ children }) 
     try {
       if (!state.settings) return;
 
-      const updatedSettings = {
-        ...state.settings,
-        ...newSettings,
-        updatedAt: new Date(),
-      };
+      const authToken = await AsyncStorage.getItem('auth_token');
 
-      await AsyncStorage.setItem('roundup_settings', JSON.stringify(updatedSettings));
-      dispatch({ type: 'SET_SETTINGS', payload: updatedSettings });
+      if (authToken) {
+        // Update via API
+        const updatedSettings = await roundUpsApiService.updateRoundUpSettings(newSettings);
+        dispatch({ type: 'SET_SETTINGS', payload: updatedSettings });
+      } else {
+        // Update locally for demo mode
+        const updatedSettings = {
+          ...state.settings,
+          ...newSettings,
+          updatedAt: new Date(),
+        };
+
+        await AsyncStorage.setItem('roundup_settings', JSON.stringify(updatedSettings));
+        dispatch({ type: 'SET_SETTINGS', payload: updatedSettings });
+      }
     } catch (error) {
       dispatch({ type: 'SET_ERROR', payload: 'Failed to update settings' });
       console.error('Settings update error:', error);

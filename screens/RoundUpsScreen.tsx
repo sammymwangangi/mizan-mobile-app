@@ -19,7 +19,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { formatCurrency, normalize } from '../utils';
 import { useRoundUps } from '../contexts/RoundUpsContext';
 import GradientBackground from '../components/GradientBackground';
-import { VictoryBar, VictoryChart, VictoryTheme, VictoryArea } from 'victory-native';
 
 type RoundUpsScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'RoundUps'>;
 
