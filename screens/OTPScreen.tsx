@@ -9,6 +9,7 @@ import {
   Platform,
   Keyboard,
   Pressable,
+  Alert,
 } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -19,6 +20,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 // @ts-ignore - Ignore the missing type declaration file
 import MaskedView from '@react-native-masked-view/masked-view';
 import CustomGradientText from 'components/CustomGradientText';
+import { smsService } from '../services/smsService';
+import { useAuth } from '../hooks/useAuth';
 
 type OTPScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'OTP'>;
 
@@ -28,10 +31,15 @@ const OTPScreen = () => {
   const navigation = useNavigation<OTPScreenNavigationProp>();
   const route = useRoute<OTPScreenRouteProp>();
   const phoneNumber = route.params?.phoneNumber || '0722 123 456';
+  const userId = route.params?.userId;
+  const { updateProfile } = useAuth();
 
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [timer, setTimer] = useState(30);
   const [isResendActive, setIsResendActive] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [error, setError] = useState('');
   const inputRefs = useRef<(TextInput | null)[]>([]);
 
   // Set up timer for resend code
@@ -83,16 +91,90 @@ const OTPScreen = () => {
     }
   };
 
-  const handleVerifyOTP = () => {
-    const otpValue = otp.join('');
-    if (otpValue.length === 6) {
-      // In a real app, you would validate the OTP here
-      navigation.navigate('KYC');
+  const handleVerifyOTP = async () => {
+    const otpCode = otp.join('');
+    setError('');
+
+    if (otpCode.length !== 6) {
+      setError('Please enter the complete 6-digit code');
+      return;
+    }
+
+    if (!userId) {
+      Alert.alert('Error', 'User ID not found');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const result = await smsService.verifyOTP(phoneNumber, otpCode);
+
+      if (!result.success) {
+        setError(result.message);
+        return;
+      }
+
+      // Update user profile to mark phone as verified
+      const updateResult = await updateProfile({
+        phone_verified: true,
+      });
+
+      if (updateResult.error) {
+        console.error('Failed to update profile:', updateResult.error);
+        // Continue anyway since OTP was verified successfully
+      }
+
+      Alert.alert(
+        'Success',
+        'Phone number verified successfully!',
+        [
+          {
+            text: 'Continue',
+            onPress: () => navigation.navigate('KYC'),
+          },
+        ]
+      );
+
+    } catch (error) {
+      console.error('OTP verification error:', error);
+      setError(error instanceof Error ? error.message : 'Verification failed');
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleGoBack = () => {
     navigation.goBack();
+  };
+
+  const handleResend = async () => {
+    if (!userId) {
+      Alert.alert('Error', 'User ID not found');
+      return;
+    }
+
+    setResending(true);
+    setError('');
+
+    try {
+      const result = await smsService.resendOTP(userId, phoneNumber);
+
+      if (!result.success) {
+        setError(result.message);
+        return;
+      }
+
+      setTimer(30);
+      setIsResendActive(false);
+      Alert.alert('Success', 'Verification code sent successfully!');
+
+    } catch (error) {
+      console.error('Resend OTP error:', error);
+      setError(error instanceof Error ? error.message : 'Failed to resend code');
+    } finally {
+      setResending(false);
+    }
   };
 
   const formatTime = (seconds: number) => {
@@ -176,18 +258,25 @@ const OTPScreen = () => {
             ))}
           </View>
 
+          {/* Error Message */}
+          {error ? (
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>{error}</Text>
+            </View>
+          ) : null}
+
           {/* Resend Code */}
           <TouchableOpacity
-            onPress={handleResendCode}
+            onPress={handleResend}
             style={styles.resendContainer}
-            disabled={!isResendActive}
+            disabled={!isResendActive || resending}
           >
             <View style={{flexDirection: 'row', justifyContent: 'center'}}>
               <Text style={[
                 styles.resendText,
                 isResendActive ? styles.activeResendText : styles.inactiveResendText
               ]}>
-                Resend {''}
+                {resending ? 'Sending...' : 'Resend'} {''}
               </Text>
               <Text style={styles.resendText}>
                  your code if it doesnt arrive in {formatTime(timer)}
@@ -202,8 +291,9 @@ const OTPScreen = () => {
         {/* Next Button - Moved outside content view to position at bottom */}
         <View style={styles.bottomButtonContainer}>
           <TouchableOpacity
-            style={styles.nextButtonContainer}
+            style={[styles.nextButtonContainer, loading && styles.buttonDisabled]}
             onPress={handleVerifyOTP}
+            disabled={loading}
           >
             <LinearGradient
               colors={['#D155FF', '#B532F2', '#A016E8', '#9406E2', '#8F00E0', '#921BE6', '#A08CFF']}
@@ -212,7 +302,9 @@ const OTPScreen = () => {
               end={{ x: 1, y: 0.5 }}
               style={styles.nextButton}
             >
-              <Text style={styles.nextButtonText}>NEXT</Text>
+              <Text style={styles.nextButtonText}>
+                {loading ? 'VERIFYING...' : 'NEXT'}
+              </Text>
             </LinearGradient>
           </TouchableOpacity>
         </View>
@@ -337,6 +429,18 @@ const styles = StyleSheet.create({
     ...FONTS.semibold(15),
     color: COLORS.textWhite,
     textAlign: 'center',
+  },
+  errorContainer: {
+    marginTop: 16,
+    paddingHorizontal: 20,
+  },
+  errorText: {
+    ...FONTS.medium(14),
+    color: COLORS.error || '#FF3B30',
+    textAlign: 'center',
+  },
+  buttonDisabled: {
+    opacity: 0.6,
   },
 });
 

@@ -13,7 +13,7 @@ export type RootStackParamList = {
     Onboarding: undefined;
     Auth: undefined;
     PhoneNumber: undefined;
-    OTP: { phoneNumber: string };
+    OTP: { phoneNumber: string; userId: string };
     KYC: undefined;
     Home: { screen?: keyof TabParamList };
     Profile: undefined;

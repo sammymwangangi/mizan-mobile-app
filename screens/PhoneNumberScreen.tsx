@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,7 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   TextInput,
-  ImageBackground,
+  Alert,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -20,18 +20,108 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { ChevronDown } from 'lucide-react-native';
 // @ts-ignore - Ignore the missing type declaration file
 import MaskedView from '@react-native-masked-view/masked-view';
+import { useAuth } from '../hooks/useAuth';
+import { smsService } from '../services/smsService';
 
 type PhoneNumberScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'PhoneNumber'>;
 
 const PhoneNumberScreen = () => {
   const navigation = useNavigation<PhoneNumberScreenNavigationProp>();
+  const { user, updateProfile, loading: authLoading } = useAuth();
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [countryCode, setCountryCode] = useState('971');
+  const [countryCode] = useState('254'); // Kenya country code
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = () => {
-    // In a real app, you would validate the phone number here
-    // Then navigate to OTP screen
-    navigation.navigate('OTP', { phoneNumber: `+${countryCode} ${phoneNumber}` });
+  // Debug user state
+  useEffect(() => {
+    console.log('📱 PhoneNumberScreen - User state:', {
+      user: !!user,
+      userId: user?.id,
+      email: user?.email,
+      authLoading
+    });
+  }, [user, authLoading]);
+
+  const validatePhoneNumber = (phone: string): boolean => {
+    // Kenya phone number validation
+    const kenyanPhoneRegex = /^[17]\d{8}$/;
+    return kenyanPhoneRegex.test(phone);
+  };
+
+  const formatPhoneNumber = (phone: string): string => {
+    // Remove any spaces, dashes, or parentheses
+    let cleaned = phone.replace(/[\s\-\(\)]/g, '');
+
+    // If it starts with 0, remove it
+    if (cleaned.startsWith('0')) {
+      cleaned = cleaned.substring(1);
+    }
+
+    return `+254${cleaned}`;
+  };
+
+  const handleSubmit = async () => {
+    setError('');
+
+    if (!phoneNumber.trim()) {
+      setError('Please enter your phone number');
+      return;
+    }
+
+    if (!validatePhoneNumber(phoneNumber)) {
+      setError('Please enter a valid Kenyan phone number');
+      return;
+    }
+
+    if (!user) {
+      console.error('❌ User not authenticated in PhoneNumberScreen');
+      Alert.alert(
+        'Authentication Required',
+        'Please sign in first to continue with phone verification.',
+        [
+          { text: 'Go to Sign In', onPress: () => navigation.navigate('Auth') },
+          { text: 'Cancel', style: 'cancel' }
+        ]
+      );
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const formattedPhone = formatPhoneNumber(phoneNumber);
+
+      // Send OTP
+      const otpResult = await smsService.sendOTP(user.id, formattedPhone);
+
+      if (!otpResult.success) {
+        setError(otpResult.message);
+        return;
+      }
+
+      // Update user profile with phone number
+      const updateResult = await updateProfile({
+        phone_number: formattedPhone,
+      });
+
+      if (updateResult.error) {
+        console.error('Failed to update profile:', updateResult.error);
+        // Continue anyway since OTP was sent successfully
+      }
+
+      // Navigate to OTP verification screen
+      navigation.navigate('OTP', {
+        phoneNumber: formattedPhone,
+        userId: user.id,
+      });
+
+    } catch (error) {
+      console.error('Phone number verification error:', error);
+      setError(error instanceof Error ? error.message : 'Failed to send verification code');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSignIn = () => {
@@ -94,14 +184,9 @@ const PhoneNumberScreen = () => {
                 <Text style={styles.countryLabel}>Country</Text>
                 <View style={styles.countryCodeRow}>
                   <View style={styles.flagContainer}>
-                    <Image
-                      source={require('../assets/emirates.png')}
-                      style={styles.flagIcon}
-                      resizeMode="contain"
-                    />
+                    <Text style={styles.flagEmoji}>🇰🇪</Text>
                   </View>
-                  <Text style={styles.countryCodeText}>{countryCode}</Text>
-                  <ChevronDown size={16} color={COLORS.textLight} />
+                  <Text style={styles.countryCodeText}>+{countryCode}</Text>
                 </View>
               </TouchableOpacity>
             </View>
@@ -110,18 +195,31 @@ const PhoneNumberScreen = () => {
             <View style={styles.phoneInputContainer}>
               <TextInput
                 style={styles.phoneInput}
-                placeholder="Insert your number here"
+                placeholder="712345678"
                 placeholderTextColor={COLORS.placeholder}
                 value={phoneNumber}
                 onChangeText={setPhoneNumber}
                 keyboardType="phone-pad"
+                maxLength={9}
+                editable={!loading}
               />
             </View>
           </View>
 
+          {/* Error Message */}
+          {error ? (
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>{error}</Text>
+            </View>
+          ) : null}
+
           {/* Submit Button */}
           <View style={styles.submitButtonWrapper}>
-            <TouchableOpacity onPress={handleSubmit} style={styles.submitButtonContainer}>
+            <TouchableOpacity
+              onPress={handleSubmit}
+              style={[styles.submitButtonContainer, loading && styles.submitButtonDisabled]}
+              disabled={loading}
+            >
               <LinearGradient
                 colors={['#D155FF', '#B532F2', '#A016E8', '#9406E2', '#8F00E0', '#921BE6', '#A08CFF']}
                 locations={[0, 0.15, 0.3, 0.45, 0.6, 0.75, 1]}
@@ -129,7 +227,9 @@ const PhoneNumberScreen = () => {
                 end={{ x: 1, y: 0.5 }}
                 style={[styles.submitButton, { shadowColor: '#6943AF', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.5, shadowRadius: 4, elevation: 20 }]}
               >
-                <Text style={styles.submitButtonText}>SIGN-UP</Text>
+                <Text style={styles.submitButtonText}>
+                  {loading ? 'SENDING...' : 'CONTINUE'}
+                </Text>
               </LinearGradient>
             </TouchableOpacity>
           </View>
@@ -307,6 +407,21 @@ const styles = StyleSheet.create({
     borderStyle: 'dashed',
     borderWidth: 1,
     borderColor: '#6D6E8A',
+  },
+  flagEmoji: {
+    fontSize: 20,
+  },
+  errorContainer: {
+    marginTop: 8,
+    paddingHorizontal: getResponsiveWidth(24),
+  },
+  errorText: {
+    ...FONTS.medium(14),
+    color: COLORS.error || '#FF3B30',
+    textAlign: 'center',
+  },
+  submitButtonDisabled: {
+    opacity: 0.6,
   },
 });
 

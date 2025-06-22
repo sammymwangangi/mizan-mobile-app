@@ -10,7 +10,10 @@ npm-debug.*
 *.orig.*
 web-build/
 
-
+MIGRATION_COMPLETE.md
+SUPABASE_MIGRATION.md
+TROUBLESHOOTING.md
+.env
 
 
 ios

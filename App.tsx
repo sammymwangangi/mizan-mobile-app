@@ -1,15 +1,15 @@
 
 import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { NavigationContainer, NavigationContainerRef } from '@react-navigation/native';
-import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StyleSheet } from 'react-native';
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import * as SecureStore from 'expo-secure-store';
-import { auth } from './firebaseConfig'; // Assuming firebaseConfig is in the root
-import { onAuthStateChanged, User } from 'firebase/auth';
+
 import { Toaster } from 'sonner-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { RootStackParamList } from './navigation/types';
+import { useAuth } from './hooks/useAuth';
+import { testSupabaseConnection, testSupabaseAuth } from './utils/testSupabase';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Font from 'expo-font';
 import TabNavigator from './navigation/TabNavigator';
@@ -29,7 +29,7 @@ import AuthScreen from './screens/AuthScreen';
 import PhoneNumberScreen from './screens/PhoneNumberScreen';
 import OTPScreen from './screens/OTPScreen';
 import KYCScreen from './screens/KYCScreen';
-import HomeScreen from './screens/HomeScreen';
+
 import ProfileScreen from './screens/ProfileScreen';
 import CampaignDetailsScreen from './screens/CampaignDetailsScreen';
 import DonationAmountScreen from './screens/DonationAmountScreen';
@@ -141,9 +141,8 @@ function RootStack({ isCheckingAuth, isUserLoggedIn }: RootStackProps) {
 
 export default function App() {
   const [appIsReady, setAppIsReady] = useState(false);
-  const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const navigationRef = useRef<NavigationContainerRef<RootStackParamList>>(null);
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     async function prepare() {
@@ -159,45 +158,13 @@ export default function App() {
           'Poppins_900Black': Poppins_900Black,
         });
 
-        // Check auth state
-        const unsubscribeAuth = onAuthStateChanged(auth, async (user: User | null) => {
-          try {
-            if (user) {
-              const token = await SecureStore.getItemAsync('userToken');
-              if (token) {
-                setIsUserLoggedIn(true);
-                console.log('User is logged in, token found.');
-              } else {
-                // Inconsistent state: Firebase has user, but no token in SecureStore
-                console.log('User in Firebase, but no token. Signing out.');
-                await auth.signOut();
-                await SecureStore.deleteItemAsync('userToken'); // Clean up
-                await SecureStore.deleteItemAsync('userUID'); // Clean up
-                setIsUserLoggedIn(false);
-              }
-            } else {
-              console.log('No user in Firebase. Ensuring local state is cleared.');
-              await SecureStore.deleteItemAsync('userToken'); // Clean up
-              await SecureStore.deleteItemAsync('userUID'); // Clean up
-              setIsUserLoggedIn(false);
-            }
-          } catch (e) {
-            console.error("Error during auth state check:", e);
-            setIsUserLoggedIn(false); // Default to not logged in on error
-          } finally {
-            setIsCheckingAuth(false);
-          }
-        });
-        // This is often desired for real-time auth state changes.
-        // If only initial check is needed, it should be unsubscribed.
-        return () => {
-          console.log("Unsubscribing auth listener");
-          unsubscribeAuth();
-        };
+        // Test Supabase connection
+        await testSupabaseConnection();
+        await testSupabaseAuth();
+
+        console.log('App initialization complete');
       } catch (e) {
         console.warn("Error in prepare function:", e);
-        setIsCheckingAuth(false); // Ensure checking is false even if fonts fail
-        setIsUserLoggedIn(false);
       } finally {
         setAppIsReady(true);
         console.log("App is ready.");
@@ -208,19 +175,19 @@ export default function App() {
   }, []);
 
   const onLayoutRootView = useCallback(async () => {
-    console.log(`onLayoutRootView called. appIsReady: ${appIsReady}, isCheckingAuth: ${isCheckingAuth}`);
-    if (appIsReady && !isCheckingAuth) {
+    console.log(`onLayoutRootView called. appIsReady: ${appIsReady}`);
+    if (appIsReady) {
       await SplashScreen.hideAsync();
       console.log("Splash screen hidden.");
     }
-  }, [appIsReady, isCheckingAuth]);
+  }, [appIsReady]);
 
   // This effect handles navigation after auth check is complete and navigation is ready
   useEffect(() => {
-    if (!isCheckingAuth && navigationRef.current) {
+    if (appIsReady && navigationRef.current) {
       const currentRoute = navigationRef.current.getCurrentRoute();
-      console.log("Auth check complete. Current route:", currentRoute?.name, "User logged in:", isUserLoggedIn);
-      if (isUserLoggedIn) {
+      console.log("Auth check complete. Current route:", currentRoute?.name, "User authenticated:", isAuthenticated);
+      if (isAuthenticated) {
         // Only navigate if not already on a screen within the 'Home' (TabNavigator) flow
         if (currentRoute?.name !== 'Home' && currentRoute?.name !== 'Profile' /* add other main screens */) {
            console.log("Navigating to Home");
@@ -234,7 +201,7 @@ export default function App() {
         }
       }
     }
-  }, [isUserLoggedIn, isCheckingAuth, appIsReady]);
+  }, [isAuthenticated, appIsReady]);
 
 
   if (!appIsReady) { // Potentially show a native splash screen or null
@@ -254,7 +221,7 @@ export default function App() {
         <RoundUpsProvider>
           <Toaster />
           <NavigationContainer ref={navigationRef}>
-            <RootStack isCheckingAuth={isCheckingAuth} isUserLoggedIn={isUserLoggedIn} />
+            <RootStack isCheckingAuth={false} isUserLoggedIn={isAuthenticated} />
           </NavigationContainer>
         </RoundUpsProvider>
       </SafeAreaProvider>

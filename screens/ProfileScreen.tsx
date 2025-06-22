@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -15,26 +15,86 @@ import { useNavigation, CommonActions } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { Alert } from 'react-native';
-import { auth } from '../firebaseConfig';
-import { signOut } from 'firebase/auth';
+import { useAuth } from '../hooks/useAuth';
+import { biometricService } from '../services/biometricService';
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Profile'>;
 
 const ProfileScreen = () => {
   const navigation = useNavigation<ProfileScreenNavigationProp>();
+  const { signOut, user, userProfile } = useAuth();
+  const [biometricEnabled, setBiometricEnabled] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  // Check biometric status on component mount
+  useEffect(() => {
+    const checkBiometricStatus = async () => {
+      if (user) {
+        const isEnabled = await biometricService.isBiometricLoginEnabled(user.id);
+        setBiometricEnabled(isEnabled);
+      }
+    };
+    checkBiometricStatus();
+  }, [user]);
 
   const handleSignOut = async () => {
     try {
-      await signOut(auth);
+      setLoading(true);
+      const result = await signOut();
+
+      if (result.error) {
+        Alert.alert('Sign Out Error', result.error.message);
+        return;
+      }
+
       navigation.dispatch(
         CommonActions.reset({
           index: 0,
           routes: [{ name: 'Auth' }],
         })
       );
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Sign out error:', error);
-      Alert.alert('Sign Out Error', error.message);
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+      Alert.alert('Sign Out Error', errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleToggleBiometric = async () => {
+    if (!user) {
+      Alert.alert('Error', 'User not authenticated');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      if (biometricEnabled) {
+        // Disable biometric
+        const result = await biometricService.disableBiometricLogin(user.id);
+        if (result.success) {
+          setBiometricEnabled(false);
+          Alert.alert('Success', 'Biometric login disabled');
+        } else {
+          Alert.alert('Error', result.error || 'Failed to disable biometric login');
+        }
+      } else {
+        // Enable biometric
+        const result = await biometricService.enableBiometricLogin(user.id);
+        if (result.success) {
+          setBiometricEnabled(true);
+          Alert.alert('Success', 'Biometric login enabled');
+        } else {
+          Alert.alert('Error', result.error || 'Failed to enable biometric login');
+        }
+      }
+    } catch (error) {
+      console.error('Biometric toggle error:', error);
+      Alert.alert('Error', 'Failed to update biometric settings');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -105,6 +165,20 @@ const ProfileScreen = () => {
               <Text style={styles.optionText}>Notifications Settings</Text>
             </TouchableOpacity>
 
+            <TouchableOpacity
+              style={styles.optionItem}
+              onPress={handleToggleBiometric}
+              disabled={loading}
+            >
+              <Image
+                source={require('../assets/FaceID.png')}
+                style={styles.optionIcon}
+              />
+              <Text style={styles.optionText}>
+                {biometricEnabled ? 'Disable' : 'Enable'} Biometric Login
+              </Text>
+            </TouchableOpacity>
+
             <TouchableOpacity style={styles.optionItem}>
               <Image
                 source={require('../assets/profile/cancel.png')}
@@ -115,15 +189,27 @@ const ProfileScreen = () => {
           </View>
 
           {/* Power Off Button */}
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.powerOffButton}
-            onPress={confirmSignOut} // Changed to confirmSignOut
+            onPress={() => {
+              Alert.alert(
+                'Sign Out',
+                'Are you sure you want to sign out?',
+                [
+                  { text: 'Cancel', style: 'cancel' },
+                  { text: 'Sign Out', style: 'destructive', onPress: handleSignOut },
+                ]
+              );
+            }}
+            disabled={loading}
           >
             <Image
               source={require('../assets/profile/power.png')} // Assuming this is a sign out icon
               style={styles.powerIcon}
             />
-            <Text style={styles.powerText}>Sign Out</Text> {/* Changed text to Sign Out */}
+            <Text style={styles.powerText}>
+              {loading ? 'Signing Out...' : 'Sign Out'}
+            </Text>
           </TouchableOpacity>
         </ScrollView>
       </SafeAreaView>
