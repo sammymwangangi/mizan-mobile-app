@@ -1,5 +1,5 @@
 
-import React, { useCallback, useEffect, useState, useRef } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import { NavigationContainer, NavigationContainerRef } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StyleSheet } from 'react-native';
@@ -8,7 +8,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Toaster } from 'sonner-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { RootStackParamList } from './navigation/types';
-import { useAuth } from './hooks/useAuth';
+import { useAuth, AuthProvider } from './hooks/useAuth';
 import { testSupabaseConnection, testSupabaseAuth } from './utils/testSupabase';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Font from 'expo-font';
@@ -26,6 +26,7 @@ import SplashScreenComponent from './screens/SplashScreen';
 import IntroScreen from './screens/IntroScreen';
 import OnboardingScreen from './screens/OnboardingScreen';
 import AuthScreen from './screens/AuthScreen';
+import SignUpScreen from './screens/SignUpScreen';
 import PhoneNumberScreen from './screens/PhoneNumberScreen';
 import OTPScreen from './screens/OTPScreen';
 import KYCScreen from './screens/KYCScreen';
@@ -77,16 +78,27 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 interface RootStackProps {
   isCheckingAuth: boolean;
   isUserLoggedIn: boolean;
+  isInSignupFlow: boolean;
+  hasUser: boolean;
 }
 
-function RootStack({ isCheckingAuth, isUserLoggedIn }: RootStackProps) {
+function RootStack({ isCheckingAuth, isUserLoggedIn, isInSignupFlow, hasUser }: RootStackProps) {
   if (isCheckingAuth) {
     return <SplashScreenComponent />;
   }
 
+  // Determine initial route based on auth state
+  let initialRoute = 'Intro';
+  if (isUserLoggedIn) {
+    initialRoute = 'Home';
+  } else if (isInSignupFlow && hasUser) {
+    // User is in signup flow but not fully authenticated yet
+    initialRoute = 'PhoneNumber';
+  }
+
   return (
     <Stack.Navigator
-      initialRouteName={isUserLoggedIn ? 'Home' : 'Intro'}
+      initialRouteName={initialRoute as keyof RootStackParamList}
       screenOptions={{
         headerShown: false,
         animation: 'fade',
@@ -97,6 +109,7 @@ function RootStack({ isCheckingAuth, isUserLoggedIn }: RootStackProps) {
       <Stack.Screen name="Intro" component={IntroScreen} />
       <Stack.Screen name="Onboarding" component={OnboardingScreen} />
       <Stack.Screen name="Auth" component={AuthScreen} />
+      <Stack.Screen name="SignUp" component={SignUpScreen} />
       <Stack.Screen name="PhoneNumber" component={PhoneNumberScreen} />
       <Stack.Screen name="OTP" component={OTPScreen} />
       <Stack.Screen name="KYC" component={KYCScreen} />
@@ -139,10 +152,10 @@ function RootStack({ isCheckingAuth, isUserLoggedIn }: RootStackProps) {
   );
 }
 
-export default function App() {
+function AppContent() {
   const [appIsReady, setAppIsReady] = useState(false);
   const navigationRef = useRef<NavigationContainerRef<RootStackParamList>>(null);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isInSignupFlow, user } = useAuth();
 
   useEffect(() => {
     async function prepare() {
@@ -221,11 +234,24 @@ export default function App() {
         <RoundUpsProvider>
           <Toaster />
           <NavigationContainer ref={navigationRef}>
-            <RootStack isCheckingAuth={false} isUserLoggedIn={isAuthenticated} />
+            <RootStack
+              isCheckingAuth={false}
+              isUserLoggedIn={isAuthenticated}
+              isInSignupFlow={isInSignupFlow}
+              hasUser={!!user}
+            />
           </NavigationContainer>
         </RoundUpsProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 

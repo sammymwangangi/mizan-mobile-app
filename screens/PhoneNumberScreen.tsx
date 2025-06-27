@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,37 +11,47 @@ import {
   TextInput,
   Alert,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
 import { normalize, getResponsiveWidth } from '../utils';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ChevronDown } from 'lucide-react-native';
+// import { ChevronDown } from 'lucide-react-native'; // Unused for now
 // @ts-ignore - Ignore the missing type declaration file
 import MaskedView from '@react-native-masked-view/masked-view';
 import { useAuth } from '../hooks/useAuth';
 import { smsService } from '../services/smsService';
 
 type PhoneNumberScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'PhoneNumber'>;
+type PhoneNumberScreenRouteProp = NativeStackScreenProps<RootStackParamList, 'PhoneNumber'>['route'];
 
 const PhoneNumberScreen = () => {
   const navigation = useNavigation<PhoneNumberScreenNavigationProp>();
-  const { user, updateProfile, loading: authLoading } = useAuth();
+  const route = useRoute<PhoneNumberScreenRouteProp>();
+  const { user, session, updateProfile, loading: authLoading } = useAuth();
   const [phoneNumber, setPhoneNumber] = useState('');
   const [countryCode] = useState('254'); // Kenya country code
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // Get route parameters
+  const routeParams = route.params;
+  const tempUserId = routeParams?.tempUserId;
+  const userEmail = routeParams?.email;
+
   // Debug user state
   useEffect(() => {
     console.log('📱 PhoneNumberScreen - User state:', {
       user: !!user,
+      session: !!session,
       userId: user?.id,
       email: user?.email,
+      tempUserId,
+      userEmail,
       authLoading
     });
-  }, [user, authLoading]);
+  }, [user, session, tempUserId, userEmail, authLoading]);
 
   const validatePhoneNumber = (phone: string): boolean => {
     // Kenya phone number validation
@@ -74,11 +84,13 @@ const PhoneNumberScreen = () => {
       return;
     }
 
-    if (!user) {
-      console.error('❌ User not authenticated in PhoneNumberScreen');
+    // Check if user is authenticated or has a valid session or temp user ID
+    // Allow phone verification even if email confirmation is pending
+    if (!user && !session && !tempUserId) {
+      console.error('❌ No user session or temp user ID found in PhoneNumberScreen');
       Alert.alert(
         'Authentication Required',
-        'Please sign in first to continue with phone verification.',
+        'Please sign up or sign in first to continue with phone verification.',
         [
           { text: 'Go to Sign In', onPress: () => navigation.navigate('Auth') },
           { text: 'Cancel', style: 'cancel' }
@@ -87,37 +99,77 @@ const PhoneNumberScreen = () => {
       return;
     }
 
+    // Use user ID from either user object, session, or temp user ID
+    const userId = user?.id || session?.user?.id || tempUserId;
+    if (!userId) {
+      console.error('❌ No user ID available in PhoneNumberScreen');
+      Alert.alert(
+        'Authentication Error',
+        'Unable to identify user. Please try signing in again.',
+        [
+          { text: 'Go to Sign In', onPress: () => navigation.navigate('Auth') },
+          { text: 'Cancel', style: 'cancel' }
+        ]
+      );
+      return;
+    }
+
+    console.log('✅ User ID found:', userId, 'proceeding with phone verification');
+
     setLoading(true);
 
     try {
       const formattedPhone = formatPhoneNumber(phoneNumber);
+      console.log('📞 Sending OTP to:', formattedPhone, 'for user:', userId);
+
+      // First test the Africa's Talking credentials
+      console.log('🧪 Testing Africa\'s Talking credentials...');
+      const credentialsTest = await smsService.testCredentials();
+      console.log('🧪 Credentials test result:', credentialsTest);
+
+      if (!credentialsTest.success) {
+        console.error('❌ Credentials test failed:', credentialsTest.message);
+        setError(`Configuration Error: ${credentialsTest.message}`);
+        Alert.alert('Configuration Error', credentialsTest.message);
+        return;
+      }
 
       // Send OTP
-      const otpResult = await smsService.sendOTP(user.id, formattedPhone);
+      const otpResult = await smsService.sendOTP(userId, formattedPhone);
 
       if (!otpResult.success) {
+        console.error('❌ OTP sending failed:', otpResult.message);
         setError(otpResult.message);
         return;
       }
 
-      // Update user profile with phone number
-      const updateResult = await updateProfile({
-        phone_number: formattedPhone,
-      });
+      console.log('✅ OTP sent successfully');
 
-      if (updateResult.error) {
-        console.error('Failed to update profile:', updateResult.error);
-        // Continue anyway since OTP was sent successfully
+      // Update user profile with phone number (if user is authenticated)
+      if (user || session) {
+        const updateResult = await updateProfile({
+          phone_number: formattedPhone,
+        });
+
+        if (updateResult.error) {
+          console.error('⚠️ Failed to update profile:', updateResult.error);
+          // Continue anyway since OTP was sent successfully
+        } else {
+          console.log('✅ User profile updated with phone number');
+        }
+      } else {
+        console.log('ℹ️ Skipping profile update - user not fully authenticated yet');
       }
 
       // Navigate to OTP verification screen
+      console.log('🔄 Navigating to OTP screen');
       navigation.navigate('OTP', {
         phoneNumber: formattedPhone,
-        userId: user.id,
+        userId: userId,
       });
 
     } catch (error) {
-      console.error('Phone number verification error:', error);
+      console.error('💥 Phone number verification error:', error);
       setError(error instanceof Error ? error.message : 'Failed to send verification code');
     } finally {
       setLoading(false);

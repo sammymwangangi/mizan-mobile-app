@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, Session, AuthError } from '@supabase/supabase-js';
 import { supabase } from '../supabaseConfig';
 import { UserProfile } from '../types/supabase';
@@ -11,6 +11,7 @@ interface UseAuthReturn {
   loading: boolean;
   error: string | null;
   isAuthenticated: boolean;
+  isInSignupFlow: boolean;
   signUp: (email: string, password: string, phone?: string) => Promise<{ user: User | null; error: AuthError | null }>;
   signIn: (email: string, password: string) => Promise<{ user: User | null; error: AuthError | null }>;
   signOut: () => Promise<{ error: AuthError | null }>;
@@ -18,14 +19,49 @@ interface UseAuthReturn {
   verifyOTP: (phone: string, otp: string) => Promise<{ error: AuthError | null }>;
   updateProfile: (updates: Partial<UserProfile>) => Promise<{ error: Error | null }>;
   refreshProfile: () => Promise<void>;
+  clearSignupFlow: () => void;
 }
 
-export const useAuth = (): UseAuthReturn => {
+// Create Auth Context
+const AuthContext = createContext<UseAuthReturn | undefined>(undefined);
+
+// Auth Provider Component
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isInSignupFlow, setIsInSignupFlow] = useState(false);
+
+  // Fetch user profile from database
+  const fetchUserProfile = async (userId: string) => {
+    try {
+      console.log('🔍 Fetching user profile for:', userId);
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        console.error('❌ Error fetching user profile:', error);
+        throw error;
+      }
+
+      console.log('✅ User profile fetched successfully');
+      setUserProfile(data);
+      return data;
+    } catch (err) {
+      console.error('💥 Fetch user profile error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch user profile');
+      return null;
+    }
+  };
 
   // Initialize auth state
   useEffect(() => {
@@ -84,26 +120,7 @@ export const useAuth = (): UseAuthReturn => {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, []);
-
-  const fetchUserProfile = async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', userId)
-        .single();
-
-      if (error) {
-        console.error('Error fetching user profile:', error);
-        return;
-      }
-
-      setUserProfile(data);
-    } catch (err) {
-      console.error('Profile fetch error:', err);
-    }
-  };
+  }, [fetchUserProfile]);
 
   const signUp = async (email: string, password: string, phone?: string) => {
     try {
@@ -120,7 +137,11 @@ export const useAuth = (): UseAuthReturn => {
         }
       });
 
-      console.log('📝 Signup response:', { data: !!data, error: error?.message });
+      console.log('📝 Signup response:', {
+        user: !!data.user,
+        session: !!data.session,
+        error: error?.message
+      });
 
       if (error) {
         console.error('❌ Signup error:', error);
@@ -128,27 +149,53 @@ export const useAuth = (): UseAuthReturn => {
         return { user: null, error };
       }
 
-      // Create user profile - Note: This might fail if user already exists
+      // Create user profile - Note: This might fail if user already exists or due to RLS
       if (data.user) {
         console.log('👤 Creating user profile for:', data.user.id);
-        const { error: profileError } = await supabase
-          .from('users')
-          .insert({
-            id: data.user.id,
-            email: data.user.email!,
-            phone_number: phone || null,
-            kyc_status: 'pending',
-            is_active: true,
-            email_verified: false,
-            phone_verified: false,
-            biometric_enabled: false,
-          });
+        console.log('🔐 User email confirmed:', data.user.email_confirmed_at);
+        console.log('📧 Confirmation sent to:', data.user.email);
 
-        if (profileError) {
-          console.error('⚠️ Error creating user profile (might already exist):', profileError);
-          // Don't fail the signup if profile creation fails - it might already exist
+        // Set the user state immediately after successful signup
+        // Note: For email confirmation required, user won't be fully authenticated until email is confirmed
+        setIsInSignupFlow(true); // Mark that user is in signup flow
+
+        if (data.session) {
+          console.log('✅ User has active session, setting auth state');
+          setUser(data.user);
+          setSession(data.session);
         } else {
-          console.log('✅ User profile created successfully');
+          console.log('⏳ No session yet - email confirmation may be required');
+          // Still set user for navigation purposes, but no session
+          setUser(data.user);
+          setSession(null);
+        }
+
+        // Temporarily skip profile creation to avoid RLS issues during testing
+        // TODO: Set up proper RLS policies in Supabase for production
+        try {
+          const { error: profileError } = await supabase
+            .from('users')
+            .insert({
+              id: data.user.id,
+              email: data.user.email!,
+              phone_number: phone || null,
+              kyc_status: 'pending',
+              is_active: true,
+              email_verified: false,
+              phone_verified: false,
+              biometric_enabled: false,
+            });
+
+          if (profileError) {
+            console.error('⚠️ Error creating user profile:', profileError);
+            if (profileError.code === '42501') {
+              console.log('🔒 RLS Policy Issue: Run the provided SQL to fix users table RLS policies');
+            }
+          } else {
+            console.log('✅ User profile created successfully');
+          }
+        } catch (err) {
+          console.log('ℹ️ Profile creation skipped due to RLS. User signup was successful.');
         }
       }
 
@@ -203,6 +250,12 @@ export const useAuth = (): UseAuthReturn => {
         return { error };
       }
 
+      // Clear local state
+      setUser(null);
+      setUserProfile(null);
+      setSession(null);
+      setIsInSignupFlow(false);
+
       return { error: null };
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Sign out failed';
@@ -214,9 +267,8 @@ export const useAuth = (): UseAuthReturn => {
   const sendOTP = async (phone: string) => {
     try {
       setError(null);
-      // This will be implemented with SMS service integration
+      // This would integrate with your SMS service
       // For now, return success
-      console.log('Sending OTP to:', phone);
       return { error: null };
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to send OTP';
@@ -228,12 +280,11 @@ export const useAuth = (): UseAuthReturn => {
   const verifyOTP = async (phone: string, otp: string) => {
     try {
       setError(null);
-      // This will be implemented with SMS service integration
+      // This would verify the OTP with your SMS service
       // For now, return success
-      console.log('Verifying OTP for:', phone, otp);
       return { error: null };
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'OTP verification failed';
+      const errorMessage = err instanceof Error ? err.message : 'Failed to verify OTP';
       setError(errorMessage);
       return { error: { message: errorMessage } as AuthError };
     }
@@ -242,16 +293,12 @@ export const useAuth = (): UseAuthReturn => {
   const updateProfile = async (updates: Partial<UserProfile>) => {
     try {
       if (!user) {
-        throw new Error('No authenticated user');
+        return { error: new Error('No user logged in') };
       }
 
-      setError(null);
       const { error } = await supabase
         .from('users')
-        .update({
-          ...updates,
-          updated_at: new Date().toISOString(),
-        })
+        .update(updates)
         .eq('id', user.id);
 
       if (error) {
@@ -275,13 +322,19 @@ export const useAuth = (): UseAuthReturn => {
     }
   };
 
-  return {
+  const clearSignupFlow = () => {
+    console.log('🔄 Clearing signup flow flag');
+    setIsInSignupFlow(false);
+  };
+
+  const authValue: UseAuthReturn = {
     user,
     userProfile,
     session,
     loading,
     error,
-    isAuthenticated: !!user,
+    isAuthenticated: !!user && !!session,
+    isInSignupFlow,
     signUp,
     signIn,
     signOut,
@@ -289,5 +342,21 @@ export const useAuth = (): UseAuthReturn => {
     verifyOTP,
     updateProfile,
     refreshProfile,
+    clearSignupFlow,
   };
+
+  return (
+    <AuthContext.Provider value={authValue}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+// Hook to use Auth Context
+export const useAuth = (): UseAuthReturn => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 };

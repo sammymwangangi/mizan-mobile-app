@@ -53,7 +53,8 @@
     "react-native-wheel-picker": "^1.2.0",
     "react-native-wheel-scrollview-picker": "^2.0.9",
     "sonner-native": "0.19.1",
-    "victory-native": "^41.17.3"
+    "victory-native": "^41.17.3",
+    "expo-haptics": "~14.1.4"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

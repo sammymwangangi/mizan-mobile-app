@@ -12,7 +12,8 @@ export type RootStackParamList = {
     Intro: undefined;
     Onboarding: undefined;
     Auth: undefined;
-    PhoneNumber: undefined;
+    SignUp: undefined;
+    PhoneNumber: { email?: string; password?: string; tempUserId?: string };
     OTP: { phoneNumber: string; userId: string };
     KYC: undefined;
     Home: { screen?: keyof TabParamList };

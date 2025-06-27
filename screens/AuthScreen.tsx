@@ -29,15 +29,13 @@ type AuthScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'A
 
 const AuthScreen = () => {
   const navigation = useNavigation<AuthScreenNavigationProp>();
-  const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [username, setUsername] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showBiometric, setShowBiometric] = useState(false);
-  const { signIn, signUp, user, error } = useAuth();
+  const { signIn, user, error } = useAuth();
 
   const validateForm = () => {
     let isValid = true;
@@ -60,17 +58,12 @@ const AuthScreen = () => {
   };
 
   const handleSubmit = async () => {
+    // Handle login
     if (validateForm()) {
       setLoading(true);
       try {
-        let result;
-        if (isLogin) {
-          result = await signIn(email, password);
-          console.log('User signed in!');
-        } else {
-          result = await signUp(email, password);
-          console.log('User account created!');
-        }
+        const result = await signIn(email, password);
+        console.log('User signed in!');
 
         if (result.error) {
           Alert.alert('Authentication Error', result.error.message);
@@ -79,14 +72,8 @@ const AuthScreen = () => {
 
         if (result.user) {
           console.log('Authentication successful');
-
-          if (isLogin) {
-            // For login, navigate to home
-            navigation.navigate('Home', { screen: 'Home' });
-          } else {
-            // For signup, navigate to phone number verification
-            navigation.navigate('PhoneNumber');
-          }
+          // For login, navigate to home
+          navigation.navigate('Home', { screen: 'Home' });
         }
 
       } catch (error: unknown) {
@@ -103,17 +90,9 @@ const AuthScreen = () => {
     // Handle forgot password
   };
 
-  const toggleAuthMode = () => {
-    if (isLogin) {
-      // If currently in login mode, navigate to phone number screen for sign up
-      navigation.navigate('PhoneNumber');
-    } else {
-      // If in sign up mode, switch to login
-      setIsLogin(true);
-      // Clear form when switching modes
-      setEmailError('');
-      setPasswordError('');
-    }
+  const handleSignUp = () => {
+    // Navigate to signup screen
+    navigation.navigate('SignUp');
   };
 
   const handleBiometricAuth = async () => {
@@ -178,17 +157,6 @@ const AuthScreen = () => {
         </View>
 
         <View style={styles.formContainer}>
-          {!isLogin && (
-            <Input
-              label="Username"
-              placeholder="Enter your username"
-              value={username}
-              onChangeText={setUsername}
-              leftIcon={<User size={20} color={COLORS.textLight} />}
-              autoCapitalize="none"
-            />
-          )}
-
           <Input
             placeholder="Enter your email"
             value={email}
@@ -206,11 +174,9 @@ const AuthScreen = () => {
             secureTextEntry
           />
 
-          {isLogin && (
-            <TouchableOpacity onPress={handleForgotPassword} style={styles.forgotPasswordContainer}>
-              <Text style={styles.forgotPasswordText}>I forgot my password</Text>
-            </TouchableOpacity>
-          )}
+          <TouchableOpacity onPress={handleForgotPassword} style={styles.forgotPasswordContainer}>
+            <Text style={styles.forgotPasswordText}>I forgot my password</Text>
+          </TouchableOpacity>
 
           <View style={styles.submitButtonContainer}>
             <ImageBackground
@@ -231,7 +197,7 @@ const AuthScreen = () => {
                   style={[styles.submitButton, loading && styles.submitButtonDisabled]}
                 >
                   <Text style={styles.submitButtonText}>
-                    {loading ? "LOADING..." : (isLogin ? "SIGN IN" : "SIGN UP")}
+                    {loading ? "LOADING..." : "SIGN IN"}
                   </Text>
                 </LinearGradient>
               </TouchableOpacity>
@@ -270,11 +236,9 @@ const AuthScreen = () => {
         </View>
 
         <View style={styles.footer}>
-          <Text style={styles.footerText}>
-            {isLogin ? "Don't have an account? " : "Already have an account? "}
-          </Text>
-          <TouchableOpacity onPress={toggleAuthMode}>
-            <Text style={styles.footerLink}>{isLogin ? "Sign up" : "Sign in"}</Text>
+          <Text style={styles.footerText}>Don't have an account? </Text>
+          <TouchableOpacity onPress={handleSignUp}>
+            <Text style={styles.footerLink}>Sign up</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
