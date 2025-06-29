@@ -172,6 +172,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: normalize(20),
   },
   backdrop: {
     position: 'absolute',
@@ -182,7 +183,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContainer: {
-    width: screenWidth - normalize(40),
+    width: '100%',
+    maxWidth: screenWidth - normalize(40),
     maxHeight: screenHeight * 0.8,
   },
   modal: {

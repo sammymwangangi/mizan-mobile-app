@@ -14,10 +14,12 @@ import Animated, {
   runOnJS,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
-import { BarChart3, TrendingUp } from 'lucide-react-native';
+import { BarChart3 } from 'lucide-react-native';
 import Svg, { Path, Defs, LinearGradient as SvgLinearGradient, Stop } from 'react-native-svg';
 import { COLORS, FONTS } from '../../constants/theme';
 import { normalize, formatCurrency } from '../../utils';
+import HoldToFillLiquidProgress from './HoldToFillLiquidProgress';
+import AAOIFIBadge from './AAOIFIBadge';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -25,7 +27,9 @@ interface Props {
   roundUpsAmount: number;
   investmentsAmount: number;
   zakatAmount: number;
+  certified?: boolean;
   onFlip?: (isFlipped: boolean) => void;
+  onHoldToFillComplete?: () => void;
 }
 
 // Mock data for growth chart
@@ -87,7 +91,9 @@ const FlippableCard: React.FC<Props> = ({
   roundUpsAmount,
   investmentsAmount,
   zakatAmount,
+  certified = true,
   onFlip,
+  onHoldToFillComplete,
 }) => {
   const [isFlipped, setIsFlipped] = useState(false);
   const flipAnimation = useSharedValue(0);
@@ -136,33 +142,50 @@ const FlippableCard: React.FC<Props> = ({
       {/* Front Side */}
       <Animated.View style={[styles.card, styles.frontCard, frontAnimatedStyle]}>
         <View style={styles.cardContent}>
-          {/* Balance Rows */}
-          <View style={styles.balanceRow}>
-            <Text style={styles.balanceLabel}>Round-Ups</Text>
-            <Text style={[styles.balanceAmount, { color: COLORS.textLight }]}>
-              {formatCurrency(roundUpsAmount)}
-            </Text>
-          </View>
-          
-          <View style={styles.balanceRow}>
-            <Text style={styles.balanceLabel}>Investments</Text>
-            <Text style={[styles.balanceAmount, { color: COLORS.primary }]}>
-              {formatCurrency(investmentsAmount)}
-            </Text>
-          </View>
-          
-          <View style={styles.balanceRow}>
-            <Text style={styles.balanceLabel}>Auto-Zakat</Text>
-            <Text style={[styles.balanceAmount, { color: COLORS.primary }]}>
-              {formatCurrency(zakatAmount)}
-            </Text>
+          {/* AAOIFI Badge */}
+          <View style={styles.badgeContainer}>
+            <AAOIFIBadge certified={certified} />
           </View>
 
-          {/* Tap to see growth journey */}
-          <TouchableOpacity style={styles.flipTrigger} onPress={handleFlip}>
-            <BarChart3 size={16} color={COLORS.primary} />
-            <Text style={styles.flipText}>Tap to see your growth journey</Text>
-          </TouchableOpacity>
+          {/* Liquid Progress Component */}
+          <View style={styles.liquidProgressContainer}>
+            <HoldToFillLiquidProgress
+              amount={roundUpsAmount}
+              size={160}
+              onComplete={onHoldToFillComplete}
+              onReset={() => console.log('Progress reset')}
+            />
+          </View>
+
+          {/* Balance Rows */}
+          <View style={styles.balanceRowsContainer}>
+            <View style={styles.balanceRow}>
+              <Text style={styles.balanceLabel}>Round-Ups</Text>
+              <Text style={[styles.balanceAmount, { color: COLORS.textLight }]}>
+                {formatCurrency(roundUpsAmount)}
+              </Text>
+            </View>
+
+            <View style={styles.balanceRow}>
+              <Text style={styles.balanceLabel}>Investments</Text>
+              <Text style={[styles.balanceAmount, { color: COLORS.primary }]}>
+                {formatCurrency(investmentsAmount)}
+              </Text>
+            </View>
+
+            <View style={styles.balanceRow}>
+              <Text style={styles.balanceLabel}>Auto-Zakat</Text>
+              <Text style={[styles.balanceAmount, { color: COLORS.primary }]}>
+                {formatCurrency(zakatAmount)}
+              </Text>
+            </View>
+
+            {/* Tap to see growth journey */}
+            <TouchableOpacity style={styles.flipTrigger} onPress={handleFlip}>
+              <BarChart3 size={16} color={COLORS.primary} />
+              <Text style={styles.flipText}>Tap to see your growth journey</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </Animated.View>
 
@@ -198,7 +221,7 @@ const FlippableCard: React.FC<Props> = ({
 
 const styles = StyleSheet.create({
   container: {
-    height: normalize(200),
+    height: normalize(600),
     marginBottom: normalize(16),
   },
   card: {
@@ -223,13 +246,23 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: normalize(20),
   },
+  badgeContainer: {
+    marginBottom: normalize(16),
+  },
+  liquidProgressContainer: {
+    alignItems: 'center',
+    marginBottom: normalize(20),
+  },
+  balanceRowsContainer: {
+    backgroundColor: COLORS.background2,
+    borderRadius: normalize(10),
+    padding: normalize(16),
+  },
   balanceRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: normalize(12),
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
   },
   balanceLabel: {
     ...FONTS.medium(16),

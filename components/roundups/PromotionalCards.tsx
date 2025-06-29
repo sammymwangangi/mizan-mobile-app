@@ -143,15 +143,21 @@ const PromoCard: React.FC<PromoCardProps> = ({
 };
 
 interface Props {
+  shareCardState: 'initial' | 'grabbed';
+  donationCardState: 'initial' | 'shared';
+  roundUpsAmount: number;
   onGrabShare?: () => void;
   onDonate?: () => void;
-  onShareSuccess?: () => void;
+  onTellFriend?: () => void;
 }
 
 const PromotionalCards: React.FC<Props> = ({
+  shareCardState,
+  donationCardState,
+  roundUpsAmount,
   onGrabShare,
   onDonate,
-  onShareSuccess,
+  onTellFriend,
 }) => {
   const [timeLeft, setTimeLeft] = useState('4 hours left');
 
@@ -166,152 +172,241 @@ const PromotionalCards: React.FC<Props> = ({
   }, []);
 
   return (
-    <ScrollView 
-      horizontal 
-      showsHorizontalScrollIndicator={false}
-      contentContainerStyle={styles.container}
-    >
-      {/* Grab your first share card */}
-      <PromoCard
-        title="Grab your first share"
-        timeLeft={timeLeft}
-        amount={10.00}
-        subtitle="$ 10.00 = 0.02 Halal AAPL"
-        type="share"
-        onPress={onGrabShare}
-      />
+    <View style={styles.container}>
+      {/* Share Card */}
+      {shareCardState === 'initial' ? (
+        <View style={styles.promoCard}>
+          <View style={styles.cardHeader}>
+            <Lock size={20} color={COLORS.text} />
+            <Text style={styles.cardTitle}>Grab your first share</Text>
+            <View style={styles.timeContainer}>
+              <Clock size={12} color={COLORS.textLight} />
+              <Text style={styles.timeText}>{timeLeft}</Text>
+            </View>
+          </View>
 
-      {/* Donation card */}
-      <PromoCard
-        title="Give a little, Change a lot"
-        subtitle="$ 5,401 raised / $ 10,000 Donation Goal"
-        progress={54}
-        type="donation"
-        onPress={onDonate}
-      />
+          <View style={styles.progressBar}>
+            <LinearGradient
+              colors={COLORS.mizanGradientColors}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.progressFill}
+            />
+          </View>
 
-      {/* Success sharing card */}
-      <PromoCard
-        title="It counts! Share the cause"
-        subtitle="Blessings on your journey."
-        type="investment"
-        onPress={onShareSuccess}
-      />
-    </ScrollView>
+          <Text style={styles.shareAmount}>$ 10.00 = 0.02 Halal AAPL</Text>
+
+          <TouchableOpacity
+            style={[styles.actionButton, { opacity: roundUpsAmount >= 10 ? 1 : 0.5 }]}
+            onPress={onGrabShare}
+            disabled={roundUpsAmount < 10}
+          >
+            <Text style={styles.actionButtonText}>Grab Now</Text>
+          </TouchableOpacity>
+
+          <Text style={styles.socialProof}>1,321 investors have joined the journey.</Text>
+        </View>
+      ) : (
+        <View style={styles.promoCard}>
+          <View style={styles.cardHeader}>
+            <Lock size={20} color={COLORS.text} />
+            <Text style={styles.cardTitle}>Grabbed</Text>
+          </View>
+
+          <View style={styles.progressBar}>
+            <LinearGradient
+              colors={COLORS.mizanGradientColors}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={[styles.progressFill, { width: '100%' }]}
+            />
+          </View>
+
+          <Text style={styles.shareAmount}>You now own 0.02 Halal AAPL Stock</Text>
+
+          <TouchableOpacity style={styles.gradientButton} onPress={onTellFriend}>
+            <LinearGradient
+              colors={COLORS.mizanGradientColors}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.gradientButtonContent}
+            >
+              <Text style={styles.gradientButtonText}>Tell a friend</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          <Text style={styles.socialProof}>Blessings on your journey.</Text>
+        </View>
+      )}
+
+      {/* Donation Card */}
+      {donationCardState === 'initial' ? (
+        <View style={styles.promoCard}>
+          <View style={styles.cardHeader}>
+            <Heart size={20} color={COLORS.error} />
+            <Text style={styles.cardTitle}>Give a little, Change a lot</Text>
+          </View>
+
+          <Text style={styles.donationSubtitle}>$ 5,401 raised / $ 10,000 Donation Goal</Text>
+
+          <View style={styles.progressContainer}>
+            <View style={styles.progressBarContainer}>
+              <LinearGradient
+                colors={COLORS.mizanGradientColors}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={[styles.progressFill, { width: '54%' }]}
+              />
+            </View>
+          </View>
+
+          <TouchableOpacity
+            style={[styles.actionButton, { opacity: roundUpsAmount > 0 ? 1 : 0.5 }]}
+            onPress={onDonate}
+            disabled={roundUpsAmount <= 0}
+          >
+            <Text style={styles.actionButtonText}>Donate via Round-Ups</Text>
+          </TouchableOpacity>
+
+          <Text style={styles.socialProof}>341 kind souls</Text>
+        </View>
+      ) : (
+        <View style={styles.promoCard}>
+          <View style={styles.cardHeader}>
+            <Heart size={20} color={COLORS.error} />
+            <Text style={styles.cardTitle}>It counts! Share the cause</Text>
+          </View>
+
+          <Text style={styles.donationSubtitle}>God sees it all.</Text>
+
+          <TouchableOpacity style={styles.gradientButton} onPress={onTellFriend}>
+            <LinearGradient
+              colors={COLORS.mizanGradientColors}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.gradientButtonContent}
+            >
+              <Text style={styles.gradientButtonText}>Shukran, Habibi!</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          <View style={styles.socialIcons}>
+            <TouchableOpacity style={styles.socialIcon}>
+              <Instagram size={16} color={COLORS.textWhite} />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.socialIcon}>
+              <MessageCircle size={16} color={COLORS.textWhite} />
+            </TouchableOpacity>
+          </View>
+
+          <Text style={styles.socialProof}>Blessings on your journey.</Text>
+        </View>
+      )}
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: normalize(20),
-    paddingVertical: normalize(10),
+    gap: normalize(16),
   },
   promoCard: {
-    width: normalize(280),
     backgroundColor: COLORS.card,
-    borderRadius: normalize(20),
+    borderRadius: normalize(25),
     padding: normalize(20),
-    marginRight: normalize(16),
     shadowColor: '#6943AF',
     shadowOffset: { width: 0, height: normalize(10) },
     shadowOpacity: 0.1,
     shadowRadius: normalize(20),
     elevation: 5,
   },
-  promoHeader: {
+  cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: normalize(12),
+    marginBottom: normalize(16),
+    gap: normalize(12),
   },
-  promoIconContainer: {
-    width: normalize(32),
-    height: normalize(32),
-    borderRadius: normalize(16),
-    backgroundColor: COLORS.background2,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: normalize(12),
-  },
-  promoTitleContainer: {
-    flex: 1,
-  },
-  promoTitle: {
+  cardTitle: {
     ...FONTS.semibold(16),
     color: COLORS.text,
-    marginBottom: normalize(4),
+    flex: 1,
   },
   timeContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: normalize(4),
   },
   timeText: {
     ...FONTS.body5,
     color: COLORS.textLight,
-    marginLeft: normalize(4),
-  },
-  promoSubtitle: {
-    ...FONTS.body4,
-    color: COLORS.textLight,
-    marginBottom: normalize(12),
-    lineHeight: normalize(20),
-  },
-  promoAmount: {
-    ...FONTS.semibold(20),
-    color: COLORS.text,
-    marginBottom: normalize(16),
-  },
-  progressContainer: {
-    marginBottom: normalize(16),
   },
   progressBar: {
     height: normalize(6),
     backgroundColor: COLORS.border,
     borderRadius: normalize(3),
     overflow: 'hidden',
+    marginBottom: normalize(16),
   },
   progressFill: {
     height: '100%',
     borderRadius: normalize(3),
+    width: '100%',
   },
-  grabButton: {
+  shareAmount: {
+    ...FONTS.semibold(18),
+    color: COLORS.text,
+    marginBottom: normalize(16),
+  },
+  donationSubtitle: {
+    ...FONTS.body4,
+    color: COLORS.textLight,
+    marginBottom: normalize(16),
+    lineHeight: normalize(20),
+  },
+  progressContainer: {
+    marginBottom: normalize(16),
+  },
+  progressBarContainer: {
+    height: normalize(6),
+    backgroundColor: COLORS.border,
+    borderRadius: normalize(3),
+    overflow: 'hidden',
+  },
+  actionButton: {
     backgroundColor: COLORS.background2,
     borderRadius: normalize(25),
     paddingVertical: normalize(12),
     alignItems: 'center',
+    marginBottom: normalize(12),
   },
-  donateButton: {
-    backgroundColor: COLORS.background2,
-    borderRadius: normalize(25),
-    paddingVertical: normalize(12),
-    alignItems: 'center',
+  actionButtonText: {
+    ...FONTS.medium(14),
+    color: COLORS.text,
   },
-  shareButton: {
+  gradientButton: {
     borderRadius: normalize(25),
     overflow: 'hidden',
     marginBottom: normalize(12),
-  },
-  defaultButton: {
-    backgroundColor: COLORS.primary,
-    borderRadius: normalize(25),
-    paddingVertical: normalize(12),
-    alignItems: 'center',
   },
   gradientButtonContent: {
     paddingVertical: normalize(12),
     alignItems: 'center',
   },
-  buttonText: {
-    ...FONTS.medium(14),
-    color: COLORS.text,
-  },
   gradientButtonText: {
     ...FONTS.medium(14),
     color: COLORS.textWhite,
+  },
+  socialProof: {
+    ...FONTS.body5,
+    color: COLORS.textLight,
+    textAlign: 'center',
   },
   socialIcons: {
     flexDirection: 'row',
     justifyContent: 'center',
     gap: normalize(12),
+    marginBottom: normalize(12),
   },
   socialIcon: {
     width: normalize(32),
@@ -321,6 +416,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+
 });
 
 export default PromotionalCards;
