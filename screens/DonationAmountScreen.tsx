@@ -97,7 +97,7 @@ const DonationAmountScreen = () => {
     // Navigate to confirmation screen
     navigation.navigate('DonationConfirmation', {
       campaignId,
-      amount: selectedAmount === 'custom' ? customAmount : selectedAmount,
+      amount: selectedAmount === 'custom' ? (customAmount || '0') : (selectedAmount || '0'),
       paymentMethod: selectedPaymentMethod
     });
   };

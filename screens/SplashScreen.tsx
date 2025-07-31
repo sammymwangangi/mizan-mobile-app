@@ -46,11 +46,13 @@ const SplashScreen = () => {
           },
         ]}
       >
-        <Image
-          source={require('../assets/LauncherIcon.png')}
-          style={styles.logo}
-          resizeMode="contain"
-        />
+        <View style={styles.iconBackground}>
+          <Image
+            source={require('../assets/LauncherIcon.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+        </View>
       </Animated.View>
     </View>
   );
@@ -61,19 +63,32 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F5F5F5',
   },
   logoContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    width: 170,
-    height: 170,
-    borderRadius: 85,
-    backgroundColor: '#FFFFFF',
+  },
+  iconBackground: {
+    width: 120,
+    height: 120,
+    borderRadius: 30,
+    backgroundColor: '#8F00E0',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#8F00E0',
+    shadowOffset: {
+      width: 0,
+      height: 10,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    elevation: 10,
   },
   logo: {
-    width: 150,
-    height: 150,
+    width: 60,
+    height: 60,
+    tintColor: '#FFFFFF',
   },
 });
 

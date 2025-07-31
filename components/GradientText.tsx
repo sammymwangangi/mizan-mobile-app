@@ -28,8 +28,8 @@ const GradientText: React.FC<GradientTextProps> = ({
   return (
     <View style={[styles.container, { marginVertical: 2 }]}>
       <LinearGradient
-        colors={colors}
-        locations={locations}
+        colors={colors as any}
+        locations={locations as any}
         start={angleStart}
         end={angleEnd}
         style={[StyleSheet.absoluteFill, styles.gradient]}

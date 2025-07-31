@@ -5,11 +5,11 @@ import {
   StyleSheet,
   Image,
 } from 'react-native';
-import { Plus, CheckCircle } from 'lucide-react-native';
+
 import { COLORS, FONTS } from '../../constants/theme';
 import { normalize } from '../../utils';
-import PlusCert from '../../assets/round-ups/certificate.png';
-import Shield from '../../assets/round-ups/shield.png';
+const PlusCert = require('../../assets/round-ups/certificate.png');
+const Shield = require('../../assets/round-ups/shield.png');
 
 interface Props {
   certified?: boolean;

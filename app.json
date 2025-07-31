@@ -32,7 +32,11 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.wingi.mizanbankingapp"
+      "bundleIdentifier": "com.wingi.mizanbankingapp",
+      "buildNumber": "1",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {

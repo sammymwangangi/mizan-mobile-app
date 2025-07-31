@@ -42,11 +42,13 @@ const IntroScreen = () => {
       style={styles.container}
     >
       <StatusBar barStyle="light-content" />
-      <Image
-        source={require('../assets/mastercard-logo.png')}
-        style={styles.logo}
-        resizeMode="contain"
-      />
+      <Animated.View style={[styles.logoContainer, { opacity: logoOpacity }]}>
+        <Image
+          source={require('../assets/logo.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+      </Animated.View>
     </LinearGradient>
     // <ImageBackground
     //   source={require('../assets/splash2-bg.png')}
@@ -70,11 +72,7 @@ const IntroScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 24,
     justifyContent: 'center',
-    alignItems: 'center',
-  },
-  content: {
     alignItems: 'center',
   },
   logoContainer: {
@@ -82,9 +80,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   logo: {
-    width: 180,
-    height: 91,
-    alignSelf: 'center',
+    width: 150,
+    height: 76,
+    tintColor: '#FFFFFF',
   },
 });
 

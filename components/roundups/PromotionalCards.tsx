@@ -321,6 +321,37 @@ const styles = StyleSheet.create({
     shadowRadius: normalize(20),
     elevation: 5,
   },
+  promoHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: normalize(12),
+  },
+  promoIconContainer: {
+    width: normalize(40),
+    height: normalize(40),
+    borderRadius: normalize(20),
+    backgroundColor: COLORS.background2,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: normalize(12),
+  },
+  promoTitleContainer: {
+    flex: 1,
+  },
+  promoTitle: {
+    ...FONTS.semibold(16),
+    color: COLORS.text,
+  },
+  promoSubtitle: {
+    ...FONTS.body4,
+    color: COLORS.textLight,
+    marginBottom: normalize(8),
+  },
+  promoAmount: {
+    ...FONTS.semibold(18),
+    color: COLORS.primary,
+    marginBottom: normalize(16),
+  },
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -415,6 +446,22 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.text,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  grabButton: {
+    backgroundColor: COLORS.success,
+  },
+  donateButton: {
+    backgroundColor: COLORS.primary,
+  },
+  shareButton: {
+    backgroundColor: COLORS.secondary,
+  },
+  defaultButton: {
+    backgroundColor: COLORS.primary,
+  },
+  buttonText: {
+    ...FONTS.semibold(14),
+    color: COLORS.textWhite,
   },
 
 });

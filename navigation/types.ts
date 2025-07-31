@@ -8,62 +8,67 @@ export type TabParamList = {
 };
 
 export type RootStackParamList = {
-    Splash: undefined;
-    Intro: undefined;
-    Onboarding: undefined;
-    Auth: undefined;
-    SignUp: undefined;
-    PhoneNumber: { email?: string; password?: string; tempUserId?: string };
-    OTP: { phoneNumber: string; userId: string };
-    KYC: undefined;
-    Home: { screen?: keyof TabParamList };
-    Profile: undefined;
-    Congratulations: undefined;
-    CampaignDetails: { campaignId: string };
-    DonationAmount: { campaignId: string };
-    DonationConfirmation: {
-      campaignId: string;
-      amount: string;
-      paymentMethod: string;
-    };
-    CardsDashboard: undefined;
-    CardLinking: undefined;
-    CardLinkingBack: undefined;
-    CardVerification: undefined;
-    SendMoney: undefined;
-    SendMoneyConfirmation: {
-      recipientName: string;
-      amount: string;
-    };
-    SendMoneySuccess: {
-      recipientName: string;
-      amount: string;
-      transactionId: string;
-    };
-    MPESA: undefined;
-    MPESARecipient: undefined;
-    MPESAAmount: { recipientId?: string; recipientName?: string; recipientPhone?: string };
-    MPESAConfirmation: {
-      recipientId?: string;
-      recipientName?: string;
-      recipientPhone?: string;
-      amount: string;
-    };
-    MPESASuccess: {
-      recipientName?: string;
-      amount: string;
-      transactionId: string;
-    };
-    Shop: undefined;
-    Checkout: undefined;
-    Payment: undefined;
-    FontDemo: undefined; // Added for font system demo
-
-    // Round-Ups Feature Screens
-    RoundUps: undefined;
-    RoundUpsSettings: undefined;
-    RoundUpsHistory: undefined;
-    InvestmentPortfolio: undefined;
-    CharitySelection: undefined;
-    RoundUpsOnboarding: undefined;
+  // Core app flow screens
+  Splash: undefined;
+  Intro: undefined;
+  Onboarding: undefined;
+  Welcome: undefined;
+  Auth: undefined;
+  AuthOptions: { tempUserId?: string };
+  OTP: { phoneNumber: string; userId: string };
+  EmailInput: undefined;
+  EmailVerification: { email: string };
+  SuccessScreen: { authMethod: 'phone' | 'email' | 'google' | 'apple' };
+  KYC: undefined;
+  Home: { screen?: keyof TabParamList };
+  // App screens
+  Profile: undefined;
+  CampaignDetails: { campaignId: string };
+  DonationAmount: { campaignId: string };
+  DonationConfirmation: {
+    campaignId: string;
+    amount: string;
+    paymentMethod: string;
   };
+  CardsDashboard: undefined;
+  CardLinking: undefined;
+  CardLinkingBack: undefined;
+  CardVerification: undefined;
+  SendMoney: undefined;
+  SendMoneyConfirmation: {
+    recipientName: string;
+    amount: string;
+  };
+  SendMoneySuccess: {
+    recipientName: string;
+    amount: string;
+    transactionId: string;
+  };
+  MPESA: undefined;
+  MPESASend: undefined;
+  MPESARecipient: undefined;
+  MPESAAmount: { recipientId?: string; recipientName?: string; recipientPhone?: string };
+  MPESAConfirmation: {
+    recipientId?: string;
+    recipientName?: string;
+    recipientPhone?: string;
+    amount: string;
+  };
+  MPESASuccess: {
+    recipientName?: string;
+    amount: string;
+    transactionId: string;
+  };
+  Shop: undefined;
+  Checkout: undefined;
+  Payment: undefined;
+  FontDemo: undefined; // Added for font system demo
+
+  // Round-Ups Feature Screens
+  RoundUps: undefined;
+  RoundUpsSettings: undefined;
+  RoundUpsHistory: undefined;
+  InvestmentPortfolio: undefined;
+  CharitySelection: undefined;
+  RoundUpsOnboarding: undefined;
+};

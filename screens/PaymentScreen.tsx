@@ -76,7 +76,7 @@ const PaymentScreen = () => {
   const handlePayLater = () => {
     // In a real app, this would process the payment
     // For now, just navigate back to home
-    navigation.navigate('Home');
+    navigation.navigate('Home', {});
   };
 
   // Render payment card
@@ -84,7 +84,7 @@ const PaymentScreen = () => {
     return (
       <View style={styles.cardContainer}>
         <LinearGradient
-          colors={item.color}
+          colors={item.color as any}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.card}

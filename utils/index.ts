@@ -152,3 +152,17 @@ export function getResponsivePadding(base: number): number {
     default: return base;
   }
 }
+
+
+
+// Phone number validation (for different countries)
+export const validatePhoneNumber = (phone: string, countryCode: string): boolean => {
+  switch (countryCode) {
+    case '254': // Kenya
+      return /^[7][0-9]{8}$/.test(phone);
+    case '971': // UAE
+      return /^[5][0-9]{8}$/.test(phone);
+    default:
+      return /^[0-9]{9,10}$/.test(phone);
+  }
+};

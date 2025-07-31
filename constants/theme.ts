@@ -38,6 +38,7 @@ export const COLORS = {
   background: '#FFFFFF', // Light background
   background2: '#F5F5F8', // Slightly darker background
   card: '#FFFFFF', // Card background
+  white: '#FFFFFF', // White color
 
   // Text colors
   text: '#1B1C39', // Primary text
@@ -56,7 +57,7 @@ export const COLORS = {
   gradientEnd: '#9370DB',
 
   // Mizan gradient colors
-  mizanGradientColors: ['#D155FF', '#B532F2', '#A016E8', '#9406E2', '#8F00E0', '#A08CFF'],
+  mizanGradientColors: ['#D155FF', '#B532F2', '#A016E8', '#9406E2', '#8F00E0', '#A08CFF'] as const,
 
   // Other colors
   border: '#E0E0E0',
@@ -138,7 +139,10 @@ export const FONTS = {
     if (typeof sizeOrType === 'string') {
       if (sizeOrType in SIZES) {
         // If it's a SIZES key
-        return createFontStyle(SIZES[sizeOrType as keyof typeof SIZES], weight, lineHeight);
+        const sizeValue = SIZES[sizeOrType as keyof typeof SIZES];
+        if (typeof sizeValue === 'number') {
+          return createFontStyle(sizeValue, weight, lineHeight);
+        }
       } else {
         // If it's a predefined font style (body1, h1, etc.)
         const baseStyle = FONTS[sizeOrType as keyof typeof FONTS] as TextStyle;
@@ -149,7 +153,12 @@ export const FONTS = {
       }
     }
     // If sizeOrType is a number (custom font size)
-    return createFontStyle(sizeOrType, weight, lineHeight);
+    if (typeof sizeOrType === 'number') {
+      return createFontStyle(sizeOrType, weight, lineHeight);
+    }
+
+    // Fallback to default size
+    return createFontStyle(16, weight, lineHeight);
   },
 
   // Convenience methods for specific weights

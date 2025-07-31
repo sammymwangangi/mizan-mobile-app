@@ -27,9 +27,12 @@
     "@shopify/react-native-skia": "v2.0.0-next.4",
     "@supabase/supabase-js": "^2.50.0",
     "expo": "^53.0.9",
+    "expo-apple-authentication": "^7.2.4",
+    "expo-auth-session": "^6.2.1",
     "expo-camera": "~16.1.6",
     "expo-dev-client": "~5.1.8",
     "expo-font": "~13.3.1",
+    "expo-haptics": "~14.1.4",
     "expo-linear-gradient": "~14.1.4",
     "expo-local-authentication": "^16.0.4",
     "expo-media-library": "~17.1.6",
@@ -37,6 +40,7 @@
     "expo-splash-screen": "~0.30.8",
     "expo-sqlite": "^15.2.10",
     "expo-status-bar": "~2.2.3",
+    "expo-web-browser": "^14.2.0",
     "lucide-react-native": "0.509.0",
     "nativewind": "latest",
     "patch-package": "^8.0.0",
@@ -53,8 +57,7 @@
     "react-native-wheel-picker": "^1.2.0",
     "react-native-wheel-scrollview-picker": "^2.0.9",
     "sonner-native": "0.19.1",
-    "victory-native": "^41.17.3",
-    "expo-haptics": "~14.1.4"
+    "victory-native": "^41.17.3"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

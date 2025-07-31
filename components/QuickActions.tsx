@@ -4,10 +4,10 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function QuickActions() {
   const actions = [
-    { icon: 'card-outline', label: 'Cards', color: '#9370DB' },
-    { icon: 'time', label: 'Pay Later', color: '#9370DB' },
-    { icon: 'paper-plane-outline', label: 'Send', color: '#9370DB' },
-    { icon: 'phone-portrait-outline', label: 'M-Pesa', color: '#9370DB' },
+    { icon: 'card-outline' as const, label: 'Cards', color: '#9370DB' },
+    { icon: 'time-outline' as const, label: 'Pay Later', color: '#9370DB' },
+    { icon: 'paper-plane-outline' as const, label: 'Send', color: '#9370DB' },
+    { icon: 'phone-portrait-outline' as const, label: 'M-Pesa', color: '#9370DB' },
   ];
 
   return (

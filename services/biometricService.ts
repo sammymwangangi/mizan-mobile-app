@@ -129,7 +129,7 @@ class BiometricService {
           errorMessage = 'No biometric credentials enrolled';
         } else if (result.error === 'lockout') {
           errorMessage = 'Too many failed attempts. Please try again later.';
-        } else if (result.error === 'lockout_permanent') {
+        } else if (result.error === 'passcode_not_set') {
           errorMessage = 'Biometric authentication permanently locked. Please use device passcode.';
         }
 

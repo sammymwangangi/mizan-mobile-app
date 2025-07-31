@@ -26,8 +26,7 @@ import SplashScreenComponent from './screens/SplashScreen';
 import IntroScreen from './screens/IntroScreen';
 import OnboardingScreen from './screens/OnboardingScreen';
 import AuthScreen from './screens/AuthScreen';
-import SignUpScreen from './screens/SignUpScreen';
-import PhoneNumberScreen from './screens/PhoneNumberScreen';
+
 import OTPScreen from './screens/OTPScreen';
 import KYCScreen from './screens/KYCScreen';
 
@@ -69,6 +68,11 @@ import { RoundUpsProvider } from './contexts/RoundUpsContext';
 
 // Import test component
 import './global.css';
+import WelcomeScreen from 'screens/WelcomeScreen';
+import AuthOptionsScreen from 'screens/AuthOptionsScreen';
+import EmailInputScreen from 'screens/EmailInputScreen';
+import EmailVerificationScreen from 'screens/EmailVerificationScreen';
+import SuccessScreen from 'screens/SuccessScreen';
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -93,7 +97,7 @@ function RootStack({ isCheckingAuth, isUserLoggedIn, isInSignupFlow, hasUser }: 
     initialRoute = 'Home';
   } else if (isInSignupFlow && hasUser) {
     // User is in signup flow but not fully authenticated yet
-    initialRoute = 'PhoneNumber';
+    initialRoute = 'AuthOptions';
   }
 
   return (
@@ -101,53 +105,71 @@ function RootStack({ isCheckingAuth, isUserLoggedIn, isInSignupFlow, hasUser }: 
       initialRouteName={initialRoute as keyof RootStackParamList}
       screenOptions={{
         headerShown: false,
-        animation: 'fade',
+        animation: 'slide_from_right',
       }}
     >
-      {/* Common screens always available */}
-      <Stack.Screen name="Splash" component={SplashScreenComponent} />
-      <Stack.Screen name="Intro" component={IntroScreen} />
-      <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-      <Stack.Screen name="Auth" component={AuthScreen} />
-      <Stack.Screen name="SignUp" component={SignUpScreen} />
-      <Stack.Screen name="PhoneNumber" component={PhoneNumberScreen} />
-      <Stack.Screen name="OTP" component={OTPScreen} />
-      <Stack.Screen name="KYC" component={KYCScreen} />
-      <Stack.Screen name="Home" component={TabNavigator} />
-      <Stack.Screen name="Profile" component={ProfileScreen} />
-      <Stack.Screen name="CampaignDetails" component={CampaignDetailsScreen} />
-      <Stack.Screen name="DonationAmount" component={DonationAmountScreen} />
-      <Stack.Screen name="DonationConfirmation" component={DonationConfirmationScreen} />
-      <Stack.Screen name="CardsDashboard" component={CardsDashboardScreen} />
-      <Stack.Screen name="CardLinking" component={CardLinkingScreen} />
-      <Stack.Screen name="CardLinkingBack" component={CardLinkingBackScreen} />
-      <Stack.Screen name="CardVerification" component={CardVerificationScreen} />
+      {isCheckingAuth ? (
+        <Stack.Screen name="Splash" component={SplashScreenComponent} />
+      ) : !isUserLoggedIn ? (
+        // Auth flow
+        <>
+          <Stack.Screen name="Intro" component={IntroScreen} />
+          <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+          <Stack.Screen name="Welcome" component={WelcomeScreen} />
+          <Stack.Screen name="AuthOptions" component={AuthOptionsScreen} />
+          <Stack.Screen name="Auth" component={AuthScreen} />
+          <Stack.Screen name="OTP" component={OTPScreen} />
+          <Stack.Screen name="EmailInput" component={EmailInputScreen} />
+          <Stack.Screen name="EmailVerification" component={EmailVerificationScreen} />
+          <Stack.Screen name="SuccessScreen" component={SuccessScreen} />
+          <Stack.Screen name="KYC" component={KYCScreen} />
+        </>
+      ) : (
+        // Main app flow
+        <>
+          <Stack.Screen name="Home" component={TabNavigator} />
 
-      {/* SendMoney Screens */}
-      <Stack.Screen name="SendMoney" component={SendMoneyScreen} />
-      <Stack.Screen name="SendMoneyConfirmation" component={SendMoneyConfirmationScreen} />
-      <Stack.Screen name="SendMoneySuccess" component={SendMoneySuccessScreen} />
+          {/* Profile and Settings */}
+          <Stack.Screen name="Profile" component={ProfileScreen} />
 
-      {/* M-PESA Screens */}
-      <Stack.Screen name="MPESA" component={MPESAScreen} />
-      <Stack.Screen name="MPESARecipient" component={MPESARecipientScreen} />
-      <Stack.Screen name="MPESAAmount" component={MPESAAmountScreen} />
-      <Stack.Screen name="MPESAConfirmation" component={MPESAConfirmationScreen} />
-      <Stack.Screen name="MPESASuccess" component={MPESASuccessScreen} />
+          {/* Islamic Corner Screens */}
+          <Stack.Screen name="CampaignDetails" component={CampaignDetailsScreen} />
+          <Stack.Screen name="DonationAmount" component={DonationAmountScreen} />
+          <Stack.Screen name="DonationConfirmation" component={DonationConfirmationScreen} />
 
-      {/* Shop Screens */}
-      <Stack.Screen name="Shop" component={ShopScreen} />
-      <Stack.Screen name="Checkout" component={CheckoutScreen} />
-      <Stack.Screen name="Payment" component={PaymentScreen} />
+          {/* Cards Screens */}
+          <Stack.Screen name="CardsDashboard" component={CardsDashboardScreen} />
+          <Stack.Screen name="CardLinking" component={CardLinkingScreen} />
+          <Stack.Screen name="CardLinkingBack" component={CardLinkingBackScreen} />
+          <Stack.Screen name="CardVerification" component={CardVerificationScreen} />
 
-      {/* Font Demo Screen */}
-      <Stack.Screen name="FontDemo" component={FontDemoScreen} />
+          {/* Send Money Screens */}
+          <Stack.Screen name="SendMoney" component={SendMoneyScreen} />
+          <Stack.Screen name="SendMoneyConfirmation" component={SendMoneyConfirmationScreen} />
+          <Stack.Screen name="SendMoneySuccess" component={SendMoneySuccessScreen} />
 
-      {/* Round-Ups Screens */}
-      <Stack.Screen name="RoundUps" component={RoundUpsScreen} />
-      <Stack.Screen name="RoundUpsSettings" component={RoundUpsSettingsScreen} />
-      <Stack.Screen name="InvestmentPortfolio" component={InvestmentPortfolioScreen} />
-      <Stack.Screen name="RoundUpsHistory" component={RoundUpsHistoryScreen} />
+          {/* M-PESA Screens */}
+          <Stack.Screen name="MPESA" component={MPESAScreen} />
+          <Stack.Screen name="MPESARecipient" component={MPESARecipientScreen} />
+          <Stack.Screen name="MPESAAmount" component={MPESAAmountScreen} />
+          <Stack.Screen name="MPESAConfirmation" component={MPESAConfirmationScreen} />
+          <Stack.Screen name="MPESASuccess" component={MPESASuccessScreen} />
+
+          {/* Shop Screens */}
+          <Stack.Screen name="Shop" component={ShopScreen} />
+          <Stack.Screen name="Checkout" component={CheckoutScreen} />
+          <Stack.Screen name="Payment" component={PaymentScreen} />
+
+          {/* Round-Ups Screens */}
+          <Stack.Screen name="RoundUps" component={RoundUpsScreen} />
+          <Stack.Screen name="RoundUpsSettings" component={RoundUpsSettingsScreen} />
+          <Stack.Screen name="InvestmentPortfolio" component={InvestmentPortfolioScreen} />
+          <Stack.Screen name="RoundUpsHistory" component={RoundUpsHistoryScreen} />
+
+          {/* Demo Screens */}
+          <Stack.Screen name="FontDemo" component={FontDemoScreen} />
+        </>
+      )}
     </Stack.Navigator>
   );
 }

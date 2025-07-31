@@ -27,7 +27,7 @@ const MPESASuccessScreen = () => {
   // Handle done button press
   const handleDone = () => {
     // Navigate back to home screen
-    navigation.navigate('Home');
+    navigation.navigate('Home', {});
   };
 
   // Format date

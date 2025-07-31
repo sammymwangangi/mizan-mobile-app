@@ -12,7 +12,7 @@ import {
 import { Eye, EyeOff } from 'lucide-react-native';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
 
-interface InputProps extends TextInputProps {
+interface InputProps extends Omit<TextInputProps, 'textAlign'> {
   label?: string;
   error?: string;
   leftIcon?: React.ReactNode;
@@ -22,6 +22,7 @@ interface InputProps extends TextInputProps {
   labelStyle?: TextStyle;
   errorStyle?: TextStyle;
   secureTextEntry?: boolean;
+  textAlign?: 'left' | 'right' | 'center';
 }
 
 const Input: React.FC<InputProps> = ({
@@ -34,6 +35,7 @@ const Input: React.FC<InputProps> = ({
   labelStyle,
   errorStyle,
   secureTextEntry,
+  textAlign,
   ...rest
 }) => {
   const [isFocused, setIsFocused] = useState(false);
@@ -59,8 +61,8 @@ const Input: React.FC<InputProps> = ({
         <TextInput
           style={[
             styles.input,
-            leftIcon && styles.inputWithLeftIcon,
-            (rightIcon || secureTextEntry) && styles.inputWithRightIcon,
+            leftIcon ? styles.inputWithLeftIcon : null,
+            (rightIcon || secureTextEntry) ? styles.inputWithRightIcon : null,
             inputStyle,
           ]}
           placeholderTextColor={COLORS.placeholder}
@@ -68,6 +70,7 @@ const Input: React.FC<InputProps> = ({
           onFocus={handleFocus}
           onBlur={handleBlur}
           secureTextEntry={secureTextEntry && !isPasswordVisible}
+          textAlign={textAlign}
           {...rest}
         />
         

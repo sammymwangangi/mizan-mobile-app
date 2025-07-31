@@ -17,11 +17,18 @@
     "production": {
       "autoIncrement": true,
       "ios": {
-        "distribution": "app-store"
+        "distribution": "store"
       }
     }
   },
   "submit": {
-    "production": {}
+    "production": {
+      "ios": {
+        "ascApiKeyPath": "./AuthKey_J3F8C8WKB6.p8",
+        "ascApiKeyIssuerId": "24c3212a-39a1-44c5-815d-210b53d0997d",
+        "ascApiKeyId": "J3F8C8WKB6",
+        "ascAppId": "6747925341"
+      }
+    }
   }
 }
