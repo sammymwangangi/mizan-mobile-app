@@ -39,6 +39,16 @@ import CardLinkingScreen from './screens/CardLinkingScreen';
 import CardLinkingBackScreen from './screens/CardLinkingBackScreen';
 import CardVerificationScreen from './screens/CardVerificationScreen';
 
+// Import Card Creation Flow screens
+import CardClaimScreen from './screens/cards/CardClaimScreen';
+import PlanSelectScreen from './screens/cards/PlanSelectScreen';
+import CardStudioScreen from './screens/cards/CardStudioScreen';
+import CardNameScreen from './screens/cards/CardNameScreen';
+import CardReviewScreen from './screens/cards/CardReviewScreen';
+import CardMintingScreen from './screens/cards/CardMintingScreen';
+import FundCardScreen from './screens/cards/FundCardScreen';
+import WalletAddScreen from './screens/cards/WalletAddScreen';
+
 // Import SendMoney screens
 import SendMoneyScreen from './screens/SendMoneyScreen';
 import SendMoneyConfirmationScreen from './screens/SendMoneyConfirmationScreen';
@@ -142,6 +152,16 @@ function RootStack({ isCheckingAuth, isUserLoggedIn, isInSignupFlow, hasUser }: 
           <Stack.Screen name="CardLinking" component={CardLinkingScreen} />
           <Stack.Screen name="CardLinkingBack" component={CardLinkingBackScreen} />
           <Stack.Screen name="CardVerification" component={CardVerificationScreen} />
+
+          {/* Card Creation Flow */}
+          <Stack.Screen name="CardClaim" component={CardClaimScreen} />
+          <Stack.Screen name="PlanSelect" component={PlanSelectScreen} />
+          <Stack.Screen name="CardStudio" component={CardStudioScreen} />
+          <Stack.Screen name="CardName" component={CardNameScreen} />
+          <Stack.Screen name="CardReview" component={CardReviewScreen} />
+          <Stack.Screen name="CardMinting" component={CardMintingScreen} />
+          <Stack.Screen name="FundCard" component={FundCardScreen} />
+          <Stack.Screen name="WalletAdd" component={WalletAddScreen} />
 
           {/* Send Money Screens */}
           <Stack.Screen name="SendMoney" component={SendMoneyScreen} />

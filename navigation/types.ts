@@ -34,6 +34,31 @@ export type RootStackParamList = {
   CardLinking: undefined;
   CardLinkingBack: undefined;
   CardVerification: undefined;
+
+  // Card Creation Flow
+  CardClaim: undefined;
+  PlanSelect: undefined;
+  CardStudio: { planId: string };
+  CardName: { color: string; isMetal: boolean };
+  CardReview: {
+    color: string;
+    isMetal: boolean;
+    name: string;
+  };
+  CardMinting: {
+    cardDetails: {
+      color: string;
+      isMetal: boolean;
+      name: string;
+      features: {
+        smartSpend: boolean;
+        fraudShield: boolean;
+        robinAI: boolean;
+      };
+    }
+  };
+  FundCard: { cardId: string };
+  WalletAdd: { cardId: string };
   SendMoney: undefined;
   SendMoneyConfirmation: {
     recipientName: string;

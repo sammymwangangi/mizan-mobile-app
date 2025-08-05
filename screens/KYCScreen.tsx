@@ -23,6 +23,11 @@ import * as FileSystem from 'expo-file-system';
 
 type KYCScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'KYC'>;
 
+// DEVELOPMENT CONFIGURATION
+// Set to true to bypass auth and navigate directly to Home screen
+// Set to false when ready to implement real Supabase auth
+const SIMULATION_MODE = true;
+
 // RadioOptionCard component for the interests step
 interface RadioOptionCardProps {
   text: string;
@@ -126,7 +131,7 @@ enum KYCStep {
 
 const KYCScreen: React.FC = () => {
   const navigation = useNavigation<KYCScreenNavigationProp>();
-  const { clearSignupFlow } = useAuth();
+  const { clearSignupFlow, simulateAuthentication } = useAuth();
   const [currentStep, setCurrentStep] = useState<KYCStep>(KYCStep.FULL_NAME);
   const [fullName, setFullName] = useState('');
   const [fullNameError, setFullNameError] = useState('');
@@ -1752,6 +1757,26 @@ const KYCScreen: React.FC = () => {
   };
 
   const renderCompleteStep = () => {
+    const handleCompleteSignup = () => {
+      console.log('🚀 Completing signup - SIMULATION MODE...');
+
+      if (SIMULATION_MODE) {
+        // SIMULATION: Create isolated mock authentication state
+        // This completely bypasses Supabase and creates a separate auth state
+        console.log('🎭 SIMULATION: Creating isolated mock authentication...');
+
+        clearSignupFlow();
+        simulateAuthentication();
+
+        console.log('✅ SIMULATION: Mock auth state created - App should navigate automatically!');
+      } else {
+        // TODO: Real auth flow implementation
+        // When ready for production, implement real Supabase auth here
+        console.log('🔐 PRODUCTION MODE: Implement real auth flow here');
+        clearSignupFlow();
+      }
+    };
+
     const onGestureEvent = Animated.event(
       [{ nativeEvent: { translationX: translateX } }],
       { useNativeDriver: true }
@@ -1776,8 +1801,7 @@ const KYCScreen: React.FC = () => {
               useNativeDriver: true
             })
           ]).start(() => {
-            // Complete the signup flow and navigate to authenticated app
-            clearSignupFlow();
+            handleCompleteSignup();
           });
         } else {
           // Reset the position with a spring animation
@@ -1815,7 +1839,7 @@ const KYCScreen: React.FC = () => {
                 duration: 200,
                 useNativeDriver: true
               }).start(() => {
-                clearSignupFlow();
+                handleCompleteSignup();
               });
             }}
             activeOpacity={0.9}

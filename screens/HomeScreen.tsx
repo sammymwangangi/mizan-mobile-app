@@ -303,6 +303,13 @@ const HomeScreen = () => {
                 <TouchableOpacity
                   key={promo.id}
                   style={styles.promotionCard}
+                  onPress={() => {
+                    if (promo.title === 'Order a Metal Card') {
+                      navigation.navigate('CardClaim');
+                    } else {
+                      console.log(`${promo.title} pressed`);
+                    }
+                  }}
                 >
                   <Image
                     source={promo.image}

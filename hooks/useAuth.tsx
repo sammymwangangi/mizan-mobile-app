@@ -20,6 +20,8 @@ interface UseAuthReturn {
   updateProfile: (updates: Partial<UserProfile>) => Promise<{ error: Error | null }>;
   refreshProfile: () => Promise<void>;
   clearSignupFlow: () => void;
+  simulateAuthentication: () => void; // Development only - simulates successful auth
+  disableSimulation: () => void; // Development only - disables simulation mode
 }
 
 // Create Auth Context
@@ -37,6 +39,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isInSignupFlow, setIsInSignupFlow] = useState(false);
+  const [isSimulationMode, setIsSimulationMode] = useState(false);
+
+  // Separate simulation state that overrides everything
+  const [simulationAuth, setSimulationAuth] = useState<{
+    user: any;
+    session: any;
+    profile: any;
+    isAuthenticated: boolean;
+  } | null>(null);
 
   // Fetch user profile from database
   const fetchUserProfile = async (userId: string) => {
@@ -96,11 +107,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth state changed:', event, session?.user?.id);
-        
-        if (mounted) {
+
+        if (mounted && !isSimulationMode) {
           setSession(session);
           setUser(session?.user ?? null);
-          
+
           if (session?.user) {
             await fetchUserProfile(session.user.id);
             // Store session info securely
@@ -112,6 +123,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             await SecureStore.deleteItemAsync('userToken');
             await SecureStore.deleteItemAsync('userUID');
           }
+        } else if (isSimulationMode) {
+          console.log('🎭 SIMULATION: Ignoring Supabase auth change - simulation mode active');
         }
       }
     );
@@ -120,7 +133,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, [fetchUserProfile]);
+  }, [fetchUserProfile, isSimulationMode]);
+
+  // Protect simulation state from being overridden
+  useEffect(() => {
+    if (isSimulationMode) {
+      console.log('🎭 SIMULATION: Simulation mode active - protecting auth state');
+    }
+  }, [isSimulationMode]);
 
   const signUp = async (email: string, password: string, phone?: string) => {
     try {
@@ -327,14 +347,83 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setIsInSignupFlow(false);
   };
 
+  const simulateAuthentication = () => {
+    console.log('🎭 SIMULATION: Creating mock user and session...');
+
+    // Create a mock user object
+    const mockUser = {
+      id: 'mock-user-id-12345',
+      email: 'user@example.com',
+      phone: '+254700000000',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      email_confirmed_at: new Date().toISOString(),
+      phone_confirmed_at: new Date().toISOString(),
+      last_sign_in_at: new Date().toISOString(),
+      app_metadata: {},
+      user_metadata: {},
+      aud: 'authenticated',
+      role: 'authenticated'
+    };
+
+    // Create a mock session object
+    const mockSession = {
+      access_token: 'mock-access-token',
+      refresh_token: 'mock-refresh-token',
+      expires_in: 3600,
+      expires_at: Math.floor(Date.now() / 1000) + 3600,
+      token_type: 'bearer',
+      user: mockUser
+    };
+
+    // Create a mock user profile
+    const mockUserProfile = {
+      id: 'mock-user-id-12345',
+      email: 'user@example.com',
+      phone_number: '+254700000000',
+      full_name: 'Mock User',
+      gender: 'male',
+      date_of_birth: '1990-01-01',
+      interests: ['technology', 'finance'],
+      financial_exposure: 78,
+      plan_type: 'Premium Ethics',
+      card_customization: false,
+      passcode_hash: null,
+      biometric_enabled: false,
+      kyc_status: 'completed',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+
+    // Set simulation auth state that completely overrides Supabase
+    setSimulationAuth({
+      user: mockUser,
+      session: mockSession,
+      profile: mockUserProfile,
+      isAuthenticated: true
+    });
+
+    setIsInSignupFlow(false);
+
+    console.log('✅ SIMULATION: Mock authentication completed');
+    console.log('🏠 SIMULATION: App should now navigate to Home screen automatically');
+  };
+
+  const disableSimulation = () => {
+    console.log('🔄 SIMULATION: Disabling simulation mode...');
+    setSimulationAuth(null);
+    setIsSimulationMode(false);
+    console.log('✅ SIMULATION: Simulation mode disabled');
+  };
+
   const authValue: UseAuthReturn = {
-    user,
-    userProfile,
-    session,
-    loading,
-    error,
-    isAuthenticated: !!user && !!session,
-    isInSignupFlow,
+    user: simulationAuth?.user || user,
+    userProfile: simulationAuth?.profile || userProfile,
+    session: simulationAuth?.session || session,
+    loading: simulationAuth ? false : loading,
+    error: simulationAuth ? null : error,
+    isAuthenticated: simulationAuth?.isAuthenticated || (!!user && !!session),
+    isInSignupFlow: simulationAuth ? false : isInSignupFlow,
     signUp,
     signIn,
     signOut,
@@ -343,6 +432,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     updateProfile,
     refreshProfile,
     clearSignupFlow,
+    simulateAuthentication,
+    disableSimulation,
   };
 
   return (
