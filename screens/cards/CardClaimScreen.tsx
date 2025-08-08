@@ -1,6 +1,7 @@
-import React, { useEffect, useRef } from 'react';
-import { View, Text, Image, TouchableOpacity, Animated, Dimensions, Platform } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, Image, TouchableOpacity, Animated, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../navigation/types';
@@ -14,6 +15,8 @@ type CardClaimNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Ca
 
 const CardClaimScreen: React.FC = () => {
   const navigation = useNavigation<CardClaimNavigationProp>();
+  const insets = useSafeAreaInsets();
+  const [activeTab, setActiveTab] = React.useState<'Accounts' | 'Cards' | 'Vaults'>('Cards');
   const scale = useRef(new Animated.Value(1)).current;
 
   // Card subtle animation (1 -> 1.03 scale)
@@ -46,7 +49,70 @@ const CardClaimScreen: React.FC = () => {
   const heroHeight = normalize(260);
 
   return (
-    <View className="flex-1 bg-white px-5 pt-10 pb-8">
+    <View className="flex-1 bg-white px-5 pb-8" style={{ paddingTop: Math.max(insets.top, 12) }}>
+      {/* Header */}
+      <View style={{ marginBottom: 12 }}>
+        {/* Back Button */}
+        <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
+          onPress={() => navigation.goBack()}
+          style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 4 }}
+        >
+          <Text style={{ color: '#1D4ED8', fontSize: 16, fontWeight: '500' }}>‹ Back</Text>
+        </TouchableOpacity>
+
+        {/* Tab Switcher */}
+        <View style={{ alignItems: 'center', marginTop: 10, marginBottom: 30 }}>
+          <View
+            style={{
+              height: 55,
+              backgroundColor: '#EBE8F3',
+              borderRadius: 60,
+              paddingVertical: 4,
+              paddingHorizontal: 10,
+              width: '100%',
+              justifyContent: 'center',
+            }}
+          >
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              {(['Accounts', 'Cards', 'Vaults'] as const).map(tab => {
+                const isActive = tab === activeTab;
+                return (
+                  <TouchableOpacity
+                    key={tab}
+                    onPress={() => setActiveTab(tab)}
+                    accessibilityRole="tab"
+                    accessibilityState={{ selected: isActive }}
+                    style={{
+                      flex: 1,
+                      marginHorizontal: 10,
+                      height: 47,
+                      borderRadius: 60,
+                      backgroundColor: isActive ? '#FFFFFF' : 'transparent',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      shadowColor: isActive ? '#7A4BFF' : 'transparent',
+                      shadowOpacity: isActive ? 0.12 : 0,
+                      shadowOffset: { width: 0, height: isActive ? 8 : 0 },
+                      shadowRadius: isActive ? 16 : 0,
+                      elevation: isActive ? 2 : 0,
+                    }}
+                  >
+                    <Text style={{
+                      color: '#1B1C39',
+                      ...FONTS[isActive ? 'semibold' : 'medium'](13)
+                    }}>
+                      {tab}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </View>
+        </View>
+      </View>
+
       {/* Hero Gradient Card */}
       <Animated.View style={{ transform: [{ scale }] }}>
         <LinearGradient

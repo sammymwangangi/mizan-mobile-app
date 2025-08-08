@@ -1,13 +1,13 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, Image, ScrollView, StyleSheet, StatusBar, SafeAreaView } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RouteProp } from '@react-navigation/native';
 import type { RootStackParamList } from '../../../navigation/types';
-import { QAMAR_BENEFITS, BARAKAH_PURPLE, QAMAR_ANALYTICS } from '../../../constants/qamar';
-import { AnimatedCardHero } from '../../../components/shared/AnimatedComponents';
+import { COLORS, FONTS, SIZES } from '../../../constants/theme';
+import { normalize } from '../../../utils';
+import { ArrowLeft } from 'lucide-react-native';
 
 type QamarIntroNavigationProp = NativeStackNavigationProp<RootStackParamList, 'QamarIntro'>;
 type QamarIntroRouteProp = RouteProp<RootStackParamList, 'QamarIntro'>;
@@ -19,133 +19,114 @@ const QamarIntroScreen: React.FC = () => {
 
   const handleCreateCard = () => {
     Haptics.selectionAsync();
-    // Track analytics
-    // PostHog.capture(QAMAR_ANALYTICS.CARD_STEP_VIEW, { step: 'intro', plan: 'qamar' });
     navigation.navigate('QamarStudio', { planId });
   };
 
-  const BenefitItem: React.FC<{ benefit: typeof QAMAR_BENEFITS[0] }> = ({ benefit }) => (
-    <View className="flex-row items-start mb-4">
-      <View className="w-6 h-6 rounded-full bg-purple-100 items-center justify-center mr-4 mt-0.5">
-        <View className="w-2 h-2 rounded-full bg-purple-600" />
+  const benefits: string[] = [
+    '30-day risk-free trial',
+    'Refer a friend, you both get $10 instantly',
+    '0 % Pay-Later unlocked by good habits',
+    'Habibi AI coach : first 3 insights free',
+    'Round-ups simple Investing',
+    'Auto-sadaqah pots.'
+  ];
+
+  return (
+    <View style={styles.root}>
+      <StatusBar barStyle="dark-content" />
+      <SafeAreaView />
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+          <ArrowLeft size={24} color={COLORS.text} />
+          <Text style={styles.backLabel}>Back</Text>
+        </TouchableOpacity>
       </View>
-      <View className="flex-1">
-        <Text className="text-gray-900 font-semibold text-base mb-1">
-          {benefit.title}
+
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        {/* Title and subtitle */}
+        <Text style={styles.title}>Claim Qamar Card</Text>
+        <Text style={styles.subtitle}>
+          Start your soft investing journey to{`\n`}unlock the moon
         </Text>
-        <Text className="text-gray-600 text-sm">
-          {benefit.description}
-        </Text>
+
+        {/* Main card container */}
+        <View style={styles.heroCard}>
+          <View style={styles.heroHeaderRow}>
+            <Image source={require('../../../assets/cards/claim/cloud-icon.png')} style={styles.cloudIcon} />
+            <Text style={styles.heroHeaderText}>Physical + Virtual Card</Text>
+          </View>
+          {/* Credit card image (already rotated) */}
+          <Image
+            source={require('../../../assets/cards/claim/claim-qamar.png')}
+            style={styles.qamarImage}
+            resizeMode="contain"
+          />
+        </View>
+
+        {/* Benefits Section */}
+        <Text style={styles.sectionTitle}>Your Qamar Card Benefits</Text>
+        <Text style={styles.benefitsIntro}>All in Noor plan plus:</Text>
+        <View style={{ marginTop: normalize(8) }}>
+          {benefits.map((b, i) => (
+            <View key={i} style={styles.benefitRow}>
+              <View style={styles.bullet} />
+              <Text style={styles.benefitText}>{b}</Text>
+            </View>
+          ))}
+        </View>
+      </ScrollView>
+
+      {/* CTA Button */}
+      <View style={styles.ctaContainer}>
+        <TouchableOpacity style={styles.ctaButton} activeOpacity={0.85} onPress={handleCreateCard}>
+          <Text style={styles.ctaText}>Create my Qamar card</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
-
-  return (
-    <ScrollView className="flex-1 bg-white">
-      {/* Header */}
-      <View className="flex-row items-center justify-between px-5 pt-12 pb-6">
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          className="w-10 h-10 rounded-full bg-gray-100 items-center justify-center"
-        >
-          <Text className="text-gray-600 text-lg">←</Text>
-        </TouchableOpacity>
-        <Text className="text-gray-500 text-sm">Qamar Preview</Text>
-        <View className="w-10" />
-      </View>
-
-      <View className="px-5">
-        {/* Hero Section */}
-        <View className="items-center mb-8">
-          <Text className="text-3xl font-bold text-gray-900 text-center mb-2">
-            Meet Qamar
-          </Text>
-          <Text className="text-gray-600 text-center mb-8 text-base">
-            Your premium halal card with enhanced features
-          </Text>
-
-          {/* 3D Card Hero with Animation */}
-          <AnimatedCardHero style={{ marginBottom: 32 }}>
-            <Image
-              source={require('../../../assets/cards/mizan-card.png')}
-              style={{
-                width: 320,
-                height: 200,
-              }}
-              resizeMode="contain"
-            />
-          </AnimatedCardHero>
-        </View>
-
-        {/* Benefits List (6-bullet list) */}
-        <View className="mb-8">
-          <Text className="text-xl font-bold text-gray-900 mb-6">
-            What you get with Qamar
-          </Text>
-          
-          {QAMAR_BENEFITS.map((benefit) => (
-            <BenefitItem key={benefit.id} benefit={benefit} />
-          ))}
-        </View>
-
-        {/* Additional Features */}
-        <View className="bg-purple-50 rounded-2xl p-6 mb-8">
-          <Text className="text-lg font-semibold text-purple-900 mb-3">
-            Premium Features
-          </Text>
-          <View className="space-y-2">
-            <Text className="text-purple-800 text-sm">
-              • Advanced spending analytics with AI insights
-            </Text>
-            <Text className="text-purple-800 text-sm">
-              • Priority customer support via dedicated line
-            </Text>
-            <Text className="text-purple-800 text-sm">
-              • Exclusive access to investment opportunities
-            </Text>
-            <Text className="text-purple-800 text-sm">
-              • Enhanced security with biometric authentication
-            </Text>
-          </View>
-        </View>
-
-        {/* Pricing Info */}
-        <View className="bg-gray-50 rounded-2xl p-6 mb-8">
-          <View className="flex-row items-center justify-between mb-2">
-            <Text className="text-lg font-semibold text-gray-900">
-              Monthly Fee
-            </Text>
-            <Text className="text-2xl font-bold text-gray-900">
-              $9.99
-            </Text>
-          </View>
-          <Text className="text-gray-600 text-sm">
-            First 30 days free • Cancel anytime
-          </Text>
-        </View>
-      </View>
-
-      {/* CTA Button */}
-      <View className="px-5 pb-8">
-        <TouchableOpacity
-          onPress={handleCreateCard}
-          activeOpacity={0.9}
-          className="w-full"
-        >
-          <LinearGradient
-            colors={[BARAKAH_PURPLE, '#9F7AFF']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            className="h-14 rounded-full justify-center items-center"
-          >
-            <Text className="text-white font-semibold text-lg">
-              Create my Qamar card
-            </Text>
-          </LinearGradient>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
-  );
 };
+
+const HERO_HEIGHT = normalize(216);
+
+const styles = StyleSheet.create({
+  root: { flex: 1, backgroundColor: COLORS.background },
+  header: { paddingHorizontal: SIZES.padding, paddingTop: normalize(4), paddingBottom: normalize(8) },
+  backBtn: { flexDirection: 'row', alignItems: 'center', gap: normalize(6) },
+  backLabel: { ...FONTS.medium(14), color: '#7A4BFF' },
+
+  scrollContent: { paddingHorizontal: SIZES.padding, paddingBottom: normalize(20) },
+  title: { ...FONTS.semibold(32), color: '#1B1C39', marginTop: normalize(4) },
+  subtitle: { ...FONTS.medium(12), color: '#6D6E8A', marginTop: normalize(6) },
+
+  heroCard: {
+    height: HERO_HEIGHT,
+    backgroundColor: '#EFEFEF',
+    borderRadius: normalize(13),
+    marginTop: normalize(16),
+    padding: normalize(16),
+    overflow: 'hidden',
+  },
+  heroHeaderRow: { flexDirection: 'row', alignItems: 'center' },
+  cloudIcon: { width: normalize(32), height: normalize(32), marginRight: normalize(10) },
+  heroHeaderText: { ...FONTS.semibold(16), color: '#ABACBE' },
+  qamarImage: {
+    position: 'absolute',
+    width: '85%',
+    height: HERO_HEIGHT,
+    bottom: normalize(6),
+    left: normalize(32),
+  },
+
+  sectionTitle: { ...FONTS.semibold(16), color: '#000000', marginTop: normalize(18) },
+  benefitsIntro: { ...FONTS.body4, color: '#1B1C39', marginTop: normalize(10) },
+  benefitRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: normalize(8) },
+  bullet: { width: normalize(6), height: normalize(6), borderRadius: 3, backgroundColor: '#A276FF', marginTop: normalize(8), marginRight: normalize(10) },
+  benefitText: { ...FONTS.body4, color: '#1B1C39', flex: 1 },
+
+  ctaContainer: { paddingHorizontal: SIZES.padding, paddingBottom: normalize(16) },
+  ctaButton: { height: normalize(55), borderRadius: normalize(25), backgroundColor: '#A276FF', alignItems: 'center', justifyContent: 'center' },
+  ctaText: { ...FONTS.semibold(16), color: COLORS.textWhite },
+});
 
 export default QamarIntroScreen;

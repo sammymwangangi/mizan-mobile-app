@@ -1,132 +1,256 @@
-import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Image, StatusBar, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../navigation/types';
+import { COLORS, FONTS, SIZES } from '../../constants/theme';
+import { normalize } from '../../utils';
+import { ArrowLeft } from 'lucide-react-native';
 
+// Navigation type
 type PlanSelectNavigationProp = NativeStackNavigationProp<RootStackParamList, 'PlanSelect'>;
 
-interface PlanTileProps {
-  title: string;
-  planName: string;
-  price: string;
-  features: string[];
-  isRecommended?: boolean;
-  onSelect: () => void;
-}
-
-const PlanTile: React.FC<PlanTileProps> = ({
-  title,
-  planName,
-  price,
-  features,
-  isRecommended,
-  onSelect,
-}) => (
-  <TouchableOpacity
-    onPress={onSelect}
-    className={`bg-white rounded-xl p-5 mb-4 ${isRecommended ? 'border-2 border-purple-500' : 'border border-gray-200'}`}
-    style={{ elevation: isRecommended ? 4 : 1 }}
-    activeOpacity={0.9}
-  >
-    {isRecommended && (
-      <View className="absolute -top-3 right-4 bg-purple-500 px-3 py-1 rounded-full">
-        <Text className="text-white text-xs">Recommended</Text>
-      </View>
-    )}
-    
-    <Text className="text-lg font-semibold mb-1">{title}</Text>
-    <Text className="text-purple-600 text-2xl font-bold mb-2">{price}</Text>
-    <Text className="text-gray-600 mb-4">{planName}</Text>
-    
-    {features.map((feature, index) => (
-      <View key={index} className="flex-row items-center mb-2">
-        <View className="w-2 h-2 rounded-full bg-purple-500 mr-2" />
-        <Text className="text-gray-700">{feature}</Text>
-      </View>
-    ))}
-  </TouchableOpacity>
-);
+// Button with press feedback matching spec
+const CTAButton: React.FC<{ title: string; onPress: () => void } & { style?: any }> = ({ title, onPress, style }) => {
+  const [pressed, setPressed] = useState(false);
+  return (
+    <TouchableOpacity
+      activeOpacity={0.9}
+      onPressIn={() => setPressed(true)}
+      onPressOut={() => setPressed(false)}
+      onPress={onPress}
+      style={[
+        styles.ctaButton,
+        { backgroundColor: pressed ? '#7541FF' : '#FFFFFF' },
+        style,
+      ]}
+    >
+      <Text style={styles.ctaText}>{title}</Text>
+    </TouchableOpacity>
+  );
+};
 
 const PlanSelectScreen: React.FC = () => {
   const navigation = useNavigation<PlanSelectNavigationProp>();
 
-  const plans = [
-    {
-      id: 'noor',
-      title: 'Start with a free plan',
-      planName: 'Noor Plan',
-      price: 'US $0.00/monthly',
-      features: [
-        'No monthly fees',
-        'Virtual card',
-        'Basic spend insights',
-        'Standard support'
-      ]
-    },
-    {
-      id: 'qamar',
-      title: 'Recommended Plan',
-      planName: 'Qamar Plan',
-      price: 'US $3/monthly',
-      features: [
-        'All Noor features',
-        'Metal card option',
-        'Advanced analytics',
-        'Priority support'
-      ]
-    },
-    {
-      id: 'shams',
-      title: 'Premium Experience',
-      planName: 'Shams Plan',
-      price: 'US $9/monthly',
-      features: [
-        'All Qamar features',
-        'Multiple virtual cards',
-        'Exclusive rewards',
-        'Concierge service'
-      ]
-    }
-  ];
-
-  const handlePlanSelect = (planId: string) => {
-    switch (planId) {
-      case 'qamar':
-        navigation.navigate('QamarIntro', { planId });
-        break;
-      case 'shams':
-        navigation.navigate('ShamsIntro');
-        break;
-      case 'noor':
-      default:
-        navigation.navigate('CardStudio', { planId });
-        break;
-    }
-  };
+  const handleNoor = () => navigation.navigate('CardStudio', { planId: 'noor' });
+  const handleQamar = () => navigation.navigate('QamarIntro', { planId: 'qamar' });
+  const handleShams = () => navigation.navigate('ShamsIntro');
 
   return (
-    <View className="flex-1 bg-gray-50">
-      <ScrollView className="flex-1 p-5">
-        <Text className="text-2xl font-bold mb-2">Choose your plan</Text>
-        <Text className="text-gray-600 mb-6">
-          Select the plan that best fits your needs
-        </Text>
+    <View style={styles.root}>
+      <StatusBar barStyle="dark-content" />
+      <SafeAreaView style={{ paddingVertical: normalize(18) }} />
+      {/* Header row */}
+      <View style={styles.headerRow}>
+        <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
+          onPress={() => navigation.goBack()}
+          style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 4 }}
+        >
+          <Text style={{ color: '#007AFF', ...FONTS.body3 }}>‹ Back</Text>
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Welcome to Card Studio</Text>
+        <View style={{ width: normalize(24) }} />
+      </View>
 
-        {plans.map((plan) => (
-          <PlanTile
-            key={plan.id}
-            title={plan.title}
-            planName={plan.planName}
-            price={plan.price}
-            features={plan.features}
-            isRecommended={plan.id === 'qamar'}
-            onSelect={() => handlePlanSelect(plan.id)}
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        {/* Noor */}
+        <View style={styles.card}>
+          <View style={styles.textBlock}>
+            <Text style={styles.planTitle}>Noor - Lightest way to spend</Text>
+            <Text style={styles.planDesc}>
+              Forever-free virtual card.{"\n"}Mint in seconds{"\n"}Track barakah spend.
+            </Text>
+          </View>
+          <Image
+            source={require('../../assets/cards/card-studio/noor-mockup.png')}
+            style={[styles.noorImage]}
+            resizeMode="contain"
           />
-        ))}
+          <CTAButton title="Get Noor" onPress={handleNoor} />
+        </View>
+
+        {/* Qamar */}
+        <View style={styles.card}>
+          <View style={styles.textBlock}>
+            <Text style={styles.planTitle}>Qamar - Guided by the Moon</Text>
+            <Text style={styles.planDesc}>
+              Your next-level physical card for effortless halal investing—powered by a sprinkle of AI.
+            </Text>
+          </View>
+          <Image source={require('../../assets/cards/card-studio/qamar-gradient-card.png')} style={styles.qamarGradient} resizeMode="contain" />
+          <Image source={require('../../assets/cards/card-studio/qamar-black-card.png')} style={styles.qamarBlack} resizeMode="contain" />
+          <Image source={require('../../assets/cards/card-studio/qamar-bottom-card.png')} style={styles.qamarBottom} resizeMode="contain" />
+          <CTAButton title="Get Qamar" onPress={handleQamar} />
+        </View>
+
+        {/* Shams */}
+        <View style={styles.card}>
+          <View style={styles.textBlock}>
+            <Text style={styles.planTitle}>Shams  - Rise with the Sun</Text>
+            <Text style={styles.planDesc}>
+              Metal prestige & cashback{`\n`}auto-donated to waqf –{`\n`}Invest like a veteran with purpose.
+            </Text>
+          </View>
+          <Image source={require('../../assets/cards/card-studio/shams-metal-card.png')} style={styles.shamsMetal} resizeMode="contain" />
+          <Image source={require('../../assets/cards/card-studio/shams-pink-card.png')} style={styles.shamsPink} resizeMode="contain" />
+          <Image source={require('../../assets/cards/card-studio/shams-blue-card.png')} style={styles.shamsBlue} resizeMode="contain" />
+          <CTAButton title="Get Shams" onPress={handleShams} />
+        </View>
       </ScrollView>
+
+      <View>
+        <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
+          onPress={() => navigation.goBack()}
+          style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 4 }}
+        >
+          <Text style={{ color: '#E0D2FF', ...FONTS.body3, alignSelf: 'center' }}>Already got a card? Link it here</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
+
+const CARD_HEIGHT = normalize(180);
+
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+    backgroundColor: COLORS.background2,
+    paddingBottom: normalize(24),
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: SIZES.padding,
+    marginVertical: normalize(18),
+  },
+  backButton: {
+    width: normalize(24),
+    height: normalize(24),
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerTitle: {
+    ...FONTS.semibold(32),
+    color: '#1B1C39',
+    textAlign: 'center',
+    width: normalize(200),
+  },
+  scrollContent: {
+    paddingHorizontal: SIZES.padding,
+    paddingBottom: normalize(24),
+  },
+  card: {
+    height: CARD_HEIGHT,
+    backgroundColor: '#FFFFFF',
+    borderRadius: normalize(25),
+    marginBottom: normalize(27),
+    padding: normalize(16),
+    overflow: 'hidden',
+    shadowColor: '#6943AF',
+    shadowOffset: { width: 0, height: normalize(20) },
+    shadowOpacity: 0.1,
+    shadowRadius: normalize(40),
+    elevation: 15,
+  },
+  textBlock: {
+    width: '62%',
+  },
+  planTitle: {
+    ...FONTS.semibold(15),
+    color: '#1B1C39',
+    marginBottom: normalize(8),
+  },
+  planDesc: {
+    ...FONTS.body5,
+    color: '#6D6E8A',
+  },
+  ctaButton: {
+    position: 'absolute',
+    left: normalize(2),
+    right: normalize(2),
+    bottom: normalize(2),
+    height: normalize(46),
+    borderRadius: normalize(25),
+    borderWidth: 1,
+    borderColor: '#A276FF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 3,
+  },
+  ctaText: {
+    ...FONTS.semibold(15),
+    color: '#1B1C39',
+  },
+  // Noor imagery
+  noorImage: {
+    position: 'absolute',
+    right: normalize(2),
+    top: normalize(16),
+    width: normalize(120),
+    height: CARD_HEIGHT - normalize(40),
+  },
+  // Qamar layering
+  qamarGradient: {
+    position: 'absolute',
+    right: -normalize(25),
+    top: -normalize(2),
+    width: normalize(160),
+    height: normalize(140),
+    transform: [{ rotate: '0deg' }],
+  },
+  qamarBlack: {
+    position: 'absolute',
+    right: normalize(35),
+    top: normalize(56),
+    width: normalize(140),
+    height: normalize(140),
+    transform: [{ rotate: '0deg' }],
+    zIndex: 2,
+  },
+  qamarBottom: {
+    position: 'absolute',
+    right: -normalize(47),
+    bottom: -normalize(20),
+    width: normalize(140),
+    height: normalize(100),
+    transform: [{ rotate: '0deg' }],
+    zIndex: 1,
+  },
+  // Shams layering
+  shamsMetal: {
+    position: 'absolute',
+    right: -normalize(27),
+    top: -normalize(16),
+    width: normalize(150),
+    height: normalize(150),
+    transform: [{ rotate: '0deg' }],
+    zIndex: 2,
+  },
+  shamsPink: {
+    position: 'absolute',
+    right: normalize(27),
+    top: normalize(50),
+    width: normalize(140),
+    height: normalize(140),
+    transform: [{ rotate: '0deg' }],
+    zIndex: 3,
+  },
+  shamsBlue: {
+    position: 'absolute',
+    right: -normalize(48),
+    bottom: -normalize(8),
+    width: normalize(130),
+    height: normalize(96),
+    transform: [{ rotate: '0deg' }],
+    zIndex: 1,
+  },
+});
 
 export default PlanSelectScreen;
