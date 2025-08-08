@@ -49,6 +49,19 @@ import CardMintingScreen from './screens/cards/CardMintingScreen';
 import FundCardScreen from './screens/cards/FundCardScreen';
 import WalletAddScreen from './screens/cards/WalletAddScreen';
 
+// Shams Flow screens
+import ShamsIntroScreen from './screens/cards/shams/ShamsIntroScreen';
+import ShamsStudioScreen from './screens/cards/shams/ShamsStudioScreen';
+import ShamsAddressScreen from './screens/cards/shams/ShamsAddressScreen';
+import ShamsReviewScreen from './screens/cards/shams/ShamsReviewScreen';
+
+// Qamar Flow screens
+import QamarIntroScreen from './screens/cards/qamar/QamarIntroScreen';
+import QamarStudioScreen from './screens/cards/qamar/QamarStudioScreen';
+import QamarAddressScreen from './screens/cards/qamar/QamarAddressScreen';
+import QamarReviewScreen from './screens/cards/qamar/QamarReviewScreen';
+import QamarMintingScreen from './screens/cards/qamar/QamarMintingScreen';
+
 // Import SendMoney screens
 import SendMoneyScreen from './screens/SendMoneyScreen';
 import SendMoneyConfirmationScreen from './screens/SendMoneyConfirmationScreen';
@@ -162,6 +175,19 @@ function RootStack({ isCheckingAuth, isUserLoggedIn, isInSignupFlow, hasUser }: 
           <Stack.Screen name="CardMinting" component={CardMintingScreen} />
           <Stack.Screen name="FundCard" component={FundCardScreen} />
           <Stack.Screen name="WalletAdd" component={WalletAddScreen} />
+
+          {/* Shams Metal Card Flow */}
+          <Stack.Screen name="ShamsIntro" component={ShamsIntroScreen} />
+          <Stack.Screen name="ShamsStudio" component={ShamsStudioScreen} />
+          <Stack.Screen name="ShamsAddress" component={ShamsAddressScreen} />
+          <Stack.Screen name="ShamsReview" component={ShamsReviewScreen} />
+
+          {/* Qamar Card Flow */}
+          <Stack.Screen name="QamarIntro" component={QamarIntroScreen} />
+          <Stack.Screen name="QamarStudio" component={QamarStudioScreen} />
+          <Stack.Screen name="QamarAddress" component={QamarAddressScreen} />
+          <Stack.Screen name="QamarReview" component={QamarReviewScreen} />
+          <Stack.Screen name="QamarMinting" component={QamarMintingScreen} />
 
           {/* Send Money Screens */}
           <Stack.Screen name="SendMoney" component={SendMoneyScreen} />

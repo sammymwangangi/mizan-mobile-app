@@ -45,8 +45,77 @@ export type RootStackParamList = {
     isMetal: boolean;
     name: string;
   };
+
+  // Shams Metal Card Flow
+  ShamsIntro: undefined;
+  ShamsStudio: undefined;
+  ShamsAddress: { selectedMetal: string };
+  ShamsReview: {
+    selectedMetal: string;
+    deliveryAddress: {
+      fullName: string;
+      addressLine1: string;
+      addressLine2: string;
+      city: string;
+      state: string;
+      postalCode: string;
+      country: string;
+    };
+  };
+
+  // Qamar Card Flow
+  QamarIntro: { planId: string };
+  QamarStudio: { planId: string };
+  QamarAddress: { planId: string; selectedColor: string };
+  QamarReview: {
+    planId: string;
+    selectedColor: string;
+    deliveryAddress: {
+      fullName: string;
+      addressLine1: string;
+      addressLine2: string;
+      city: string;
+      state: string;
+      postalCode: string;
+      country: string;
+    };
+  };
+  QamarMinting: {
+    planId: string;
+    selectedColor: string;
+    deliveryAddress: {
+      fullName: string;
+      addressLine1: string;
+      addressLine2: string;
+      city: string;
+      state: string;
+      postalCode: string;
+      country: string;
+    };
+    features: {
+      smartSpend: boolean;
+      fraudShield: boolean;
+      robinAI: boolean;
+    };
+  };
+
   CardMinting: {
-    cardDetails: {
+    selectedMetal?: string;
+    deliveryAddress?: {
+      fullName: string;
+      addressLine1: string;
+      addressLine2: string;
+      city: string;
+      state: string;
+      postalCode: string;
+      country: string;
+    };
+    settings?: {
+      smartSpending: boolean;
+      fraudProtection: boolean;
+      aiPro: boolean;
+    };
+    cardDetails?: {
       color: string;
       isMetal: boolean;
       name: string;
@@ -55,7 +124,7 @@ export type RootStackParamList = {
         fraudShield: boolean;
         robinAI: boolean;
       };
-    }
+    };
   };
   FundCard: { cardId: string };
   WalletAdd: { cardId: string };

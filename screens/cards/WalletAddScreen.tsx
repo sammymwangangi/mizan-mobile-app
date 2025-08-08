@@ -1,9 +1,11 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, Image, Platform } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, Image, Platform, Modal } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import * as Haptics from 'expo-haptics';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RouteProp } from '@react-navigation/native';
 import type { RootStackParamList } from '../../navigation/types';
+import { addToAppleWallet, addToGoogleWallet, ANALYTICS_EVENTS } from '../../constants/shams';
 
 // Simple normalize function to replace the import
 const normalize = (size: number) => size;
@@ -16,17 +18,34 @@ const WalletAddScreen: React.FC = () => {
   const route = useRoute<WalletAddScreenRouteProp>();
   const { cardId } = route.params;
 
-  const handleAddToWallet = async (walletType: 'apple' | 'google') => {
-    // In a real app, this would integrate with the respective wallet API
-    console.log(`Adding card ${cardId} to ${walletType} wallet`);
-    
-    // Simulate success
-    setTimeout(() => {
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'Home' as never }]
-      });
-    }, 1000);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [walletType, setWalletType] = useState<'apple' | 'google'>('apple');
+
+  const handleAddToWallet = async (type: 'apple' | 'google') => {
+    setWalletType(type);
+    Haptics.selectionAsync();
+
+    try {
+      if (type === 'apple') {
+        await addToAppleWallet(cardId);
+      } else {
+        await addToGoogleWallet(cardId);
+      }
+
+      // Track analytics
+      // PostHog.capture(ANALYTICS_EVENTS.WALLET_ADD_SUCCESS, { wallet: type });
+
+      setShowSuccessModal(true);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
+      // Auto-close after 2 seconds
+      setTimeout(() => {
+        setShowSuccessModal(false);
+        handleBackToHome();
+      }, 2000);
+    } catch (error) {
+      console.error(`Failed to add to ${type} wallet:`, error);
+    }
   };
 
   const handleBackToHome = () => {
@@ -36,14 +55,52 @@ const WalletAddScreen: React.FC = () => {
     });
   };
 
+  const SuccessModal = () => (
+    <Modal
+      visible={showSuccessModal}
+      transparent
+      animationType="fade"
+    >
+      <View className="flex-1 bg-black/50 items-center justify-center">
+        <View className="bg-white rounded-3xl p-8 mx-8 items-center">
+          <View className="w-16 h-16 bg-green-100 rounded-full items-center justify-center mb-4">
+            <Text className="text-green-500 text-2xl">✓</Text>
+          </View>
+          <Text className="text-xl font-bold text-gray-800 mb-2">
+            {walletType === 'apple' ? 'Added to Apple' : 'Added to Google'}
+          </Text>
+          <Text className="text-xl font-bold text-gray-800 mb-2">
+            Wallet
+          </Text>
+          <Text className="text-gray-600 text-center">
+            Your card is ready to use
+          </Text>
+        </View>
+      </View>
+    </Modal>
+  );
+
   return (
-    <View className="flex-1 bg-white p-5">
-      <View className="flex-1 items-center justify-center">
-        <Text className="text-2xl font-bold text-center mb-2">
-          Your Card Is Ready
+    <View className="flex-1 bg-[#1A1B23]">
+      {/* Header */}
+      <View className="flex-row items-center justify-between px-5 pt-12 pb-6">
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          className="w-10 h-10 rounded-full bg-white/10 items-center justify-center"
+        >
+          <Text className="text-white text-lg">←</Text>
+        </TouchableOpacity>
+        <Text className="text-white/60 text-sm">Home</Text>
+        <View className="w-10" />
+      </View>
+
+      <View className="flex-1 items-center justify-center px-5">
+        <Text className="text-white text-2xl font-bold text-center mb-2">
+          Your Card is Ready
         </Text>
-        <Text className="text-gray-600 text-center mb-8">
-          Funded: $1.00
+        <Text className="text-white/70 text-center mb-8">
+          Funded: $10.00{'\n'}
+          Here&apos;s your shiny new Habibi card. Start spending ethically and live free right away
         </Text>
 
         <Image
@@ -92,12 +149,14 @@ const WalletAddScreen: React.FC = () => {
             onPress={handleBackToHome}
             className="w-full"
           >
-            <Text className="text-center text-purple-600 font-semibold">
+            <Text className="text-center text-[#D4AF37] font-semibold">
               Back to Home
             </Text>
           </TouchableOpacity>
         </View>
       </View>
+
+      <SuccessModal />
     </View>
   );
 };

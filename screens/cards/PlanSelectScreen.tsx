@@ -91,7 +91,18 @@ const PlanSelectScreen: React.FC = () => {
   ];
 
   const handlePlanSelect = (planId: string) => {
-    navigation.navigate('CardStudio', { planId });
+    switch (planId) {
+      case 'qamar':
+        navigation.navigate('QamarIntro', { planId });
+        break;
+      case 'shams':
+        navigation.navigate('ShamsIntro');
+        break;
+      case 'noor':
+      default:
+        navigation.navigate('CardStudio', { planId });
+        break;
+    }
   };
 
   return (
