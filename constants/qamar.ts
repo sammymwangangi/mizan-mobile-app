@@ -127,22 +127,23 @@ export const QAMAR_BENEFITS = [
 export const QAMAR_FEATURES = [
   {
     id: 'smartSpend',
-    name: 'Smart Spend',
-    description: 'AI-powered spending insights',
-    defaultValue: true
+    name: 'AI Powered Spend Insights',
+    description: "We'll categorise your transactions so you see where your money really goes.",
+    defaultValue: false,
   },
   {
     id: 'fraudShield',
-    name: 'Fraud Shield',
-    description: 'Advanced fraud protection',
-    defaultValue: true
+    name: 'Fraud & Security Shield',
+    description: 'Instant alerts if we spot suspicious activity.',
+    defaultValue: false,
   },
   {
     id: 'robinAI',
-    name: 'Robin AI',
-    description: 'Personal finance assistant',
-    defaultValue: false
-  }
+    name: 'Robin Habibi AI (Beta)',
+    description: "Our AI saves as you spend — quietly rounding up your change into halal investments & savings.\n(e.g. Spend $4.40 — Robin saves $0.60 for your future).",
+    defaultValue: false,
+    exampleItalic: true,
+  },
 ];
 
 // Referral Channels
@@ -181,7 +182,11 @@ export const QAMAR_ANALYTICS = {
   CARD_ORDER_SUBMIT: 'card_order_submit',
   CARD_ORDER_SUCCESS: 'card_order_success',
   ACTIVATION_FUND_SUCCESS: 'activation_fund_success',
-  SHARE_REFERRAL_CLICKED: 'share_referral_clicked'
+  SHARE_REFERRAL_CLICKED: 'share_referral_clicked',
+  CARD_TNC_OPEN: 'card_tnc_open',
+  CARD_TNC_AGREE: 'card_tnc_agree',
+  CARD_TNC_DECLINE: 'card_tnc_decline',
+  CARD_TNC_EMAIL: 'card_tnc_email',
 };
 
 // Confetti Configuration

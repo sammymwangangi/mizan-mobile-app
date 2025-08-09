@@ -71,26 +71,14 @@ export type RootStackParamList = {
     planId: string;
     selectedColor: string;
     deliveryAddress: {
-      fullName: string;
-      addressLine1: string;
-      addressLine2: string;
-      city: string;
-      state: string;
-      postalCode: string;
-      country: string;
+      address: string;
     };
   };
   QamarMinting: {
     planId: string;
     selectedColor: string;
     deliveryAddress: {
-      fullName: string;
-      addressLine1: string;
-      addressLine2: string;
-      city: string;
-      state: string;
-      postalCode: string;
-      country: string;
+      address: string;
     };
     features: {
       smartSpend: boolean;

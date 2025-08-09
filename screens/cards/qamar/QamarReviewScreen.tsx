@@ -1,12 +1,15 @@
-import React, { useState, useRef } from 'react';
-import { View, Text, TouchableOpacity, Image, Switch, Animated } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import { View, Text, TouchableOpacity, Switch, Animated } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RouteProp } from '@react-navigation/native';
 import type { RootStackParamList } from '../../../navigation/types';
-import { QAMAR_FEATURES, BARAKAH_PURPLE, QAMAR_ANALYTICS } from '../../../constants/qamar';
+import QamarCardPreview from '../../../components/cards/qamar/QamarCardPreview';
+import { TnCSheet, MintingSheet, CancelSheet, ErrorSheet, SuccessSheet } from '../../../components/cards/qamar/QamarBottomSheets';
+import { QAMAR_FEATURES, BARAKAH_PURPLE, QAMAR_ANALYTICS, QAMAR_COLORS } from '../../../constants/qamar';
+import { FONTS } from 'constants/theme';
 
 type QamarReviewNavigationProp = NativeStackNavigationProp<RootStackParamList, 'QamarReview'>;
 type QamarReviewRouteProp = RouteProp<RootStackParamList, 'QamarReview'>;
@@ -23,12 +26,18 @@ const QamarReviewScreen: React.FC = () => {
   const { planId, selectedColor, deliveryAddress } = route.params;
 
   const [features, setFeatures] = useState<FeatureToggles>({
-    smartSpend: true,
-    fraudShield: true,
-    robinAI: false
+    smartSpend: false,
+    fraudShield: false,
+    robinAI: false,
   });
 
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [showTnc, setShowTnc] = useState(false);
+  const [showMinting, setShowMinting] = useState(false);
+  const [showCancel, setShowCancel] = useState(false);
+  const [showError, setShowError] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [mintingProgress, setMintingProgress] = useState(0);
   const shakeAnim = useRef(new Animated.Value(0)).current;
 
   const handleFeatureToggle = (featureId: keyof FeatureToggles) => {
@@ -40,9 +49,83 @@ const QamarReviewScreen: React.FC = () => {
   };
 
   const handleTermsToggle = () => {
-    setTermsAccepted(!termsAccepted);
+    // Open the T&C modal instead of toggling acceptance immediately
+    setShowTnc(true);
+    // PostHog.capture?.(QAMAR_ANALYTICS.CARD_TNC_OPEN);
     Haptics.selectionAsync();
   };
+
+  // Minting flow handlers and effects (modal-based on this screen)
+  const handleMintingCancel = () => {
+    setShowCancel(true);
+  };
+
+  const handleKeepMinting = () => {
+    setShowCancel(false);
+  };
+
+  const handleCancelOrder = () => {
+    setShowCancel(false);
+    setShowMinting(false);
+    navigation.goBack();
+  };
+
+  const handleRetryError = () => {
+    setShowError(false);
+    setShowMinting(true);
+    setMintingProgress(0);
+  };
+
+  const handleExitError = () => {
+    setShowError(false);
+    navigation.goBack();
+  };
+
+  const handleSuccessComplete = () => {
+    setShowSuccess(false);
+    // PostHog.capture?.(QAMAR_ANALYTICS.CARD_ORDER_SUCCESS);
+    navigation.navigate('FundCard', { cardId: `qamar-${Date.now()}` });
+  };
+
+  // Auto-progress minting similar to QamarMintingScreen
+  useEffect(() => {
+    let interval: NodeJS.Timeout | undefined;
+    if (showMinting && mintingProgress < 100) {
+      interval = setInterval(() => {
+        setMintingProgress(prev => {
+          const next = prev + 2; // ~5s total
+          if (next % 20 === 0 && next <= 100) {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          }
+          if (next >= 100) {
+            if (interval) clearInterval(interval);
+            setTimeout(() => {
+              setShowMinting(false);
+              setShowSuccess(true);
+            }, 500);
+            return 100;
+          }
+          return next;
+        });
+      }, 100);
+    }
+    return () => { if (interval) clearInterval(interval); };
+  }, [showMinting, mintingProgress]);
+
+  // Optional: simulate transient error mid-way
+  const simulateError = () => {
+    if (mintingProgress > 50 && Math.random() < 0.1) {
+      setShowMinting(false);
+      setShowError(true);
+    }
+  };
+
+  useEffect(() => {
+    if (showMinting) {
+      const t = setTimeout(simulateError, 3000);
+      return () => clearTimeout(t);
+    }
+  }, [showMinting, mintingProgress]);
 
   const handleOrderCard = () => {
     if (!termsAccepted) {
@@ -69,190 +152,183 @@ const QamarReviewScreen: React.FC = () => {
           useNativeDriver: true,
         }),
       ]).start();
-      
+
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       return;
     }
 
     Haptics.selectionAsync();
-    
+
     // Track analytics
-    // PostHog.capture(QAMAR_ANALYTICS.CARD_ORDER_SUBMIT, { 
-    //   plan: 'qamar', 
-    //   toggles: features 
+    // PostHog.capture?.(QAMAR_ANALYTICS.CARD_ORDER_SUBMIT, {
+    //   plan: 'qamar',
+    //   toggles: features
     // });
-    
-    navigation.navigate('QamarMinting', { 
-      planId, 
-      selectedColor, 
-      deliveryAddress, 
-      features 
-    });
+
+    // Start modal-based minting flow on this screen
+    setShowMinting(true);
+    setMintingProgress(0);
   };
 
-  const FeatureToggle: React.FC<{ 
-    feature: typeof QAMAR_FEATURES[0], 
-    value: boolean, 
-    onToggle: () => void 
-  }> = ({ feature, value, onToggle }) => (
-    <View className="flex-row items-center justify-between py-4">
-      <View className="flex-1 mr-4">
-        <Text className="text-gray-900 font-semibold text-base">
-          {feature.name}
-        </Text>
-        <Text className="text-gray-600 text-sm">
-          {feature.description}
-        </Text>
+  const FeatureToggle: React.FC<{
+    feature: typeof QAMAR_FEATURES[0],
+    value: boolean,
+    onToggle: () => void
+  }> = ({ feature, value, onToggle }) => {
+    const parts = (feature.description || '').split('\n');
+    const hasExample = parts.length > 1;
+    return (
+      <View className="flex-row items-center justify-between py-4">
+        <View className="flex-1 mr-4">
+          <Text style={{ ...FONTS.semibold(14), color: '#0F172A' }}>
+            {feature.name}
+          </Text>
+          {!!parts[0] && (
+            <Text style={{ ...FONTS.medium(12), color: '#6B7280', marginTop: 4 }}>
+              {parts[0]}
+            </Text>
+          )}
+          {hasExample && (
+            <Text style={{ ...FONTS.medium(12), color: '#94A3B8', fontStyle: 'italic', marginTop: 4 }}>
+              {parts[1]}
+            </Text>
+          )}
+        </View>
+        <Switch
+          value={value}
+          onValueChange={onToggle}
+          trackColor={{ false: '#E5E7EB', true: BARAKAH_PURPLE }}
+          thumbColor={value ? '#FFFFFF' : '#F3F4F6'}
+          ios_backgroundColor="#E5E7EB"
+        />
       </View>
-      <Switch
-        value={value}
-        onValueChange={onToggle}
-        trackColor={{ false: '#E5E7EB', true: BARAKAH_PURPLE }}
-        thumbColor={value ? '#FFFFFF' : '#F3F4F6'}
-        ios_backgroundColor="#E5E7EB"
-      />
-    </View>
-  );
+    );
+  };
 
   return (
-    <View className="flex-1 bg-white">
-      {/* Header */}
-      <View className="flex-row items-center justify-between px-5 pt-12 pb-6">
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          className="w-10 h-10 rounded-full bg-gray-100 items-center justify-center"
-        >
-          <Text className="text-gray-600 text-lg">←</Text>
-        </TouchableOpacity>
-        <Text className="text-gray-500 text-sm">Step 3 of 3</Text>
-        <View className="w-10" />
-      </View>
-
-      {/* Progress Indicator */}
-      <View className="px-5 mb-6">
-        <View className="flex-row items-center">
-          <View className="w-2 h-2 rounded-full bg-purple-600 mr-2" />
-          <View className="w-2 h-2 rounded-full bg-purple-600 mr-2" />
-          <View className="w-2 h-2 rounded-full bg-purple-600" />
-        </View>
-      </View>
-
-      {/* Content */}
-      <View className="flex-1 px-5">
-        <Text className="text-2xl font-bold text-gray-900 mb-2">
-          Final preview
-        </Text>
-        <Text className="text-gray-600 text-base mb-8">
-          Review your card and customize features
-        </Text>
-
-        {/* Card Preview */}
-        <View className="items-center mb-8">
-          <Image
-            source={require('../../../assets/cards/mizan-card.png')}
-            style={{
-              width: 280,
-              height: 175,
-            }}
-            resizeMode="contain"
-          />
-          <Text className="text-gray-600 text-sm mt-2">
-            {selectedColor} • Qamar Card
-          </Text>
-        </View>
-
-        {/* Feature Toggles */}
-        <View className="mb-8">
-          <Text className="text-lg font-semibold text-gray-900 mb-4">
-            Customize your experience
-          </Text>
-          
-          <View className="bg-gray-50 rounded-2xl px-4">
-            {QAMAR_FEATURES.map((feature, index) => (
-              <View key={feature.id}>
-                <FeatureToggle
-                  feature={feature}
-                  value={features[feature.id as keyof FeatureToggles]}
-                  onToggle={() => handleFeatureToggle(feature.id as keyof FeatureToggles)}
-                />
-                {index < QAMAR_FEATURES.length - 1 && (
-                  <View className="h-px bg-gray-200" />
-                )}
-              </View>
-            ))}
-          </View>
-        </View>
-
-        {/* Terms & Conditions */}
-        <Animated.View
-          style={{
-            transform: [{ translateX: shakeAnim }],
-          }}
-          className={`border-2 rounded-2xl p-4 mb-8 ${
-            !termsAccepted && shakeAnim._value !== 0 ? 'border-red-500' : 'border-transparent'
-          }`}
-        >
-          <TouchableOpacity
-            onPress={handleTermsToggle}
-            className="flex-row items-start"
-          >
-            <View className={`w-5 h-5 rounded border-2 mr-3 mt-0.5 items-center justify-center ${
-              termsAccepted ? 'bg-purple-600 border-purple-600' : 'border-gray-300'
-            }`}>
-              {termsAccepted && (
-                <Text className="text-white text-xs font-bold">✓</Text>
-              )}
-            </View>
-            <Text className="text-gray-700 text-sm flex-1">
-              I agree to the{' '}
-              <Text className="text-purple-600 underline">Terms & Conditions</Text>
-              {' '}and{' '}
-              <Text className="text-purple-600 underline">Privacy Policy</Text>
-            </Text>
+    <>
+      <View className="flex-1 bg-white">
+        {/* Header */}
+        <View className="px-5 pt-12 pb-[36px]">
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Text style={{ ...FONTS.semibold(14), color: '#6B4EFF' }}>Back</Text>
           </TouchableOpacity>
-        </Animated.View>
+          <Text style={{ ...FONTS.bold(26), color: '#0F172A', marginTop: 12 }}>Looks good?</Text>
+          <Text style={{ ...FONTS.medium(12), color: '#64748B', marginTop: 4 }}>Step 3 / 3 - Review & mint</Text>
+        {/* Bottom Sheets (modals) */}
+        <MintingSheet
+          visible={showMinting}
+          onClose={() => setShowMinting(false)}
+          progress={mintingProgress}
+          onCancel={handleMintingCancel}
+        />
 
-        {/* Order Summary */}
-        <View className="bg-purple-50 rounded-2xl p-4 mb-8">
-          <Text className="text-purple-900 font-semibold mb-2">
-            Order Summary
-          </Text>
-          <View className="flex-row justify-between items-center">
-            <Text className="text-purple-800">
-              Qamar Card (Monthly)
-            </Text>
-            <Text className="text-purple-900 font-semibold">
-              $9.99/month
-            </Text>
+        <CancelSheet
+          visible={showCancel}
+          onClose={() => setShowCancel(false)}
+          onKeep={handleKeepMinting}
+          onCancel={handleCancelOrder}
+        />
+
+        <ErrorSheet
+          visible={showError}
+          onClose={() => setShowError(false)}
+          onRetry={handleRetryError}
+          onExit={handleExitError}
+        />
+
+        <SuccessSheet
+          visible={showSuccess}
+          onClose={() => setShowSuccess(false)}
+          onComplete={handleSuccessComplete}
+        />
+        </View>
+        {/* Hidden props usage for TypeScript awareness */}
+        {/* selectedColor and deliveryAddress used in analytics or future UI; retained intentionally */}
+
+        {/* Content */}
+        <View className="flex-1 px-5">
+
+          {/* Card Preview */}
+          <View className="items-center mb-4">
+            <QamarCardPreview
+              color={(QAMAR_COLORS.find(c => c.id === selectedColor) || null)}
+              playSheen={true}
+              expiryText="Exp 12/2026"
+            />
+            <TouchableOpacity onPress={() => navigation.navigate('QamarStudio', { planId })}>
+              <Text style={{ ...FONTS.medium(12), color: '#7B5CFF', textDecorationLine: 'underline', marginTop: 8, fontStyle: 'italic' }}>Tap to edit card</Text>
+            </TouchableOpacity>
           </View>
-          <Text className="text-purple-700 text-xs mt-1">
-            First 30 days free
-          </Text>
+
+          {/* Feature Toggles */}
+          <View className="mb-6">
+            <View className="bg-white">
+              {QAMAR_FEATURES.map((feature, index) => (
+                <View key={feature.id}>
+                  <FeatureToggle
+                    feature={feature}
+                    value={features[feature.id as keyof FeatureToggles]}
+                    onToggle={() => handleFeatureToggle(feature.id as keyof FeatureToggles)}
+                  />
+                  {index < QAMAR_FEATURES.length - 1 && (
+                    <View className="h-px bg-gray-200" />
+                  )}
+                </View>
+              ))}
+            </View>
+          </View>
+
+          {/* Terms & Conditions */}
+          <Animated.View style={{ transform: [{ translateX: shakeAnim }] }}>
+            <View className="flex-row items-center justify-between py-4">
+              <Text style={{ ...FONTS.semibold(14), color: '#0F172A' }}>
+                I agree to the Terms & Conditions
+              </Text>
+              <Switch
+                value={termsAccepted}
+                onValueChange={handleTermsToggle}
+                trackColor={{ false: '#E5E7EB', true: BARAKAH_PURPLE }}
+                thumbColor={termsAccepted ? '#FFFFFF' : '#F3F4F6'}
+                ios_backgroundColor="#E5E7EB"
+              />
+            </View>
+          </Animated.View>
+
+
+        </View>
+
+        {/* CTA Button */}
+        <View className="px-5 pb-8">
+          <TouchableOpacity
+            onPress={handleOrderCard}
+            activeOpacity={0.9}
+            className="w-full"
+          >
+            <LinearGradient
+              colors={termsAccepted ? [BARAKAH_PURPLE, '#9F7AFF'] : ['#D1D5DB', '#D1D5DB']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              className={`h-14 rounded-full justify-center items-center ${!termsAccepted ? 'opacity-50' : ''}`}
+              style={{ borderRadius: 40 }}
+            >
+              <Text className="text-white font-semibold text-lg">Order Card</Text>
+            </LinearGradient>
+            {!termsAccepted && (
+              <Text className="text-gray-400 text-xs text-center mt-2">Accept T&Cs to continue</Text>
+            )}
+          </TouchableOpacity>
         </View>
       </View>
 
-      {/* CTA Button */}
-      <View className="px-5 pb-8">
-        <TouchableOpacity
-          onPress={handleOrderCard}
-          activeOpacity={0.9}
-          className="w-full"
-        >
-          <LinearGradient
-            colors={termsAccepted ? [BARAKAH_PURPLE, '#9F7AFF'] : ['#D1D5DB', '#D1D5DB']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            className={`h-14 rounded-full justify-center items-center ${
-              !termsAccepted ? 'opacity-50' : ''
-            }`}
-          >
-            <Text className="text-white font-semibold text-lg">
-              Order Card
-            </Text>
-          </LinearGradient>
-        </TouchableOpacity>
-      </View>
-    </View>
+      {/* T&C Sheet */}
+      <TnCSheet
+        visible={showTnc}
+        onClose={() => setShowTnc(false)}
+        onAgree={() => { setTermsAccepted(true); setShowTnc(false); }}
+        onDecline={() => { setShowTnc(false); navigation.goBack(); }}
+      />
+    </>
   );
 };
 

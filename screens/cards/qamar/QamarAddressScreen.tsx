@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { View, Text, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -6,19 +6,16 @@ import * as Haptics from 'expo-haptics';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RouteProp } from '@react-navigation/native';
 import type { RootStackParamList } from '../../../navigation/types';
-import { BARAKAH_PURPLE, VALIDATION, QAMAR_ANALYTICS } from '../../../constants/qamar';
+import QamarCardPreview from '../../../components/cards/qamar/QamarCardPreview';
+import { BARAKAH_PURPLE, VALIDATION, QAMAR_COLORS } from '../../../constants/qamar';
+import { FONTS } from 'constants/theme';
+import { MOCK_PLACES } from './mockPlaces';
 
 type QamarAddressNavigationProp = NativeStackNavigationProp<RootStackParamList, 'QamarAddress'>;
 type QamarAddressRouteProp = RouteProp<RootStackParamList, 'QamarAddress'>;
 
 interface AddressForm {
-  fullName: string;
-  addressLine1: string;
-  addressLine2: string;
-  city: string;
-  state: string;
-  postalCode: string;
-  country: string;
+  address: string;
 }
 
 const QamarAddressScreen: React.FC = () => {
@@ -26,32 +23,34 @@ const QamarAddressScreen: React.FC = () => {
   const route = useRoute<QamarAddressRouteProp>();
   const { planId, selectedColor } = route.params;
 
-  const [address, setAddress] = useState<AddressForm>({
-    fullName: '',
-    addressLine1: '',
-    addressLine2: '',
-    city: '',
-    state: '',
-    postalCode: '',
-    country: 'Kenya'
-  });
+  const [address, setAddress] = useState<AddressForm>({ address: '' });
+  const [error, setError] = useState<string>('');
+  const scrollRef = useRef<ScrollView | null>(null);
+  const addressInputRef = useRef<TextInput | null>(null);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+
 
   const [isValid, setIsValid] = useState(false);
 
-  const validateForm = (formData: AddressForm) => {
-    const hasRequiredFields = VALIDATION.REQUIRED_FIELDS.every(
-      field => formData[field as keyof AddressForm].trim() !== ''
-    );
-    const hasMinLength = formData.addressLine1.length >= VALIDATION.MIN_ADDRESS_LENGTH;
-    const valid = hasRequiredFields && hasMinLength;
-    setIsValid(valid);
-    return valid;
+  const validateForm = (value: string) => {
+    const trimmed = value.trim();
+    const hasMinLength = trimmed.length >= VALIDATION.MIN_ADDRESS_LENGTH;
+    setIsValid(hasMinLength);
+    setError(hasMinLength ? '' : `Please enter at least ${VALIDATION.MIN_ADDRESS_LENGTH} characters`);
+    return hasMinLength;
   };
 
-  const updateAddress = (field: keyof AddressForm, value: string) => {
-    const newAddress = { ...address, [field]: value };
-    setAddress(newAddress);
-    validateForm(newAddress);
+  const updateAddress = (value: string) => {
+    setAddress({ address: value });
+    validateForm(value);
+    // update suggestions when typing
+    const q = value.trim().toLowerCase();
+    if (q.length >= 3) {
+      const results = MOCK_PLACES.filter((p) => p.toLowerCase().includes(q)).slice(0, 6);
+      setSuggestions(results);
+    } else {
+      setSuggestions([]);
+    }
   };
 
   const handleNext = () => {
@@ -83,156 +82,93 @@ const QamarAddressScreen: React.FC = () => {
   };
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 bg-[#F1F3F5]">
       {/* Header */}
-      <View className="flex-row items-center justify-between px-5 pt-12 pb-6">
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          className="w-10 h-10 rounded-full bg-gray-100 items-center justify-center"
-        >
-          <Text className="text-gray-600 text-lg">←</Text>
+      <View className="px-5 pt-12 pb-4">
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Text style={{ ...FONTS.semibold(14), color: '#6B4EFF' }}>Back</Text>
         </TouchableOpacity>
-        <Text className="text-gray-500 text-sm">Step 2 of 3</Text>
-        <View className="w-10" />
-      </View>
-
-      {/* Progress Indicator */}
-      <View className="px-5 mb-6">
-        <View className="flex-row items-center">
-          <View className="w-2 h-2 rounded-full bg-purple-600 mr-2" />
-          <View className="w-2 h-2 rounded-full bg-purple-600 mr-2" />
-          <View className="w-2 h-2 rounded-full bg-gray-300" />
-        </View>
+        <Text style={{ ...FONTS.bold(26), color: '#0F172A', marginTop: 12 }}>Where shall we ship?</Text>
+        <Text style={{ ...FONTS.medium(12), color: '#64748B', marginTop: 4 }}>
+          Step 2 / 3 - Let us know where you live, we’ll deliver for free In Shaa Allah.
+        </Text>
       </View>
 
       {/* Content */}
-      <ScrollView className="flex-1 px-5">
-        <Text className="text-2xl font-bold text-gray-900 mb-2">
-          Shipping address
-        </Text>
-        <Text className="text-gray-600 text-base mb-8">
-          Where should we send your Qamar card?
-        </Text>
-
-        {/* Google Places Search */}
-        <TouchableOpacity
-          onPress={handleGooglePlaces}
-          className="bg-gray-50 rounded-xl p-4 mb-6 flex-row items-center"
-        >
-          <Text className="text-gray-500 flex-1">
-            Search for your address...
-          </Text>
-          <Text className="text-gray-400">🔍</Text>
-        </TouchableOpacity>
-
-        {/* Manual Address Form */}
-        <View className="space-y-4">
-          <View>
-            <Text className="text-gray-700 text-sm mb-2 font-medium">
-              Full Name *
-            </Text>
-            <TextInput
-              value={address.fullName}
-              onChangeText={(text) => updateAddress('fullName', text)}
-              placeholder="Enter your full name"
-              placeholderTextColor="#9CA3AF"
-              className="bg-gray-50 rounded-xl p-4 text-gray-900"
-              autoCapitalize="words"
-            />
-          </View>
-
-          <View>
-            <Text className="text-gray-700 text-sm mb-2 font-medium">
-              Address Line 1 *
-            </Text>
-            <TextInput
-              value={address.addressLine1}
-              onChangeText={(text) => updateAddress('addressLine1', text)}
-              placeholder="Street address, building name"
-              placeholderTextColor="#9CA3AF"
-              className="bg-gray-50 rounded-xl p-4 text-gray-900"
-              autoCapitalize="words"
-            />
-          </View>
-
-          <View>
-            <Text className="text-gray-700 text-sm mb-2 font-medium">
-              Address Line 2
-            </Text>
-            <TextInput
-              value={address.addressLine2}
-              onChangeText={(text) => updateAddress('addressLine2', text)}
-              placeholder="Apartment, suite, floor (optional)"
-              placeholderTextColor="#9CA3AF"
-              className="bg-gray-50 rounded-xl p-4 text-gray-900"
-              autoCapitalize="words"
-            />
-          </View>
-
-          <View className="flex-row space-x-4">
-            <View className="flex-1">
-              <Text className="text-gray-700 text-sm mb-2 font-medium">
-                City *
-              </Text>
-              <TextInput
-                value={address.city}
-                onChangeText={(text) => updateAddress('city', text)}
-                placeholder="City"
-                placeholderTextColor="#9CA3AF"
-                className="bg-gray-50 rounded-xl p-4 text-gray-900"
-                autoCapitalize="words"
-              />
-            </View>
-            
-            <View className="flex-1">
-              <Text className="text-gray-700 text-sm mb-2 font-medium">
-                State/Region *
-              </Text>
-              <TextInput
-                value={address.state}
-                onChangeText={(text) => updateAddress('state', text)}
-                placeholder="State"
-                placeholderTextColor="#9CA3AF"
-                className="bg-gray-50 rounded-xl p-4 text-gray-900"
-                autoCapitalize="words"
-              />
-            </View>
-          </View>
-
-          <View className="flex-row space-x-4">
-            <View className="flex-1">
-              <Text className="text-gray-700 text-sm mb-2 font-medium">
-                Postal Code *
-              </Text>
-              <TextInput
-                value={address.postalCode}
-                onChangeText={(text) => updateAddress('postalCode', text)}
-                placeholder="Postal code"
-                placeholderTextColor="#9CA3AF"
-                className="bg-gray-50 rounded-xl p-4 text-gray-900"
-                keyboardType="default"
-                returnKeyType="done"
-                onSubmitEditing={handleSubmitEditing}
-              />
-            </View>
-            
-            <View className="flex-1">
-              <Text className="text-gray-700 text-sm mb-2 font-medium">
-                Country *
-              </Text>
-              <TextInput
-                value={address.country}
-                onChangeText={(text) => updateAddress('country', text)}
-                placeholder="Country"
-                placeholderTextColor="#9CA3AF"
-                className="bg-gray-50 rounded-xl p-4 text-gray-900"
-                autoCapitalize="words"
-              />
-            </View>
-          </View>
+      <ScrollView ref={scrollRef} className="flex-1 px-5" showsVerticalScrollIndicator={false}>
+        {/* Card Preview */}
+        <View className="items-center mb-6">
+          <QamarCardPreview
+            color={(QAMAR_COLORS.find(c => c.id === selectedColor) || null)}
+            playSheen={true}
+            expiryText="Exp 12/2026"
+          />
         </View>
 
-        <View className="h-8" />
+        {/* Address Input (single field + mock suggestions) */}
+        <View>
+          <LinearGradient
+            colors={['#A276FF', '#F053E0']}
+            start={{ x: 0, y: 0.25 }}
+            end={{ x: 1, y: 0.75 }}
+            style={{
+              borderRadius: 40,
+              padding: 1,
+              shadowColor: '#6943AF',
+              shadowOffset: { width: 0, height: 20 },
+              shadowOpacity: 0.1,
+              shadowRadius: 40,
+              elevation: 5,
+            }}
+          >
+            <View
+              style={{
+                backgroundColor: 'white',
+                height: 55,
+                borderRadius: 39,
+                justifyContent: 'center',
+                borderWidth: address.address.length > 0 ? 1 : 0,
+                borderColor: isValid ? '#16A34A' : '#EF4444',
+              }}
+            >
+              <TextInput
+                ref={addressInputRef}
+                value={address.address}
+                onChangeText={updateAddress}
+                placeholder="Type your full physical address"
+                placeholderTextColor="#6B7280"
+                style={{ paddingHorizontal: 20, color: '#0F172A', fontSize: 14 }}
+                autoCapitalize="words"
+                returnKeyType="done"
+                onSubmitEditing={() => validateForm(address.address)}
+              />
+            </View>
+          </LinearGradient>
+          <Text style={{ ...FONTS.medium(12), color: '#9CA3AF', marginTop: 6 }}>(i.e.Riverside Square Apartments)</Text>
+
+          {/* Validation error */}
+          {!!error && (
+            <Text style={{ ...FONTS.medium(12), color: '#EF4444', marginTop: 6 }}>{error}</Text>
+          )}
+
+          {/* Suggestions dropdown (mock) */}
+          {suggestions.length > 0 && (
+            <View style={{ backgroundColor: 'white', borderRadius: 16, borderWidth: 1, borderColor: '#E4E7EC', marginTop: 8, overflow: 'hidden' }}>
+              {suggestions.map((s, idx) => (
+                <TouchableOpacity
+                  key={`${s}-${idx}`}
+                  onPress={() => { setAddress({ address: s }); setSuggestions([]); setIsValid(true); setError(''); }}
+                  style={{ paddingVertical: 12, paddingHorizontal: 16 }}
+                >
+                  <Text style={{ ...FONTS.medium(14), color: '#334155' }}>{s}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
+        </View>
+
+        {/* Spacer */}
+        <View style={{ height: 32 }} />
       </ScrollView>
 
       {/* CTA Button */}
@@ -244,15 +180,14 @@ const QamarAddressScreen: React.FC = () => {
           className="w-full"
         >
           <LinearGradient
-            colors={isValid ? [BARAKAH_PURPLE, '#9F7AFF'] : ['#D1D5DB', '#D1D5DB']}
+            colors={isValid ? [BARAKAH_PURPLE, '#9F7AFF'] : ['#E5E7EB', '#E5E7EB']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
-            className={`h-14 rounded-full justify-center items-center ${
-              !isValid ? 'opacity-50' : ''
-            }`}
+            className={`h-[55px] items-center justify-center ${!isValid ? 'opacity-60' : ''}`}
+            style={{ borderRadius: 40 }}
           >
-            <Text className="text-white font-semibold text-lg">
-              Review & mint
+            <Text style={{ ...FONTS.semibold(16), color: 'white' }}>
+              Continue
             </Text>
           </LinearGradient>
         </TouchableOpacity>

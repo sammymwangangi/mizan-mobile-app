@@ -1,92 +1,106 @@
-import React, { useRef } from 'react';
-import { View, Text, TouchableOpacity, Modal, ScrollView, Linking } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, Linking, Pressable, StyleSheet, BackHandler, Modal } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import * as Haptics from 'expo-haptics';
-import { BARAKAH_PURPLE, REFERRAL_CHANNELS, REFERRAL_MESSAGE, QAMAR_ANALYTICS } from '../../../constants/qamar';
+import { BARAKAH_PURPLE, REFERRAL_CHANNELS, QAMAR_ANALYTICS } from '../../../constants/qamar';
 import { AnimatedProgressRing, AnimatedSuccessCheck, ConfettiBurst } from '../../shared/AnimatedComponents';
+import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
+import { ChevronLeft } from 'lucide-react-native';
 
 interface BaseSheetProps {
   visible: boolean;
   onClose: () => void;
 }
 
-// Terms & Conditions Sheet
 interface TnCSheetProps extends BaseSheetProps {
   onAgree: () => void;
   onDecline: () => void;
 }
 
 export const TnCSheet: React.FC<TnCSheetProps> = ({ visible, onClose, onAgree, onDecline }) => {
+  const sheetRef = React.useRef<BottomSheet>(null);
+
+  useEffect(() => {
+    if (!visible) return;
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      onDecline();
+      return true;
+    });
+    return () => sub.remove();
+  }, [visible, onDecline]);
+
+  if (!visible) return null;
+
   const handleEmailCopy = () => {
     const emailBody = encodeURIComponent('Please send me a copy of the Terms & Conditions and Privacy Policy.');
     Linking.openURL(`mailto:support@mizanmoney.ai,mizanmoneyapp@gmail.com?subject=Terms%20%26%20Conditions&body=${emailBody}`);
   };
 
   return (
-    <Modal visible={visible} transparent animationType="slide">
-      <View className="flex-1 bg-black/50 justify-end">
-        <View className="bg-white rounded-t-3xl max-h-4/5">
-          <View className="w-12 h-1 bg-gray-300 rounded-full self-center mt-3 mb-6" />
-          
-          <ScrollView className="px-6">
-            <Text className="text-xl font-bold text-gray-900 mb-4">
-              Terms & Conditions
-            </Text>
-            
-            <Text className="text-gray-700 text-sm leading-6 mb-4">
-              By using Mizan Money services, you agree to our terms which include:
-            </Text>
-            
-            <View className="space-y-3 mb-6">
-              <Text className="text-gray-700 text-sm">
-                • <Text className="font-semibold">Amenah (Trust):</Text> We handle your money with complete transparency and Islamic principles
-              </Text>
-              <Text className="text-gray-700 text-sm">
-                • <Text className="font-semibold">Riba-Free:</Text> All our services are completely free from interest (riba)
-              </Text>
-              <Text className="text-gray-700 text-sm">
-                • <Text className="font-semibold">GDPR Compliance:</Text> Your data is protected according to international standards
-              </Text>
-              <Text className="text-gray-700 text-sm">
-                • <Text className="font-semibold">Halal Transactions:</Text> We only facilitate transactions that comply with Islamic law
-              </Text>
-              <Text className="text-gray-700 text-sm">
-                • <Text className="font-semibold">Fair Usage:</Text> Our services are designed for personal and business use within legal boundaries
-              </Text>
-            </View>
+    <View style={StyleSheet.absoluteFillObject} pointerEvents="box-none">
+      {/* Backdrop */}
+      <Pressable style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.5)' }]} onPress={onDecline} />
 
-            <TouchableOpacity
-              onPress={handleEmailCopy}
-              className="bg-gray-50 rounded-xl p-4 mb-6"
-            >
-              <Text className="text-purple-600 text-center font-medium">
-                📧 Email me a copy
-              </Text>
-            </TouchableOpacity>
+      {/* Bottom Sheet */}
+      <BottomSheet
+        ref={sheetRef}
+        index={0}
+        snapPoints={["70%"]}
+        enablePanDownToClose
+        onChange={(i) => { if (i === -1) onDecline(); }}
+        backgroundStyle={{ backgroundColor: '#FFFFFF', borderTopLeftRadius: 24, borderTopRightRadius: 24 }}
+        handleIndicatorStyle={{ backgroundColor: '#D1D5DB', width: 48, height: 4, borderRadius: 2 }}
+      >
+        <BottomSheetView style={{ flex: 1 }}>
+          {/* Header */}
+          <View className="px-6 pt-3 pb-2 flex-row items-center">
+            <View className="w-8 h-8 items-center justify-center mr-2">
+              <ChevronLeft color="#94A3B8" size={24} onPress={onDecline} />
+            </View>
+            <Text numberOfLines={1} ellipsizeMode="tail" style={{ flex: 1, fontSize: 20, fontWeight: '700', color: '#0F172A' }}>
+              Terms and Conditions
+            </Text>
+          </View>
+
+          {/* Content */}
+          <ScrollView className="px-6" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 12 }}>
+            <Text className="text-base font-semibold text-gray-900 mb-2">The fine print</Text>
+
+            <Text className="text-gray-900 font-semibold">Your Amanah</Text>
+            <Text className="text-gray-600 mb-3">Data is encrypted, never sold, and you can delete it any time.</Text>
+
+            <Text className="text-gray-900 font-semibold">Shariah Compliance</Text>
+            <Text className="text-gray-600 mb-3">Noor Card is riba-free and audited by Shariah board.</Text>
+
+            <Text className="text-gray-900 font-semibold">Reg-compliant</Text>
+            <Text className="text-gray-600 mb-3">Using Mizan Money means you accept our Terms & Privacy Policy. Read the full legal text</Text>
+            <View style={{ height: 8 }} />
           </ScrollView>
 
-          <View className="px-6 pb-8 space-y-3">
-            <TouchableOpacity onPress={onAgree} className="w-full">
+          {/* Actions */}
+          <View className="px-6 pb-8">
+            <TouchableOpacity onPress={() => { onAgree(); /* PostHog.capture?.(QAMAR_ANALYTICS.CARD_TNC_AGREE); */ }} className="w-full">
               <LinearGradient
                 colors={[BARAKAH_PURPLE, '#9F7AFF']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 className="h-14 rounded-full justify-center items-center"
+                style={{ borderRadius: 40 }}
               >
                 <Text className="text-white font-semibold text-lg">Agree</Text>
               </LinearGradient>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              onPress={onDecline}
-              className="w-full h-14 bg-gray-100 rounded-full justify-center items-center"
-            >
+            <TouchableOpacity onPress={() => { onDecline(); /* PostHog.capture?.(QAMAR_ANALYTICS.CARD_TNC_DECLINE); */ }} className="w-full h-14 bg-gray-100 rounded-full justify-center items-center mt-3" style={{ borderRadius: 40 }}>
               <Text className="text-gray-700 font-semibold text-lg">Decline & Exit</Text>
             </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => { handleEmailCopy(); /* PostHog.capture?.(QAMAR_ANALYTICS.CARD_TNC_EMAIL); */ }} className="mt-3">
+              <Text className="text-indigo-500 text-center">Email me a copy</Text>
+            </TouchableOpacity>
           </View>
-        </View>
-      </View>
-    </Modal>
+        </BottomSheetView>
+      </BottomSheet>
+    </View>
   );
 };
 
