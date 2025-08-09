@@ -40,7 +40,7 @@ const PlanSelectScreen: React.FC = () => {
   return (
     <View style={styles.root}>
       <StatusBar barStyle="dark-content" />
-      <SafeAreaView style={{ paddingVertical: normalize(18) }} />
+      <SafeAreaView style={{ paddingVertical: normalize(32) }} />
       {/* Header row */}
       <View style={styles.headerRow}>
         <TouchableOpacity

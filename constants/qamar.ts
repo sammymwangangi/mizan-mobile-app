@@ -5,45 +5,60 @@ export const MIN_TOPUP = 1; // USD
 export const CURRENCY = 'USD';
 export const BARAKAH_PURPLE = '#7B5CFF';
 
-// Qamar Color Palette (same as Noor)
-export const QAMAR_COLORS = [
+// Qamar Color Palette (Studio)
+// The purple option uses a bespoke gradient; all others are solid fills
+export type QamarGradientStop = { offset: string; color: string };
+export type QamarGradient = { angle: number; stops: QamarGradientStop[] };
+export type QamarColor = { id: string; value?: string; gradient?: QamarGradient };
+
+export const QAMAR_COLORS: QamarColor[] = [
   {
     id: 'purple',
-    name: 'Purple',
-    value: '#7B5CFF',
-    description: 'Classic Barakah'
+    gradient: {
+      angle: 45,
+      stops: [
+        { offset: '0%', color: '#D155FF' },
+        { offset: '14%', color: '#B532F2' },
+        { offset: '28%', color: '#A016E8' },
+        { offset: '41%', color: '#9406E2' },
+        { offset: '50%', color: '#8F00E0' },
+        { offset: '60%', color: '#921BE6' },
+        { offset: '100%', color: '#A08CFF' },
+      ],
+    },
   },
-  {
-    id: 'blue',
-    name: 'Blue',
-    value: '#3B82F6',
-    description: 'Ocean Calm'
-  },
-  {
-    id: 'green',
-    name: 'Green',
-    value: '#10B981',
-    description: 'Nature Fresh'
-  },
-  {
-    id: 'pink',
-    name: 'Pink',
-    value: '#EC4899',
-    description: 'Sunset Glow'
-  },
-  {
-    id: 'orange',
-    name: 'Orange',
-    value: '#F59E0B',
-    description: 'Desert Sun'
-  },
-  {
-    id: 'teal',
-    name: 'Teal',
-    value: '#14B8A6',
-    description: 'Peaceful Waters'
-  }
+  { id: 'rose', value: '#F6CFCA' },
+  { id: 'violet', value: '#7146BC' },
+  { id: 'navy', value: '#1B1C39' },
+  { id: 'magenta', value: '#D155FF' },
+  { id: 'white', value: '#FFFFFF' },
+  { id: 'blue', value: '#F1F6FB' },
 ];
+
+// Shams Gold upgrade (disabled in Qamar studio)
+export const QAMAR_SHAMS_UPGRADE = {
+  gold: {
+    gradient: {
+      angle: 45,
+      stops: [
+        { offset: '0%', color: '#C3A4A0' },
+        { offset: '50%', color: '#F6CFCA' },
+        { offset: '100%', color: '#907976' },
+      ],
+    },
+  },
+  gunmetal: {
+    gradient: {
+      angle: 45,
+      stops: [
+        { offset: '0%', color: '#000000' },
+        { offset: '52%', color: '#C5C5C6' },
+        { offset: '100%', color: '#848484' },
+      ],
+    },
+  },
+  nimbus: { value: '#F0F0F0' },
+} as const;
 
 // Fund Amount Presets
 export const FUND_PRESETS = [

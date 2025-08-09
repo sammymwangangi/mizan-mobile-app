@@ -34,12 +34,11 @@ const QamarIntroScreen: React.FC = () => {
   return (
     <View style={styles.root}>
       <StatusBar barStyle="dark-content" />
-      <SafeAreaView />
+      <SafeAreaView style={{ paddingVertical: normalize(32) }} />
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-          <ArrowLeft size={24} color={COLORS.text} />
-          <Text style={styles.backLabel}>Back</Text>
+          <Text style={{ color: '#007AFF', ...FONTS.body3 }}>‹ Back</Text>
         </TouchableOpacity>
       </View>
 
@@ -57,12 +56,12 @@ const QamarIntroScreen: React.FC = () => {
             <Text style={styles.heroHeaderText}>Physical + Virtual Card</Text>
           </View>
           {/* Credit card image (already rotated) */}
+        </View>
           <Image
             source={require('../../../assets/cards/claim/claim-qamar.png')}
             style={styles.qamarImage}
             resizeMode="contain"
           />
-        </View>
 
         {/* Benefits Section */}
         <Text style={styles.sectionTitle}>Your Qamar Card Benefits</Text>
@@ -80,7 +79,7 @@ const QamarIntroScreen: React.FC = () => {
       {/* CTA Button */}
       <View style={styles.ctaContainer}>
         <TouchableOpacity style={styles.ctaButton} activeOpacity={0.85} onPress={handleCreateCard}>
-          <Text style={styles.ctaText}>Create my Qamar card</Text>
+          <Text style={styles.ctaText}>Create My Qamar Card</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -97,31 +96,33 @@ const styles = StyleSheet.create({
 
   scrollContent: { paddingHorizontal: SIZES.padding, paddingBottom: normalize(20) },
   title: { ...FONTS.semibold(32), color: '#1B1C39', marginTop: normalize(4) },
-  subtitle: { ...FONTS.medium(12), color: '#6D6E8A', marginTop: normalize(6) },
+  subtitle: { ...FONTS.medium(12), color: '#6D6E8A' },
 
   heroCard: {
     height: HERO_HEIGHT,
     backgroundColor: '#EFEFEF',
     borderRadius: normalize(13),
     marginTop: normalize(16),
-    padding: normalize(16),
+    paddingHorizontal: normalize(10),
+    paddingTop: normalize(27),
     overflow: 'hidden',
   },
-  heroHeaderRow: { flexDirection: 'row', alignItems: 'center' },
-  cloudIcon: { width: normalize(32), height: normalize(32), marginRight: normalize(10) },
+  heroHeaderRow: { flexDirection: 'row', alignItems: 'center',gap: normalize(10) },
+  cloudIcon: { width: normalize(36), height: normalize(34.83) },
   heroHeaderText: { ...FONTS.semibold(16), color: '#ABACBE' },
   qamarImage: {
-    position: 'absolute',
-    width: '85%',
+    // position: 'absolute',
+    width: '100%',
     height: HERO_HEIGHT,
-    bottom: normalize(6),
-    left: normalize(32),
+    // bottom: -normalize(60),
+    // left: normalize(32),
+    marginTop: -normalize(170),
   },
 
   sectionTitle: { ...FONTS.semibold(16), color: '#000000', marginTop: normalize(18) },
-  benefitsIntro: { ...FONTS.body4, color: '#1B1C39', marginTop: normalize(10) },
+  benefitsIntro: { ...FONTS.body4, color: '#1B1C39', marginTop: normalize(36) },
   benefitRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: normalize(8) },
-  bullet: { width: normalize(6), height: normalize(6), borderRadius: 3, backgroundColor: '#A276FF', marginTop: normalize(8), marginRight: normalize(10) },
+  bullet: { width: normalize(6), height: normalize(6), borderRadius: 3, backgroundColor: '#000000', marginTop: normalize(8), marginRight: normalize(10) },
   benefitText: { ...FONTS.body4, color: '#1B1C39', flex: 1 },
 
   ctaContainer: { paddingHorizontal: SIZES.padding, paddingBottom: normalize(16) },
