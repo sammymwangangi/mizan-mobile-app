@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Linking, Pressable, StyleSheet, BackHandler, Modal } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Linking, Pressable, StyleSheet, BackHandler, Modal, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { BARAKAH_PURPLE, REFERRAL_CHANNELS, QAMAR_ANALYTICS } from '../../../constants/qamar';
+import { BARAKAH_PURPLE, QAMAR_ANALYTICS } from '../../../constants/qamar';
 import { AnimatedProgressRing, AnimatedSuccessCheck, ConfettiBurst } from '../../shared/AnimatedComponents';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
-import { ChevronLeft } from 'lucide-react-native';
+import { ChevronLeft, Check } from 'lucide-react-native';
 
 interface BaseSheetProps {
   visible: boolean;
@@ -237,14 +237,31 @@ export const SuccessSheet: React.FC<SuccessSheetProps> = ({ visible, onComplete 
   <Modal visible={visible} transparent animationType="fade">
     <View className="flex-1 bg-black/50 items-center justify-center">
       <ConfettiBurst visible={visible} onComplete={onComplete} />
-      
-      <View className="bg-white rounded-3xl p-8 mx-8 items-center">
-        <AnimatedSuccessCheck visible={visible} />
-        
-        <Text className="text-xl font-bold text-gray-900 mt-4 mb-2">
+
+      {/* Modal container with explicit sizing per spec */}
+      <View
+        style={{
+          width: 341,
+          height: 304,
+          backgroundColor: '#FFFFFF',
+          borderRadius: 24,
+          alignItems: 'center',
+          justifyContent: 'flex-start',
+          paddingTop: 20,
+          paddingHorizontal: 24
+        }}
+      >
+        {/* Optional handle bar for visual polish */}
+        <View style={{ width: 56, height: 4, borderRadius: 2, backgroundColor: '#E5E7EB', marginBottom: 12 }} />
+
+        {/* Success check at exact 120x120 */}
+        <AnimatedSuccessCheck visible={visible} size={120} />
+
+        {/* Texts with spacing */}
+        <Text style={{ fontSize: 22, fontWeight: '700', color: '#0F172A', marginTop: 16 }}>
           Order Complete
         </Text>
-        <Text className="text-gray-600 text-center">
+        <Text style={{ fontSize: 14, color: '#475569', textAlign: 'center', marginTop: 8 }}>
           You&apos;re good to go
         </Text>
       </View>
@@ -266,62 +283,110 @@ export const FundLoaderSheet: React.FC<BaseSheetProps> = ({ visible }) => (
   </Modal>
 );
 
-// Fund Success Sheet
-export const FundSuccessSheet: React.FC<SuccessSheetProps> = ({ visible, onComplete }) => (
-  <Modal visible={visible} transparent animationType="fade">
-    <View className="flex-1 bg-black/50 items-center justify-center">
-      <View className="bg-white rounded-3xl p-8 mx-8 items-center">
-        <AnimatedSuccessCheck visible={visible} />
-        
-        <Text className="text-lg font-semibold text-gray-900 mt-4">
-          Funded!
-        </Text>
-      </View>
-    </View>
-  </Modal>
-);
+// Fund Success Sheet (Figma: 340x300, outlined circle, auto-dismiss)
+export const FundSuccessSheet: React.FC<SuccessSheetProps> = ({ visible, onComplete }) => {
+  React.useEffect(() => {
+    if (visible) {
+      const t = setTimeout(() => onComplete && onComplete(), 1600);
+      return () => clearTimeout(t);
+    }
+  }, [visible, onComplete]);
 
-// Referral Sheet
+  return (
+    <Modal visible={visible} transparent animationType="fade">
+      <View className="flex-1 bg-black/50 justify-end">
+        <View style={{ position: 'relative', alignItems: 'center', marginBottom: 24 }}>
+          {/* Purple base accent shadow */}
+          <LinearGradient
+            colors={[ '#6B4EFF', '#8F00E0' ]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={{ position: 'absolute', bottom: 8, width: 340, height: 20, borderBottomLeftRadius: 20, borderBottomRightRadius: 20, opacity: 1 }}
+          />
+
+          {/* Card */}
+          <View style={{ width: 340, height: 300, backgroundColor: '#FFFFFF', borderTopLeftRadius: 24, borderTopRightRadius: 24, borderBottomLeftRadius: 24, borderBottomRightRadius: 24, alignItems: 'center', paddingTop: 14 }}>
+            {/* Handle indicator */}
+            <View style={{ width: 48, height: 4, borderRadius: 2, backgroundColor: '#D1D5DB', marginBottom: 10 }} />
+
+            {/* Outlined circle with check */}
+            <View style={{ width: 118, height: 118, borderRadius: 59, borderWidth: 3, borderColor: '#A08CFF', alignItems: 'center', justifyContent: 'center' }}>
+              <Check size={44} color="#A08CFF" strokeWidth={3} />
+            </View>
+
+            {/* Title */}
+            <Text style={{ marginTop: 24, fontSize: 20, fontWeight: '800', color: '#0F172A' }}>Funded!</Text>
+          </View>
+        </View>
+      </View>
+    </Modal>
+  );
+};
+
+// Referral Sheet (Figma: 340x300, heart icon, $5 copy, top-right close, social icons)
 interface ReferralSheetProps extends BaseSheetProps {
   onShare: (channel: string) => void;
   onSkip: () => void;
 }
 
-export const ReferralSheet: React.FC<ReferralSheetProps> = ({ visible, onShare, onSkip }) => (
-  <Modal visible={visible} transparent animationType="slide">
-    <View className="flex-1 bg-black/50 justify-end">
-      <View className="bg-white rounded-t-3xl p-6">
-        <View className="w-12 h-1 bg-gray-300 rounded-full self-center mb-6" />
-        
-        <Text className="text-xl font-bold text-gray-900 mb-2 text-center">
-          Share the love — you both get $10
-        </Text>
-        <Text className="text-gray-600 text-center mb-8">
-          Invite friends to join Mizan Money
-        </Text>
+export const ReferralSheet: React.FC<ReferralSheetProps> = ({ visible, onShare, onSkip }) => {
+  if (!visible) return null; // guard to avoid duplicate mounting artifacts
+  return (
+    <Modal visible={visible} transparent animationType="fade">
+      <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end', alignItems: 'center' }}>
+        <View style={{ position: 'relative', alignItems: 'center', marginBottom: 24, alignSelf: 'center' }}>
+          {/* Purple base accent */}
+          <LinearGradient
+            colors={[ '#6B4EFF', '#8F00E0' ]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={{ position: 'absolute', bottom: 8, width: 340, height: 20, borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }}
+          />
 
-        <View className="flex-row flex-wrap justify-center mb-6">
-          {REFERRAL_CHANNELS.map((channel) => (
-            <TouchableOpacity
-              key={channel.id}
-              onPress={() => onShare(channel.id)}
-              className="w-16 h-16 bg-gray-50 rounded-2xl items-center justify-center m-2"
-            >
-              <Text className="text-2xl">{channel.name.charAt(0)}</Text>
-            </TouchableOpacity>
-          ))}
+          {/* Card */}
+          <View style={{ width: 340, height: 300, backgroundColor: '#FFFFFF', borderRadius: 24, paddingTop: 12, paddingHorizontal: 16 }}>
+            {/* Handle + Close */}
+            <View style={{ alignItems: 'center' }}>
+              <View style={{ width: 48, height: 4, borderRadius: 2, backgroundColor: '#D1D5DB', marginBottom: 6 }} />
+              <TouchableOpacity onPress={onSkip} style={{ position: 'absolute', right: 6, top: -6, padding: 8 }}>
+                <Text style={{ color: '#9CA3AF', fontSize: 22 }}>×</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Heart */}
+            <View style={{ alignItems: 'center', marginTop: 6 }}>
+              <Image source={require('../../../assets/cards/social/heart.png')} style={{ width: 28, height: 28 }} />
+            </View>
+
+            {/* Title */}
+            <Text style={{ marginTop: 10, textAlign: 'center', fontSize: 20, fontWeight: '800', color: '#0F172A' }}>
+              Share the love, you{"\n"}both get $5.00
+            </Text>
+            <Text style={{ marginTop: 8, textAlign: 'center', fontSize: 12, color: '#6B7280' }}>
+              Once their first top-up is complete,{"\n"}we credit you instantly.
+            </Text>
+
+            {/* Social icons row */}
+            <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center', marginTop: 18, paddingHorizontal: 10 }}>
+              <TouchableOpacity onPress={() => onShare('whatsapp')} style={{ padding: 6 }}>
+                <Image source={require('../../../assets/cards/social/whatsapp.png')} style={{ width: 36, height: 36 }} />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => onShare('instagram')} style={{ padding: 6 }}>
+                <Image source={require('../../../assets/cards/social/instagram.png')} style={{ width: 36, height: 36 }} />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => onShare('twitter')} style={{ padding: 6 }}>
+                <Image source={require('../../../assets/cards/social/twitter.png')} style={{ width: 36, height: 36 }} />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => onShare('messenger')} style={{ padding: 6 }}>
+                <Image source={require('../../../assets/cards/social/messenger.png')} style={{ width: 36, height: 36 }} />
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
-
-        <TouchableOpacity
-          onPress={onSkip}
-          className="w-full h-14 bg-gray-100 rounded-full justify-center items-center"
-        >
-          <Text className="text-gray-700 font-semibold text-lg">Not now</Text>
-        </TouchableOpacity>
       </View>
-    </View>
-  </Modal>
-);
+    </Modal>
+  );
+};
 
 // Wallet Success Sheet
 export const WalletSuccessSheet: React.FC<SuccessSheetProps> = ({ visible, onComplete }) => (

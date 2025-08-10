@@ -87,6 +87,13 @@ export type RootStackParamList = {
     };
   };
 
+  // Post-order intermediate screen
+  QamarOrderStatus: {
+    planId?: string;
+    selectedColor: string;
+    cardId: string;
+  };
+
   CardMinting: {
     selectedMetal?: string;
     deliveryAddress?: {
@@ -114,7 +121,7 @@ export type RootStackParamList = {
       };
     };
   };
-  FundCard: { cardId: string };
+  FundCard: { cardId: string; selectedColor?: string };
   WalletAdd: { cardId: string };
   SendMoney: undefined;
   SendMoneyConfirmation: {

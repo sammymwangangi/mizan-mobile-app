@@ -188,6 +188,7 @@ function RootStack({ isCheckingAuth, isUserLoggedIn, isInSignupFlow, hasUser }: 
           <Stack.Screen name="QamarAddress" component={QamarAddressScreen} />
           <Stack.Screen name="QamarReview" component={QamarReviewScreen} />
           <Stack.Screen name="QamarMinting" component={QamarMintingScreen} />
+          <Stack.Screen name="QamarOrderStatus" component={require('./screens/cards/qamar/QamarOrderStatusScreen').default} />
 
           {/* Send Money Screens */}
           <Stack.Screen name="SendMoney" component={SendMoneyScreen} />

@@ -84,7 +84,8 @@ const QamarReviewScreen: React.FC = () => {
   const handleSuccessComplete = () => {
     setShowSuccess(false);
     // PostHog.capture?.(QAMAR_ANALYTICS.CARD_ORDER_SUCCESS);
-    navigation.navigate('FundCard', { cardId: `qamar-${Date.now()}` });
+    const cardId = `qamar-${Date.now()}`;
+    navigation.navigate('QamarOrderStatus', { planId, selectedColor, cardId });
   };
 
   // Auto-progress minting similar to QamarMintingScreen
