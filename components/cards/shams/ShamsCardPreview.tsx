@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { View, StyleSheet, Text } from 'react-native';
+import { View, StyleSheet, Text, Image } from 'react-native';
 import Svg, { Defs, LinearGradient as SvgLinearGradient, Stop, Rect, G } from 'react-native-svg';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing, runOnJS, cancelAnimation } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -9,10 +9,7 @@ import { METAL_SWATCHES } from '../../../constants/shams';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import ShamsPattern from '../../../assets/cards/shams/pattern-bg.svg';
-// Reuse shared brand assets from Qamar preview for consistency
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import MizanLogo from '../../../assets/cards/card-studio/qamar-card/mizan-logo.svg';
+// Reuse shared brand assets from Qamar preview for consistency (except center logo)
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import MastercardLogo from '../../../assets/cards/card-studio/qamar-card/mastercard-logo.svg';
@@ -41,11 +38,11 @@ interface Props {
   expiryText?: string;
 }
 
-const CARD_W = 335;
-const CARD_H = 200;
-const RADIUS = 16;
+const CARD_W = 240; // portrait card width
+const CARD_H = 380; // portrait card height
+const RADIUS = 18;
 
-const ShamsCardPreview: React.FC<Props> = ({ metalId = 'bronze', playSheen = false, onSheenEnd, width = CARD_W, height = CARD_H, expiryText = 'Exp 12/2026' }) => {
+const ShamsCardPreview: React.FC<Props> = ({ metalId = 'bronze', playSheen = false, onSheenEnd, width = CARD_W, height = CARD_H, expiryText = 'World Elite' }) => {
   const sheenX = useSharedValue(-width);
   const mountedRef = useRef(true);
 
@@ -109,33 +106,38 @@ const ShamsCardPreview: React.FC<Props> = ({ metalId = 'bronze', playSheen = fal
           </G>
         </Svg>
 
-        {/* Brand overlays */}
+        {/* Brand overlays - portrait alignment */}
         <View pointerEvents="none" style={styles.overlay}>
-          <View style={styles.logoRow}>
-            {toComponent(MizanLogo) ? React.createElement(toComponent(MizanLogo)!, { width: 67, height: 30 }) : null}
-          </View>
-          <View style={styles.chipRow}>
-            {toComponent(Contactless) ? React.createElement(toComponent(Contactless)!, { width: 28, height: 20 }) : null}
+          {/* Chip and contactless near top center */}
+          <View style={styles.topRow}>
             {toComponent(Chip) ? React.createElement(toComponent(Chip)!, { width: 36, height: 36 }) : null}
-          </View>
-          <View style={styles.footerRow}>
-            {toComponent(MastercardLogo) ? React.createElement(toComponent(MastercardLogo)!, { width: 34, height: 21 }) : null}
+            {toComponent(Contactless) ? React.createElement(toComponent(Contactless)!, { width: 24, height: 18 }) : null}
           </View>
 
-          {/* Expiry text */}
-          <View style={styles.expiryRow}>
-            <Text style={styles.expiryText}>{expiryText}</Text>
+          {/* Center Mizan icon image */}
+          <View style={styles.centerLogoWrap}>
+            <Image source={require('../../../assets/cards/shams/mizan-icon.png')} style={{ width: 84, height: 84, opacity: 0.9 }} resizeMode="contain" />
+          </View>
+
+          {/* World Elite text lower-left */}
+          <View style={styles.tierRow}>
+            <Text style={styles.tierText}>{expiryText}</Text>
+          </View>
+
+          {/* Mastercard at bottom-right */}
+          <View style={styles.footerRow}>
+            {toComponent(MastercardLogo) ? React.createElement(toComponent(MastercardLogo)!, { width: 36, height: 22 }) : null}
           </View>
         </View>
 
-        {/* Sheen overlay */}
-        <View pointerEvents="none" style={StyleSheet.absoluteFill}> 
-          <Animated.View style={[styles.sheen, sheenStyle]}> 
+        {/* Sheen overlay - diagonal sweep */}
+        <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+          <Animated.View style={[styles.sheen, sheenStyle]}>
             <LinearGradient
-              colors={["#FFFFFF00", "#FFFFFF80", "#FFFFFF00"]}
+              colors={["#FFFFFF00", "#FFFFFF66", "#FFFFFF00"]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
-              style={{ width: 60, height }}
+              style={{ width: 80, height }}
             />
           </Animated.View>
         </View>
@@ -162,39 +164,36 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     zIndex: 1,
   },
-  logoRow: {
+  topRow: {
     position: 'absolute',
-    top: 14,
-    right: 16,
-    left: 16,
+    top: 24,
+    alignSelf: 'center',
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'flex-end',
-    opacity: 0.9,
+    gap: 18,
   },
-  chipRow: {
+  centerLogoWrap: {
     position: 'absolute',
-    top: 66,
-    right: 15,
-    flexDirection: 'row',
+    top: 120,
+    left: 0,
+    right: 0,
     alignItems: 'center',
-    gap: 8,
+    justifyContent: 'center',
+  },
+  tierRow: {
+    position: 'absolute',
+    bottom: 28,
+    left: 18,
+  },
+  tierText: {
+    color: 'rgba(255,255,255,0.95)',
+    fontSize: 13,
+    fontWeight: '600',
   },
   footerRow: {
     position: 'absolute',
-    bottom: 14,
-    right: 16,
-  },
-  expiryRow: {
-    position: 'absolute',
-    bottom: 14,
-    left: 16,
-  },
-  expiryText: {
-    color: '#101010',
-    fontSize: 12,
-    fontWeight: '600',
-    opacity: 0.9,
+    bottom: 22,
+    right: 18,
   },
   sheen: {
     position: 'absolute',

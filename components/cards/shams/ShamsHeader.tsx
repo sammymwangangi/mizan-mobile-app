@@ -28,8 +28,10 @@ const ShamsHeader: React.FC<Props> = ({ title, subtitle, step = 1, onBack }) => 
       </View>
 
       {/* Title */}
-      <MaskedView style={{ height: 56, alignSelf: 'flex-start' }}
-        maskElement={<Text style={styles.titleText}>{title}</Text>}>
+      <MaskedView
+        style={{ height: 60, minWidth: 260, alignSelf: 'flex-start' }}
+        maskElement={<Text style={[styles.titleText, { color: '#000' }]}>{title}</Text>}
+      >
         <LinearGradient
           colors={SHAMS_TOKENS.headingGradient.colors as any}
           locations={SHAMS_TOKENS.headingGradient.locations as any}

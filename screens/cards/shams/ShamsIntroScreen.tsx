@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
   heroCard: { height: CARD_HEIGHT, backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 13, marginTop: 24, paddingHorizontal: 10, paddingTop: 16, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)', position: 'relative' },
   cloudCircle: { position: 'absolute', top: 160, left: 10, width: 36, height: 33, borderRadius: 18, alignItems: 'center', justifyContent: 'center', zIndex: 1 },
   heroHeader: { fontFamily: 'Poppins_600SemiBold', fontSize: 13, color: '#fff', textAlign: 'center' },
-  cardImage: { position: 'absolute', width: 416, height: '100%', top: -90, left: -12 },
+  cardImage: { position: 'absolute', width: 416, height: '100%', top: -60, left: -12 },
   priceBadge: { marginTop: 10, width: 320, height: 20, borderRadius: 20, backgroundColor: '#E0D2FF',flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
   priceText: { ...FONTS.medium(13), color: '#1B1C39' },
   sectionTitle: { marginTop: 16, fontFamily: 'Poppins_600SemiBold', fontSize: 15, color: '#FFFFFF' },
