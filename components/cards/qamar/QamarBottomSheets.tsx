@@ -5,6 +5,7 @@ import { BARAKAH_PURPLE, QAMAR_ANALYTICS } from '../../../constants/qamar';
 import { AnimatedProgressRing, AnimatedSuccessCheck, ConfettiBurst } from '../../shared/AnimatedComponents';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import { ChevronLeft, Check } from 'lucide-react-native';
+import { FONTS } from 'constants/theme';
 
 interface BaseSheetProps {
   visible: boolean;
@@ -56,23 +57,23 @@ export const TnCSheet: React.FC<TnCSheetProps> = ({ visible, onClose, onAgree, o
             <View className="w-8 h-8 items-center justify-center mr-2">
               <ChevronLeft color="#94A3B8" size={24} onPress={onDecline} />
             </View>
-            <Text numberOfLines={1} ellipsizeMode="tail" style={{ flex: 1, fontSize: 20, fontWeight: '700', color: '#0F172A' }}>
+            <Text numberOfLines={1} ellipsizeMode="tail" style={{ flex: 1, ...FONTS.bold(28), color: '#000000' }}>
               Terms and Conditions
             </Text>
           </View>
 
           {/* Content */}
           <ScrollView className="px-6" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 12 }}>
-            <Text className="text-base font-semibold text-gray-900 mb-2">The fine print</Text>
+            <Text className="mb-2" style={{ ...FONTS.semibold(16), color: '#000000' }}>The fine print</Text>
 
-            <Text className="text-gray-900 font-semibold">Your Amanah</Text>
-            <Text className="text-gray-600 mb-3">Data is encrypted, never sold, and you can delete it any time.</Text>
+            <Text style={{ ...FONTS.semibold(16), color: '#888888' }}>Your Amanah:</Text>
+            <Text style={{ ...FONTS.body3, color: '#888888' }}>Data is encrypted, never sold, and you can delete it any time.</Text>
 
-            <Text className="text-gray-900 font-semibold">Shariah Compliance</Text>
-            <Text className="text-gray-600 mb-3">Noor Card is riba-free and audited by Shariah board.</Text>
+            <Text style={{ ...FONTS.semibold(16), color: '#888888' }}>Shariah Compliance:</Text>
+            <Text style={{ ...FONTS.body3, color: '#888888' }}>Noor Card is riba-free and audited by Shariah board.</Text>
 
-            <Text className="text-gray-900 font-semibold">Reg-compliant</Text>
-            <Text className="text-gray-600 mb-3">Using Mizan Money means you accept our Terms & Privacy Policy. Read the full legal text</Text>
+            <Text style={{ ...FONTS.semibold(16), color: '#888888' }}>Reg-compliant:</Text>
+            <Text style={{ ...FONTS.body3, color: '#888888' }}>Using Mizan Money means you accept our Terms & Privacy Policy. Read the full legal text</Text>
             <View style={{ height: 8 }} />
           </ScrollView>
 
@@ -86,16 +87,16 @@ export const TnCSheet: React.FC<TnCSheetProps> = ({ visible, onClose, onAgree, o
                 className="h-14 rounded-full justify-center items-center"
                 style={{ borderRadius: 40 }}
               >
-                <Text className="text-white font-semibold text-lg">Agree</Text>
+                <Text style={{ ...FONTS.semibold(16), color: '#FFFFFF' }}>Continue</Text>
               </LinearGradient>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => { onDecline(); /* PostHog.capture?.(QAMAR_ANALYTICS.CARD_TNC_DECLINE); */ }} className="w-full h-14 bg-gray-100 rounded-full justify-center items-center mt-3" style={{ borderRadius: 40 }}>
-              <Text className="text-gray-700 font-semibold text-lg">Decline & Exit</Text>
+            <TouchableOpacity onPress={() => { onDecline(); /* PostHog.capture?.(QAMAR_ANALYTICS.CARD_TNC_DECLINE); */ }} className="w-full h-14 bg-[#E0D2FF] rounded-full justify-center items-center mt-3" style={{ borderRadius: 40 }}>
+              <Text style={{ ...FONTS.semibold(16), color: '#FFFFFF' }}>Decline & Exit</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => { handleEmailCopy(); /* PostHog.capture?.(QAMAR_ANALYTICS.CARD_TNC_EMAIL); */ }} className="mt-3">
-              <Text className="text-indigo-500 text-center">Email me a copy</Text>
+            <TouchableOpacity onPress={() => { handleEmailCopy(); /* PostHog.capture?.(QAMAR_ANALYTICS.CARD_TNC_EMAIL); */ }} className="mt-3" style={{ alignSelf: 'center' }}>
+              <Text style={{ ...FONTS.body4, color: '#1B1C39', textDecorationLine: 'underline' }}>Email me a copy</Text>
             </TouchableOpacity>
           </View>
         </BottomSheetView>
@@ -113,7 +114,7 @@ interface MintingSheetProps extends BaseSheetProps {
 export const MintingSheet: React.FC<MintingSheetProps> = ({ visible, progress, onCancel }) => (
   <Modal visible={visible} transparent animationType="slide">
     <View className="flex-1 bg-black/50 justify-end">
-      <View className="bg-white rounded-t-3xl" style={{ height: '60%' }}>
+      <View className="bg-white rounded-3xl" style={{ height: '60%', marginHorizontal: 16, marginBottom: 16, shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 12, shadowOffset: { width: 0, height: 6 }, elevation: 4 }}>
         <View className="flex-row items-center justify-between px-6 pt-6 pb-4">
           <View className="w-12 h-1 bg-gray-300 rounded-full" />
           <TouchableOpacity onPress={onCancel} className="w-6 h-6">
@@ -125,7 +126,7 @@ export const MintingSheet: React.FC<MintingSheetProps> = ({ visible, progress, o
           <AnimatedProgressRing progress={progress} />
           
           <Text className="text-xl font-bold text-gray-900 mt-6 mb-2">
-            Creating your card
+            Processing card
           </Text>
           <Text className="text-gray-600 text-center">
             Sabr in shaa Allah, almost done
@@ -323,6 +324,44 @@ export const FundSuccessSheet: React.FC<SuccessSheetProps> = ({ visible, onCompl
   );
 };
 
+// Wallet Added Sheet (same spec as FundSuccessSheet, but text "Added" and animated check)
+export const WalletAddedSheet: React.FC<SuccessSheetProps> = ({ visible, onComplete }) => {
+  React.useEffect(() => {
+    if (visible) {
+      const t = setTimeout(() => onComplete && onComplete(), 1600);
+      return () => clearTimeout(t);
+    }
+  }, [visible, onComplete]);
+
+  return (
+    <Modal visible={visible} transparent animationType="fade">
+      <View className="flex-1 bg-black/50 justify-end">
+        <View style={{ position: 'relative', alignItems: 'center', marginBottom: 24 }}>
+          {/* Purple base accent shadow */}
+          <LinearGradient
+            colors={[ '#6B4EFF', '#8F00E0' ]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={{ position: 'absolute', bottom: 8, width: 340, height: 20, borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }}
+          />
+
+          {/* Card */}
+          <View style={{ width: 340, height: 300, backgroundColor: '#FFFFFF', borderRadius: 24, alignItems: 'center', paddingTop: 14 }}>
+            {/* Handle indicator */}
+            <View style={{ width: 48, height: 4, borderRadius: 2, backgroundColor: '#D1D5DB', marginBottom: 10 }} />
+
+            {/* Animated filled check, centered */}
+            <AnimatedSuccessCheck visible={visible} size={76} color="#A08CFF" />
+
+            {/* Title */}
+            <Text style={{ marginTop: 24, fontSize: 20, fontWeight: '800', color: '#0F172A' }}>Added</Text>
+          </View>
+        </View>
+      </View>
+    </Modal>
+  );
+};
+
 // Referral Sheet (Figma: 340x300, heart icon, $5 copy, top-right close, social icons)
 interface ReferralSheetProps extends BaseSheetProps {
   onShare: (channel: string) => void;
@@ -388,13 +427,13 @@ export const ReferralSheet: React.FC<ReferralSheetProps> = ({ visible, onShare, 
   );
 };
 
-// Wallet Success Sheet
-export const WalletSuccessSheet: React.FC<SuccessSheetProps> = ({ visible, onComplete }) => (
+// Wallet Success Sheet (legacy compact) - unused; prefer WalletAddedSheet above
+export const WalletSuccessSheet: React.FC<SuccessSheetProps> = ({ visible }) => (
   <Modal visible={visible} transparent animationType="fade">
     <View className="flex-1 bg-black/50 items-center justify-center">
       <View className="bg-white rounded-3xl p-8 mx-8 items-center">
         <AnimatedSuccessCheck visible={visible} />
-        
+
         <Text className="text-lg font-semibold text-gray-900 mt-4">
           Added
         </Text>

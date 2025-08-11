@@ -122,7 +122,7 @@ export type RootStackParamList = {
     };
   };
   FundCard: { cardId: string; selectedColor?: string };
-  WalletAdd: { cardId: string };
+  WalletAdd: { cardId: string; selectedColor?: string };
   SendMoney: undefined;
   SendMoneyConfirmation: {
     recipientName: string;

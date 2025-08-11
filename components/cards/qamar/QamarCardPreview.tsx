@@ -46,8 +46,8 @@ interface Props {
   expiryText?: string; // e.g., "Exp 12/2026"
 }
 
-const CARD_W = 300;
-const CARD_H = 190;
+const CARD_W = 335;
+const CARD_H = 200;
 const RADIUS = 16;
 
 const QamarCardPreview: React.FC<Props> = ({ color, playSheen = false, onSheenEnd, width = CARD_W, height = CARD_H, expiryText = 'Exp 12/2026' }) => {
@@ -119,17 +119,25 @@ const QamarCardPreview: React.FC<Props> = ({ color, playSheen = false, onSheenEn
             {toComponent(Rectangle2) ? React.createElement(toComponent(Rectangle2)!, { width, height }) : null}
           </G>
 
-          {/* Main pattern overlay */}
-          {toComponent(Pattern1) ? React.createElement(toComponent(Pattern1)!, { width, height }) : null}
+          {/* Main pattern overlay (anchored bottom-left) */}
+          {toComponent(Pattern1) ? (
+            React.createElement(toComponent(Pattern1)!, {
+              width,
+              height,
+              preserveAspectRatio: 'xMinYMax meet',
+              x: 0,
+              y: 0,
+            })
+          ) : null}
         </Svg>
 
         {/* Brand and icons overlays (absolute positioned) */}
         <View pointerEvents="none" style={styles.overlay}>
           <View style={[styles.logoRow]}>
             {toComponent(MizanLogo) ? React.createElement(toComponent(MizanLogo)!, { width: 67, height: 30 }) : null}
-            {toComponent(Contactless) ? React.createElement(toComponent(Contactless)!, { width: 28, height: 20 }) : null}
           </View>
           <View style={styles.chipRow}>
+            {toComponent(Contactless) ? React.createElement(toComponent(Contactless)!, { width: 28, height: 20 }) : null}
             {toComponent(Chip) ? React.createElement(toComponent(Chip)!, { width: 36, height: 36 }) : null}
           </View>
           <View style={styles.footerRow}>
@@ -183,14 +191,17 @@ const styles = StyleSheet.create({
     left: 16,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     opacity: 0.9,
   },
   chipRow: {
     position: 'absolute',
     top: 66,
-    right: 52,
+    right: 15,
     opacity: 0.9,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   footerRow: {
     position: 'absolute',

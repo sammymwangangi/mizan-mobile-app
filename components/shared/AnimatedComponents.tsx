@@ -1,9 +1,10 @@
 import React, { useRef } from 'react';
-import { TouchableOpacity, Dimensions } from 'react-native';
-import Animated, { 
-  useSharedValue, 
-  useAnimatedStyle, 
-  withSequence, 
+import { TouchableOpacity, Dimensions, View } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  useAnimatedProps,
+  withSequence,
   withTiming,
   withRepeat
 } from 'react-native-reanimated';
@@ -186,11 +187,13 @@ export const AnimatedSuccessCheck: React.FC<AnimatedSuccessCheckProps> = ({
   );
 };
 
+import Svg, { Circle, Defs, LinearGradient as SvgLinearGradient, Stop } from 'react-native-svg';
+
 interface AnimatedProgressRingProps {
   progress: number; // 0-100
   size?: number;
   strokeWidth?: number;
-  color?: string;
+  color?: string; // kept for compatibility but we use gradient by default
 }
 
 export const AnimatedProgressRing: React.FC<AnimatedProgressRingProps> = ({
@@ -199,76 +202,72 @@ export const AnimatedProgressRing: React.FC<AnimatedProgressRingProps> = ({
   strokeWidth = 8,
   color = '#7B5CFF'
 }) => {
-  const animatedProgress = useSharedValue(0);
+  const pct = useSharedValue(0);
 
   React.useEffect(() => {
-    animatedProgress.value = withTiming(progress / 100, { duration: 500 });
-  }, [progress, animatedProgress]);
+    pct.value = withTiming(progress, { duration: 500 });
+  }, [progress, pct]);
 
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
 
-  const rStyle = useAnimatedStyle(() => {
-    const strokeDashoffset = circumference * (1 - animatedProgress.value);
-    return {
-      strokeDashoffset
-    };
-  });
+  // Animated props for the progress stroke
+  const animatedProps = useAnimatedProps(() => ({
+    strokeDashoffset: circumference * (1 - pct.value / 100),
+  }));
+
+  // Animated SVG circle
+  const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
   return (
-    <Animated.View style={{ width: size, height: size }}>
-      {/* Background circle */}
-      <Animated.View
+    <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
+      <Svg width={size} height={size}>
+        <Defs>
+          <SvgLinearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
+            <Stop offset="0%" stopColor="#C5B9FF" />
+            <Stop offset="50%" stopColor={color} />
+            <Stop offset="100%" stopColor="#9F7AFF" />
+          </SvgLinearGradient>
+        </Defs>
+
+        {/* Background track */}
+        <Circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke="#EFEAFE"
+          strokeWidth={strokeWidth}
+          fill="none"
+        />
+
+        {/* Progress arc */}
+        <AnimatedCircle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke="url(#ringGrad)"
+          strokeWidth={strokeWidth}
+          strokeLinecap="round"
+          fill="none"
+          strokeDasharray={`${circumference}, ${circumference}`}
+          animatedProps={animatedProps}
+          // start at 12 o'clock
+          transform={`rotate(-90 ${size / 2} ${size / 2})`}
+        />
+      </Svg>
+
+      {/* Center text (overlaid) */}
+      <Animated.Text
         style={{
           position: 'absolute',
-          width: size,
-          height: size,
-          borderRadius: size / 2,
-          borderWidth: strokeWidth,
-          borderColor: '#F0F0F0'
-        }}
-      />
-      
-      {/* Progress circle */}
-      <Animated.View
-        style={[
-          {
-            position: 'absolute',
-            width: size,
-            height: size,
-            borderRadius: size / 2,
-            borderWidth: strokeWidth,
-            borderColor: color,
-            borderTopColor: 'transparent',
-            borderRightColor: 'transparent',
-            borderBottomColor: 'transparent',
-            transform: [{ rotate: '-90deg' }]
-          },
-          rStyle
-        ]}
-      />
-      
-      {/* Progress text */}
-      <Animated.View
-        style={{
-          position: 'absolute',
-          width: size,
-          height: size,
-          alignItems: 'center',
-          justifyContent: 'center'
+          fontSize: size * 0.22,
+          fontWeight: 'bold',
+          color: '#111827'
         }}
       >
-        <Animated.Text
-          style={{
-            fontSize: size * 0.2,
-            fontWeight: 'bold',
-            color: '#374151'
-          }}
-        >
-          {Math.round(progress)}%
-        </Animated.Text>
-      </Animated.View>
-    </Animated.View>
+        {`${Math.round(progress)}%`}
+      </Animated.Text>
+    </View>
   );
 };
 
