@@ -25,6 +25,20 @@ export const METAL_SWATCHES = {
   accent: '#D4AF37' // gold confetti
 };
 
+// Design tokens for Shams visual language
+export const SHAMS_TOKENS = {
+  background: '#1B1C39',
+  // Shared gradient used for headings/headers
+  headingGradient: {
+    colors: ['#D39C90', '#FFFFFF', '#D39B8E'] as const,
+    locations: [0, 0.5, 1] as const,
+    start: { x: 0, y: 1 },
+    end: { x: 1, y: 0 },
+  },
+  // Shared pattern (top-right)
+  pattern: require('../assets/cards/shams/shams-pattern.png'),
+} as const;
+
 export const CTA_GRADIENT = {
   start: { x: 0, y: 0 },
   end: { x: 1, y: 1 },

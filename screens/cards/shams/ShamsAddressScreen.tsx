@@ -6,7 +6,9 @@ import * as Haptics from 'expo-haptics';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RouteProp } from '@react-navigation/native';
 import type { RootStackParamList } from '../../../navigation/types';
-import { CTA_GRADIENT, ANALYTICS_EVENTS } from '../../../constants/shams';
+import { CTA_GRADIENT, ANALYTICS_EVENTS, SHAMS_TOKENS } from '../../../constants/shams';
+import ShamsCardPreview from '../../../components/cards/shams/ShamsCardPreview';
+import ShamsHeader from '../../../components/cards/shams/ShamsHeader';
 
 type ShamsAddressNavigationProp = NativeStackNavigationProp<RootStackParamList, 'ShamsAddress'>;
 type ShamsAddressRouteProp = RouteProp<RootStackParamList, 'ShamsAddress'>;
@@ -71,41 +73,20 @@ const ShamsAddressScreen: React.FC = () => {
   };
 
   return (
-    <View className="flex-1 bg-[#1A1B23]">
-      {/* Header */}
-      <View className="flex-row items-center justify-between px-5 pt-12 pb-6">
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          className="w-10 h-10 rounded-full bg-white/10 items-center justify-center"
-        >
-          <Text className="text-white text-lg">←</Text>
-        </TouchableOpacity>
-        <Text className="text-white/60 text-sm">Delivery</Text>
-        <View className="w-10" />
-      </View>
-
-      {/* Progress Indicator */}
-      <View className="px-5 mb-6">
-        <View className="flex-row items-center">
-          <View className="w-2 h-2 rounded-full bg-[#D4AF37] mr-2" />
-          <View className="w-2 h-2 rounded-full bg-[#D4AF37] mr-2" />
-          <View className="w-2 h-2 rounded-full bg-white/30" />
-        </View>
-        
-        {/* Progress Bar */}
-        <View className="w-full h-1 bg-white/20 rounded-full mt-4">
-          <View className="w-2/3 h-full bg-[#D4AF37] rounded-full" />
-        </View>
-      </View>
+    <View className="flex-1" style={{ backgroundColor: SHAMS_TOKENS.background }}>
+      <ShamsHeader
+        title="Your Card, Your Way"
+        subtitle="Let us know where you live so that we can hand deliver the card"
+        step={2}
+        onBack={() => navigation.goBack()}
+      />
 
       {/* Content */}
       <ScrollView className="flex-1 px-5">
-        <Text className="text-white text-2xl font-bold mb-2">
-          Your Card, Your Way
-        </Text>
-        <Text className="text-white/70 text-base mb-8">
-          Tell us where you live so we can deliver your card
-        </Text>
+        {/* Selected card preview */}
+        <View className="items-center mb-6">
+          <ShamsCardPreview metalId={selectedMetal} playSheen />
+        </View>
 
         {/* Address Search */}
         <TouchableOpacity

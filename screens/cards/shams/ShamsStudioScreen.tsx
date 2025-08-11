@@ -1,11 +1,13 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, TouchableOpacity, Image, Animated, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, Animated } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../../navigation/types';
-import { METAL_SWATCHES, METAL_OPTIONS, CTA_GRADIENT, ANALYTICS_EVENTS } from '../../../constants/shams';
+import { METAL_SWATCHES, METAL_OPTIONS, CTA_GRADIENT, ANALYTICS_EVENTS, SHAMS_TOKENS } from '../../../constants/shams';
+import ShamsCardPreview from '../../../components/cards/shams/ShamsCardPreview';
+import ShamsHeader from '../../../components/cards/shams/ShamsHeader';
 
 type ShamsStudioNavigationProp = NativeStackNavigationProp<RootStackParamList, 'ShamsStudio'>;
 
@@ -72,62 +74,20 @@ const ShamsStudioScreen: React.FC = () => {
   );
 
   return (
-    <View className="flex-1 bg-[#1A1B23]">
-      {/* Header */}
-      <View className="flex-row items-center justify-between px-5 pt-12 pb-6">
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          className="w-10 h-10 rounded-full bg-white/10 items-center justify-center"
-        >
-          <Text className="text-white text-lg">←</Text>
-        </TouchableOpacity>
-        <Text className="text-white/60 text-sm">Selection of cards</Text>
-        <View className="w-10" />
-      </View>
-
-      {/* Progress Indicator */}
-      <View className="px-5 mb-6">
-        <View className="flex-row items-center">
-          <View className="w-2 h-2 rounded-full bg-[#D4AF37] mr-2" />
-          <View className="w-2 h-2 rounded-full bg-white/30 mr-2" />
-          <View className="w-2 h-2 rounded-full bg-white/30" />
-        </View>
-      </View>
+    <View className="flex-1" style={{ backgroundColor: SHAMS_TOKENS.background }}>
+      <ShamsHeader
+        title="Shams Gold Club"
+        subtitle="Made from 20g of aerospace‑grade steel. Heavy on blessings. Light in hand."
+        step={1}
+        onBack={() => navigation.goBack()}
+      />
 
       {/* Content */}
       <View className="flex-1 px-5">
-        <Text className="text-white text-2xl font-bold mb-2">
-          Shams Gold Club
-        </Text>
-        <Text className="text-white/70 text-base mb-8">
-          Metal finish that fits your style
-        </Text>
 
         {/* Metal Card Preview */}
         <View className="items-center mb-8">
-          <View className="relative">
-            {Platform.OS === 'ios' ? (
-              // WebGL/Skia implementation for iOS
-              <View className="w-80 h-48 rounded-2xl bg-gradient-to-br from-rose-400 to-rose-600 items-center justify-center">
-                <Text className="text-white text-sm">WebGL Card Preview</Text>
-              </View>
-            ) : (
-              // PNG + blur fallback for Android
-              <Image
-                source={require('../../../assets/cards/mizan-card.png')}
-                style={{
-                  width: 320,
-                  height: 200,
-                }}
-                resizeMode="contain"
-              />
-            )}
-            
-            {/* Sound icon */}
-            <TouchableOpacity className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20 items-center justify-center">
-              <Text className="text-white text-xs">🔊</Text>
-            </TouchableOpacity>
-          </View>
+          <ShamsCardPreview metalId={selectedMetal || 'bronze'} playSheen={!!selectedMetal} />
         </View>
 
         {/* Metal Selection */}

@@ -1,12 +1,14 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, TouchableOpacity, Image, Switch, Animated } from 'react-native';
+import { View, Text, TouchableOpacity, Switch, Animated } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RouteProp } from '@react-navigation/native';
 import type { RootStackParamList } from '../../../navigation/types';
-import { CTA_GRADIENT, ANALYTICS_EVENTS } from '../../../constants/shams';
+import { CTA_GRADIENT, ANALYTICS_EVENTS, SHAMS_TOKENS } from '../../../constants/shams';
+import ShamsCardPreview from '../../../components/cards/shams/ShamsCardPreview';
+import ShamsHeader from '../../../components/cards/shams/ShamsHeader';
 
 type ShamsReviewNavigationProp = NativeStackNavigationProp<RootStackParamList, 'ShamsReview'>;
 type ShamsReviewRouteProp = RouteProp<RootStackParamList, 'ShamsReview'>;
@@ -87,52 +89,19 @@ const ShamsReviewScreen: React.FC = () => {
   };
 
   return (
-    <View className="flex-1 bg-[#1A1B23]">
-      {/* Header */}
-      <View className="flex-row items-center justify-between px-5 pt-12 pb-6">
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          className="w-10 h-10 rounded-full bg-white/10 items-center justify-center"
-        >
-          <Text className="text-white text-lg">←</Text>
-        </TouchableOpacity>
-        <Text className="text-white/60 text-sm">Review & Order</Text>
-        <View className="w-10" />
-      </View>
-
-      {/* Progress Indicator */}
-      <View className="px-5 mb-6">
-        <View className="flex-row items-center">
-          <View className="w-2 h-2 rounded-full bg-[#D4AF37] mr-2" />
-          <View className="w-2 h-2 rounded-full bg-[#D4AF37] mr-2" />
-          <View className="w-2 h-2 rounded-full bg-[#D4AF37]" />
-        </View>
-        
-        {/* Progress Bar */}
-        <View className="w-full h-1 bg-white/20 rounded-full mt-4">
-          <View className="w-full h-full bg-[#D4AF37] rounded-full" />
-        </View>
-      </View>
+    <View className="flex-1" style={{ backgroundColor: SHAMS_TOKENS.background }}>
+      <ShamsHeader
+        title="Review & Order"
+        subtitle="Let's personalise your card"
+        step={3}
+        onBack={() => navigation.goBack()}
+      />
 
       {/* Content */}
       <View className="flex-1 px-5">
-        <Text className="text-white text-2xl font-bold mb-2">
-          Review & Order
-        </Text>
-        <Text className="text-white/70 text-base mb-8">
-          Let's personalise your card
-        </Text>
-
         {/* Card Preview */}
         <View className="items-center mb-8">
-          <Image
-            source={require('../../../assets/cards/mizan-card.png')}
-            style={{
-              width: 280,
-              height: 175,
-            }}
-            resizeMode="contain"
-          />
+          <ShamsCardPreview metalId={selectedMetal} playSheen />
         </View>
 
         {/* Settings Toggles */}
@@ -190,7 +159,7 @@ const ShamsReviewScreen: React.FC = () => {
             )}
           </View>
           <Text className="text-white/70 text-sm flex-1">
-            I agree to Mizan's{' '}
+            I agree to Mizan&apos;s{' '}
             <Text className="text-[#D4AF37] underline">Terms & Conditions</Text>
             {' '}and{' '}
             <Text className="text-[#D4AF37] underline">Privacy Policy</Text>
