@@ -95,6 +95,7 @@ const styles = StyleSheet.create({
   dotsRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 10,
     gap: 8,
   },

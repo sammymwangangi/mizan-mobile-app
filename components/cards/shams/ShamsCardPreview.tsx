@@ -5,10 +5,6 @@ import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing, runOnJS
 import { LinearGradient } from 'expo-linear-gradient';
 import { METAL_SWATCHES } from '../../../constants/shams';
 
-// SVG assets (gracefully degrade if transformer isn't available)
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import ShamsPattern from '../../../assets/cards/shams/pattern-bg.svg';
 // Reuse shared brand assets from Qamar preview for consistency (except center logo)
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -19,6 +15,12 @@ import Contactless from '../../../assets/cards/card-studio/qamar-card/contactles
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import Chip from '../../../assets/cards/card-studio/qamar-card/chip.svg';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import Rectangle1 from '../../../assets/cards/card-studio/qamar-card/rectangle1.svg';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import Rectangle2 from '../../../assets/cards/card-studio/qamar-card/rectangle2.svg';
 
 const toComponent = (M: any): React.ComponentType<any> | null => {
   if (!M) return null;
@@ -38,8 +40,8 @@ interface Props {
   expiryText?: string;
 }
 
-const CARD_W = 240; // portrait card width
-const CARD_H = 380; // portrait card height
+const CARD_W = 196; // portrait card width
+const CARD_H = 323; // portrait card height
 const RADIUS = 18;
 
 const ShamsCardPreview: React.FC<Props> = ({ metalId = 'bronze', playSheen = false, onSheenEnd, width = CARD_W, height = CARD_H, expiryText = 'World Elite' }) => {
@@ -99,12 +101,12 @@ const ShamsCardPreview: React.FC<Props> = ({ metalId = 'bronze', playSheen = fal
 
           {/* Background fill */}
           <Rect x={0} y={0} width={width} height={height} rx={RADIUS} ry={RADIUS} fill={`url(#${gradientId})`} />
-
-          {/* Subtle pattern overlay */}
-          <G opacity={0.20}>
-            {toComponent(ShamsPattern) ? React.createElement(toComponent(ShamsPattern)!, { width, height, preserveAspectRatio: 'xMinYMin slice' }) : null}
-          </G>
         </Svg>
+
+        {/* Decorative rectangle */}
+        <View style={[styles.decorativeRect]}>
+          {toComponent(Rectangle2) ? React.createElement(toComponent(Rectangle2)!, { width: width * 1.2, height: height * 0.5 }) : null}
+        </View>
 
         {/* Brand overlays - portrait alignment */}
         <View pointerEvents="none" style={styles.overlay}>
@@ -150,9 +152,28 @@ const styles = StyleSheet.create({
   wrapper: {
     alignItems: 'center',
     justifyContent: 'center',
+    position: 'relative',
   },
   card: {
     overflow: 'hidden',
+    position: 'relative',
+    zIndex: 2,
+  },
+  decorativeRect: {
+    position: 'absolute',
+    top: 0,
+    right: -40,
+    opacity: 0.6,
+    zIndex: 1,
+  },
+  stackedCard: {
+    position: 'absolute',
+    top: 10,
+    width: CARD_W,
+    height: CARD_H,
+    backgroundColor: '#FFFFFF20',
+    borderRadius: RADIUS,
+    zIndex: 1,
   },
   overlay: {
     position: 'absolute',

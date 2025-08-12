@@ -8,6 +8,7 @@ import type { RootStackParamList } from '../../../navigation/types';
 import { METAL_SWATCHES, METAL_OPTIONS, CTA_GRADIENT, ANALYTICS_EVENTS, SHAMS_TOKENS } from '../../../constants/shams';
 import ShamsCardPreview from '../../../components/cards/shams/ShamsCardPreview';
 import ShamsHeader from '../../../components/cards/shams/ShamsHeader';
+import { FONTS } from 'constants/theme';
 
 type ShamsStudioNavigationProp = NativeStackNavigationProp<RootStackParamList, 'ShamsStudio'>;
 
@@ -54,14 +55,18 @@ const ShamsStudioScreen: React.FC = () => {
       <Animated.View
         style={{
           transform: [{ scale: scaleAnims[index] }],
+          borderRadius: 40,
         }}
-        className={`w-16 h-16 rounded-full mb-3 border-2 ${
+        className={`w-16 h-16 mb-3 border-2 ${
           selectedMetal === metal.id ? 'border-white' : 'border-white/30'
         }`}
       >
         <LinearGradient
           colors={[metal.colors.light, metal.colors.base, metal.colors.dark]}
-          className="w-full h-full rounded-full"
+          className="w-full h-full"
+          start={{ x: 1, y: 0 }}
+          end={{ x: 0, y: 1 }}
+          style={{ borderRadius: 40 }}
         />
       </Animated.View>
       <Text className={`text-sm font-medium ${
@@ -93,20 +98,20 @@ const ShamsStudioScreen: React.FC = () => {
           showsHorizontalScrollIndicator={false}
           snapToAlignment="center"
           decelerationRate="fast"
-          snapToInterval={360}
+          snapToInterval={220}
           contentContainerStyle={{ paddingHorizontal: 24 }}
           initialScrollIndex={selectedIndex}
-          getItemLayout={(_, i) => ({ length: 360, offset: 360 * i, index: i })}
+          getItemLayout={(_, i) => ({ length: 220, offset: 220 * i, index: i })}
           onScrollToIndexFailed={(info) => setTimeout(() => carouselRef.current?.scrollToIndex?.({ index: info.index, animated: true }), 200)}
           onMomentumScrollEnd={(e) => {
-            const index = Math.round(e.nativeEvent.contentOffset.x / 360);
+            const index = Math.round(e.nativeEvent.contentOffset.x / 220);
             if (index >= 0 && index < METAL_OPTIONS.length && index !== selectedIndex) {
               setSelectedIndex(index);
               Haptics.selectionAsync();
             }
           }}
           renderItem={({ item, index }) => (
-            <View style={{ width: 360, alignItems: 'center' }}>
+            <View style={{ width: 220, alignItems: 'center' }}>
               <ShamsCardPreview metalId={item.id} playSheen={selectedIndex === index} />
             </View>
           )}
@@ -118,7 +123,7 @@ const ShamsStudioScreen: React.FC = () => {
 
       {/* CTA Button inside panel like Figma */}
       <View className="px-5 pb-8">
-        <View className="rounded-2xl" style={{ backgroundColor: 'rgba(255,255,255,0.06)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' }}>
+        <View className="rounded-2xl" style={{ backgroundColor: 'rgba(255,255,255,0.06)', borderWidth: 0.3, borderColor: '#FFFFFF' }}>
           <View className="px-5 pt-5 pb-4">
             <Text className="text-white text-lg font-semibold mb-5">Pick your finish</Text>
             <View className="flex-row justify-center">
@@ -135,12 +140,12 @@ const ShamsStudioScreen: React.FC = () => {
               className="w-full"
             >
               <LinearGradient
-                colors={selectedIndex >= 0 ? CTA_GRADIENT.colors : ['#666', '#666']}
+                colors={selectedIndex >= 0 ? CTA_GRADIENT.colors : ['#D39C90', '#FFFFFF', '#D39B8E']}
                 start={CTA_GRADIENT.start}
                 end={CTA_GRADIENT.end}
-                className={`h-14 rounded-full justify-center items-center ${selectedIndex < 0 ? 'opacity-50' : ''}`}
+                style={{ height: 55, borderRadius: 40, alignItems: 'center', justifyContent: 'center' }}
               >
-                <Text className="text-white font-semibold text-lg">Claim My Metal</Text>
+                <Text style={{...FONTS.semibold(18), color: '#000000'}}>Claim My Metal</Text>
               </LinearGradient>
             </TouchableOpacity>
           </View>

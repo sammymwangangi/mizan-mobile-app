@@ -3,14 +3,14 @@
 
 export const METAL_SWATCHES = {
   titanium: {
-    base: '#8B8C8F',
-    light: '#9C9FA2',
-    dark: '#6B6C6E'
+    base: '#4A4747',
+    light: '#E8E8E8',
+    dark: '#101010'
   },
   bronze: {
-    base: '#B77E5B',
-    light: '#C99979',
-    dark: '#925F46'
+    base: '#D39C90',
+    light: '#FFF2EF',
+    dark: '#D39B8E'
   },
   nebula: {
     base: '#F5F4F3',
