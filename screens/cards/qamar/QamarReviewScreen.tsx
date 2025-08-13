@@ -216,33 +216,33 @@ const QamarReviewScreen: React.FC = () => {
           </TouchableOpacity>
           <Text style={{ ...FONTS.bold(26), color: '#0F172A', marginTop: 12 }}>Looks good?</Text>
           <Text style={{ ...FONTS.medium(12), color: '#64748B', marginTop: 4 }}>Step 3 / 3 - Review & mint</Text>
-        {/* Bottom Sheets (modals) */}
-        <MintingSheet
-          visible={showMinting}
-          onClose={() => setShowMinting(false)}
-          progress={mintingProgress}
-          onCancel={handleMintingCancel}
-        />
+          {/* Bottom Sheets (modals) */}
+          <MintingSheet
+            visible={showMinting}
+            onClose={() => setShowMinting(false)}
+            progress={mintingProgress}
+            onCancel={handleMintingCancel}
+          />
 
-        <CancelSheet
-          visible={showCancel}
-          onClose={() => setShowCancel(false)}
-          onKeep={handleKeepMinting}
-          onCancel={handleCancelOrder}
-        />
+          <CancelSheet
+            visible={showCancel}
+            onClose={() => setShowCancel(false)}
+            onKeep={handleKeepMinting}
+            onCancel={handleCancelOrder}
+          />
 
-        <ErrorSheet
-          visible={showError}
-          onClose={() => setShowError(false)}
-          onRetry={handleRetryError}
-          onExit={handleExitError}
-        />
+          <ErrorSheet
+            visible={showError}
+            onClose={() => setShowError(false)}
+            onRetry={handleRetryError}
+            onExit={handleExitError}
+          />
 
-        <SuccessSheet
-          visible={showSuccess}
-          onClose={() => setShowSuccess(false)}
-          onComplete={handleSuccessComplete}
-        />
+          <SuccessSheet
+            visible={showSuccess}
+            onClose={() => setShowSuccess(false)}
+            onComplete={handleSuccessComplete}
+          />
         </View>
         {/* Hidden props usage for TypeScript awareness */}
         {/* selectedColor and deliveryAddress used in analytics or future UI; retained intentionally */}

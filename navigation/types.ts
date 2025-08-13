@@ -81,20 +81,36 @@ export type RootStackParamList = {
   };
 
   // Shams Metal Card Flow
-  ShamsIntro: undefined;
-  ShamsStudio: undefined;
-  ShamsAddress: { selectedMetal: string };
+  ShamsIntro: { planId: string };
+  ShamsStudio: { planId: string };
+  ShamsAddress: { planId: string; selectedMetal: string; selectedColor: string };
   ShamsReview: {
+    planId: string;
     selectedMetal: string;
+    selectedColor: string;
     deliveryAddress: {
-      fullName: string;
-      addressLine1: string;
-      addressLine2: string;
-      city: string;
-      state: string;
-      postalCode: string;
-      country: string;
+      address: string;
     };
+  };
+  ShamsMinting: {
+    planId: string;
+    selectedColor: string;
+    deliveryAddress: {
+      address: string;
+    };
+    selectedMetal: string;
+
+    features: {
+      smartSpend: boolean;
+      fraudShield: boolean;
+      robinAI: boolean;
+    };
+  };
+
+  ShamsOrderStatus: {
+    planId?: string;
+    selectedColor: string;
+    cardId: string;
   };
 
   // Qamar Card Flow

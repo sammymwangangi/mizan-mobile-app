@@ -1,6 +1,8 @@
 // Shams Metal Card Constants
 // Based on developer handoff notes
 
+export const BARAKAH_PURPLE = '#7B5CFF';
+
 export const METAL_SWATCHES = {
   titanium: {
     base: '#4A4747',
@@ -18,12 +20,41 @@ export const METAL_SWATCHES = {
     dark: '#D7D6D5'
   },
   roseGold: {
-    base: '#C09780',
-    light: '#D7B2A0',
-    dark: '#9E7661'
+    base: '#DDA79B',
+    light: '#F6CFCA',
+    dark: '#D39B8E'
   },
-  accent: '#D4AF37' // gold confetti
+  accent: '#DDA79B' // gold confetti
 };
+
+// Feature Toggles
+export const SHAMS_FEATURES = [
+  {
+    id: 'smartSpend',
+    name: 'AI Powered Spend Insights',
+    description: "We'll categorise your transactions so you see where your money really goes.",
+    defaultValue: false,
+  },
+  {
+    id: 'fraudShield',
+    name: 'Fraud & Security Shield',
+    description: 'Instant alerts if we spot suspicious activity.',
+    defaultValue: false,
+  },
+  {
+    id: 'robinAI',
+    name: 'Robin Habibi AI x 2 (Beta)',
+    description: "Our AI saves as you spend — quietly rounding up your change into halal investments & savings.\n(e.g. Spend $4.40 — Robin saves $0.60 for your future).",
+    defaultValue: false,
+    exampleItalic: true,
+  },
+  {
+    id: 'ethicalPillars',
+    name: 'Bound by Mizan’s ethical pillars',
+    description: 'No third-party eyes shall ever gaze upon your privacy.',
+    defaultValue: false,
+  },
+];
 
 // Design tokens for Shams visual language
 export const SHAMS_TOKENS = {

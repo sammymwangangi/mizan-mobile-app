@@ -1,14 +1,16 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, TouchableOpacity, Switch, Animated } from 'react-native';
+import { View, Text, TouchableOpacity, Switch, Animated, ScrollView } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RouteProp } from '@react-navigation/native';
 import type { RootStackParamList } from '../../../navigation/types';
-import { CTA_GRADIENT, ANALYTICS_EVENTS, SHAMS_TOKENS } from '../../../constants/shams';
+import { CTA_GRADIENT, ANALYTICS_EVENTS, SHAMS_TOKENS, SHAMS_FEATURES, BARAKAH_PURPLE } from '../../../constants/shams';
 import ShamsCardPreview from '../../../components/cards/shams/ShamsCardPreview';
 import ShamsHeader from '../../../components/cards/shams/ShamsHeader';
+import { FONTS } from 'constants/theme';
+import { MintingSheet, CancelSheet, ErrorSheet, SuccessSheet, TnCSheet } from 'components/cards/shams/ShamsBottomSheets';
 
 type ShamsReviewNavigationProp = NativeStackNavigationProp<RootStackParamList, 'ShamsReview'>;
 type ShamsReviewRouteProp = RouteProp<RootStackParamList, 'ShamsReview'>;
@@ -19,36 +21,85 @@ interface ToggleSettings {
   aiPro: boolean;
 }
 
+interface FeatureToggles {
+  smartSpend: boolean;
+  fraudShield: boolean;
+  robinAI: boolean;
+  ethicalPillars: boolean;
+}
+
 const ShamsReviewScreen: React.FC = () => {
   const navigation = useNavigation<ShamsReviewNavigationProp>();
   const route = useRoute<ShamsReviewRouteProp>();
-  const { selectedMetal, deliveryAddress } = route.params;
+  const { planId, selectedMetal, selectedColor, deliveryAddress } = route.params;
 
-  const [settings, setSettings] = useState<ToggleSettings>({
-    smartSpending: true,
-    fraudProtection: true,
-    aiPro: false
+  const [features, setFeatures] = useState<FeatureToggles>({
+    smartSpend: false,
+    fraudShield: false,
+    robinAI: false,
+    ethicalPillars: false,
   });
 
-  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [showTnc, setShowTnc] = useState(false);
+  const [showMinting, setShowMinting] = useState(false);
+  const [showCancel, setShowCancel] = useState(false);
+  const [showError, setShowError] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [mintingProgress, setMintingProgress] = useState(0);
   const shakeAnim = useRef(new Animated.Value(0)).current;
 
-  const handleToggle = (setting: keyof ToggleSettings) => {
-    setSettings(prev => ({
+  const handleFeatureToggle = (featureId: keyof FeatureToggles) => {
+    setFeatures(prev => ({
       ...prev,
-      [setting]: !prev[setting]
+      [featureId]: !prev[featureId]
     }));
     Haptics.selectionAsync();
   };
 
   const handleTermsToggle = () => {
-    setAcceptedTerms(!acceptedTerms);
+    // Open the T&C modal instead of toggling acceptance immediately
+    setShowTnc(true);
+    // PostHog.capture?.(QAMAR_ANALYTICS.CARD_TNC_OPEN);
     Haptics.selectionAsync();
   };
 
-  const handleSubmit = () => {
-    if (!acceptedTerms) {
-      // Shake animation + light haptic for disabled tap
+  // Minting flow handlers and effects (modal-based on this screen)
+  const handleMintingCancel = () => {
+    setShowCancel(true);
+  };
+
+  const handleKeepMinting = () => {
+    setShowCancel(false);
+  };
+
+  const handleCancelOrder = () => {
+    setShowCancel(false);
+    setShowMinting(false);
+    navigation.goBack();
+  };
+
+  const handleRetryError = () => {
+    setShowError(false);
+    setShowMinting(true);
+    setMintingProgress(0);
+  };
+
+  const handleExitError = () => {
+    setShowError(false);
+    navigation.goBack();
+  };
+
+  const handleSuccessComplete = () => {
+    setShowSuccess(false);
+    // PostHog.capture?.(QAMAR_ANALYTICS.CARD_ORDER_SUCCESS);
+    const cardId = `qamar-${Date.now()}`;
+    navigation.navigate('QamarOrderStatus', { planId, selectedColor, cardId });
+  };
+
+  const handleOrderCard = () => {
+    if (!termsAccepted) {
+      // Disabled-tap flashes red outline around T&C switch
       Animated.sequence([
         Animated.timing(shakeAnim, {
           toValue: 10,
@@ -71,130 +122,183 @@ const ShamsReviewScreen: React.FC = () => {
           useNativeDriver: true,
         }),
       ]).start();
-      
+
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       return;
     }
 
     Haptics.selectionAsync();
+
     // Track analytics
-    // PostHog.capture(ANALYTICS_EVENTS.CARD_ORDER_SUBMIT, { metal: selectedMetal });
-    
-    // Navigate to minting process
-    navigation.navigate('CardMinting', { 
-      selectedMetal, 
-      deliveryAddress, 
-      settings 
-    });
+    // PostHog.capture?.(QAMAR_ANALYTICS.CARD_ORDER_SUBMIT, {
+    //   plan: 'qamar',
+    //   toggles: features
+    // });
+
+    // Start modal-based minting flow on this screen
+    setShowMinting(true);
+    setMintingProgress(0);
+  };
+
+  const FeatureToggle: React.FC<{
+    feature: typeof SHAMS_FEATURES[0],
+    value: boolean,
+    onToggle: () => void
+  }> = ({ feature, value, onToggle }) => {
+    const parts = (feature.description || '').split('\n');
+    const hasExample = parts.length > 1;
+    return (
+      <View className="flex-row items-center justify-between py-4">
+        <View className="flex-1 mr-4">
+          <Text style={{ ...FONTS.semibold(15), color: '#F5F5FC' }}>
+        {feature.name}
+          </Text>
+          {!!parts[0] && (
+        <Text style={{ ...FONTS.medium(9), color: '#F5F5FC', marginTop: 4 }}>
+          {parts[0]}
+        </Text>
+          )}
+          {hasExample && (
+        <Text style={{ ...FONTS.medium(9), color: '#94A3B8', fontStyle: 'italic', marginTop: 4 }}>
+          {parts[1]}
+        </Text>
+          )}
+        </View>
+        <Switch
+          value={value}
+          onValueChange={onToggle}
+          trackColor={{ false: '#E5E7EB', true: '#1B8800' }}
+          thumbColor={value ? '#FFFFFF' : '#F3F4F6'}
+          ios_backgroundColor="#E5E7EB"
+          style={{ transform: [{ scaleX: 1.5 }, { scaleY: 1.5 }] }} // increases thumb/track size
+        />
+      </View>
+    );
   };
 
   return (
-    <View className="flex-1" style={{ backgroundColor: SHAMS_TOKENS.background }}>
-      <ShamsHeader
-        title="Review & Order"
-        subtitle="Let's personalise your card"
-        step={3}
-        onBack={() => navigation.goBack()}
-      />
+    <>
+      <View className="flex-1" style={{ backgroundColor: SHAMS_TOKENS.background }}>
+        <View>
 
-      {/* Content */}
-      <View className="flex-1 px-5">
-        {/* Card Preview */}
-        <View className="items-center mb-8">
-          <ShamsCardPreview metalId={selectedMetal} playSheen />
+          <ShamsHeader
+            title="Review & Order"
+            subtitle="Let's personalise your card"
+            step={3}
+            onBack={() => navigation.goBack()}
+          />
+
+          {/* Bottom Sheets (modals) */}
+          <MintingSheet
+            visible={showMinting}
+            onClose={() => setShowMinting(false)}
+            progress={mintingProgress}
+            onCancel={handleMintingCancel}
+          />
+
+          <CancelSheet
+            visible={showCancel}
+            onClose={() => setShowCancel(false)}
+            onKeep={handleKeepMinting}
+            onCancel={handleCancelOrder}
+          />
+
+          <ErrorSheet
+            visible={showError}
+            onClose={() => setShowError(false)}
+            onRetry={handleRetryError}
+            onExit={handleExitError}
+          />
+
+          <SuccessSheet
+            visible={showSuccess}
+            onClose={() => setShowSuccess(false)}
+            onComplete={handleSuccessComplete}
+          />
         </View>
 
-        {/* Settings Toggles */}
-        <View className="space-y-4 mb-8">
-          <View className="flex-row items-center justify-between py-3">
-            <View className="flex-1">
-              <Text className="text-white font-semibold">AI Powered Spend Insights</Text>
-              <Text className="text-white/60 text-sm">Get smart spending recommendations</Text>
+        {/* Content */}
+        <ScrollView>
+          <View className="flex-1 px-5">
+            {/* Card Preview */}
+            <View className="items-center mb-8">
+              <ShamsCardPreview metalId={selectedMetal} playSheen />
             </View>
-            <Switch
-              value={settings.smartSpending}
-              onValueChange={() => handleToggle('smartSpending')}
-              trackColor={{ false: '#666', true: '#D4AF37' }}
-              thumbColor={settings.smartSpending ? '#fff' : '#ccc'}
-            />
-          </View>
 
-          <View className="flex-row items-center justify-between py-3">
-            <View className="flex-1">
-              <Text className="text-white font-semibold">Fraud & Security Shield</Text>
-              <Text className="text-white/60 text-sm">Advanced fraud protection</Text>
+            {/* Feature Toggles */}
+            <View className="mb-2">
+              <View>
+                {SHAMS_FEATURES.map((feature, index) => (
+                  <View key={feature.id}>
+                    <FeatureToggle
+                      feature={feature}
+                      value={features[feature.id as keyof FeatureToggles]}
+                      onToggle={() => handleFeatureToggle(feature.id as keyof FeatureToggles)}
+                    />
+                    {index < SHAMS_FEATURES.length - 1 && (
+                      <View className="h-px bg-gray-400" />
+                    )}
+                  </View>
+                ))}
+              </View>
             </View>
-            <Switch
-              value={settings.fraudProtection}
-              onValueChange={() => handleToggle('fraudProtection')}
-              trackColor={{ false: '#666', true: '#D4AF37' }}
-              thumbColor={settings.fraudProtection ? '#fff' : '#ccc'}
-            />
-          </View>
 
-          <View className="flex-row items-center justify-between py-3">
-            <View className="flex-1">
-              <Text className="text-white font-semibold">Robin Habibi AI+ (Beta)</Text>
-              <Text className="text-white/60 text-sm">Advanced AI financial assistant</Text>
-            </View>
-            <Switch
-              value={settings.aiPro}
-              onValueChange={() => handleToggle('aiPro')}
-              trackColor={{ false: '#666', true: '#D4AF37' }}
-              thumbColor={settings.aiPro ? '#fff' : '#ccc'}
-            />
+            {/* Terms & Conditions */}
+            <Animated.View style={{ transform: [{ translateX: shakeAnim }] }}>
+              <View className="flex-row items-center justify-between py-4">
+                <Text style={{ ...FONTS.semibold(14), color: '#F5F5FC' }}>
+                  I agree to the Terms & Conditions
+                </Text>
+                <Switch
+                  value={termsAccepted}
+                  onValueChange={handleTermsToggle}
+                  trackColor={{ false: '#E5E7EB', true: '#1B8800' }}
+                  thumbColor={termsAccepted ? '#FFFFFF' : '#F3F4F6'}
+                  ios_backgroundColor="#E5E7EB"
+                  style={{ transform: [{ scaleX: 1.5 }, { scaleY: 1.5 }] }}
+                />
+              </View>
+            </Animated.View>
           </View>
-        </View>
+        </ScrollView>
 
-        {/* Terms & Conditions */}
-        <TouchableOpacity
-          onPress={handleTermsToggle}
-          className="flex-row items-start mb-8"
-        >
-          <View className={`w-5 h-5 rounded border-2 mr-3 mt-0.5 items-center justify-center ${
-            acceptedTerms ? 'bg-[#D4AF37] border-[#D4AF37]' : 'border-white/30'
-          }`}>
-            {acceptedTerms && (
-              <Text className="text-black text-xs font-bold">✓</Text>
-            )}
-          </View>
-          <Text className="text-white/70 text-sm flex-1">
-            I agree to Mizan&apos;s{' '}
-            <Text className="text-[#D4AF37] underline">Terms & Conditions</Text>
-            {' '}and{' '}
-            <Text className="text-[#D4AF37] underline">Privacy Policy</Text>
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* CTA Button */}
-      <View className="px-5 pb-8">
-        <Animated.View
-          style={{
-            transform: [{ translateX: shakeAnim }],
-          }}
-        >
-          <TouchableOpacity
-            onPress={handleSubmit}
-            activeOpacity={0.9}
-            className="w-full"
+        {/* CTA Button */}
+        <View className="px-5 pb-8">
+          <Animated.View
+            style={{
+              transform: [{ translateX: shakeAnim }],
+            }}
           >
-            <LinearGradient
-              colors={acceptedTerms ? CTA_GRADIENT.colors : ['#666', '#666']}
-              start={CTA_GRADIENT.start}
-              end={CTA_GRADIENT.end}
-              className={`h-14 rounded-full justify-center items-center ${
-                !acceptedTerms ? 'opacity-50 border-2 border-red-500/50' : ''
-              }`}
+            <TouchableOpacity
+              onPress={handleOrderCard}
+              activeOpacity={0.9}
+              className="w-full"
             >
-              <Text className="text-white font-semibold text-lg">
-                Enter the Gold Club
-              </Text>
-            </LinearGradient>
-          </TouchableOpacity>
-        </Animated.View>
+              <LinearGradient
+                colors={termsAccepted ? CTA_GRADIENT.colors : ['#D39C90', '#FFFFFF', '#D39B8E']}
+                start={CTA_GRADIENT.start}
+                end={CTA_GRADIENT.end}
+                className={`h-14 ${!termsAccepted ? 'opacity-50' : ''
+                  }`}
+                  style={{ borderRadius: 40, alignItems: 'center', justifyContent: 'center' }}
+              >
+                <Text className="text-white font-semibold text-lg">
+                  Enter the Gold Club
+                </Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </Animated.View>
+        </View>
       </View>
-    </View>
+
+      {/* T&C Sheet */}
+      <TnCSheet
+        visible={showTnc}
+        onClose={() => setShowTnc(false)}
+        onAgree={() => { setTermsAccepted(true); setShowTnc(false); }}
+        onDecline={() => { setShowTnc(false); navigation.goBack(); }}
+      />
+    </>
   );
 };
 

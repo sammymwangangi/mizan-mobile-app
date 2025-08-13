@@ -41,7 +41,7 @@ const ShamsStudioScreen: React.FC = () => {
     if (!selectedMetal) return;
     
     Haptics.selectionAsync();
-    navigation.navigate('ShamsAddress', { selectedMetal });
+    navigation.navigate('ShamsAddress', { planId: 'shams', selectedMetal, selectedColor: '' });
   };
 
   const MetalSwatch: React.FC<{ metal: typeof METAL_OPTIONS[0], index: number }> = ({ metal, index }) => (

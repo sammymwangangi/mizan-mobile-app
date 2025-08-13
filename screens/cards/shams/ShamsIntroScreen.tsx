@@ -33,7 +33,7 @@ const ShamsIntroScreen: React.FC = () => {
 
   const handleUnlockShams = () => {
     Haptics.selectionAsync();
-    navigation.navigate('ShamsStudio');
+    navigation.navigate({ name: 'ShamsStudio', params: { planId: 'shams' } });
   };
 
   const MoreLink = () => (

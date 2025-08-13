@@ -19,13 +19,14 @@
     "@expo/vector-icons": "latest",
     "@gorhom/bottom-sheet": "^5.1.8",
     "@react-native-async-storage/async-storage": "^1.24.0",
+    "@react-native-community/blur": "^4.4.1",
     "@react-native-community/slider": "^4.5.6",
     "@react-native-masked-view/masked-view": "^0.3.2",
     "@react-navigation/bottom-tabs": "7.3.12",
     "@react-navigation/native": "^7.1.8",
     "@react-navigation/native-stack": "7.3.12",
     "@react-navigation/stack": "^7.3.2",
-    "@shopify/react-native-skia": "v2.0.0-next.4",
+    "@shopify/react-native-skia": "^2.0.0-next.4",
     "@supabase/supabase-js": "^2.50.0",
     "expo": "^53.0.9",
     "expo-apple-authentication": "^7.2.4",
@@ -58,7 +59,8 @@
     "react-native-wheel-picker": "^1.2.0",
     "react-native-wheel-scrollview-picker": "^2.0.9",
     "sonner-native": "0.19.1",
-    "victory-native": "^41.17.3"
+    "victory-native": "^41.17.3",
+    "expo-blur": "~14.1.5"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
