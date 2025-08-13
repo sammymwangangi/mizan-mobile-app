@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import MaskedView from '@react-native-masked-view/masked-view';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SHAMS_TOKENS } from '../../../constants/shams';
+import { FONTS } from 'constants/theme';
 
 interface Props {
   title: string;
@@ -81,8 +82,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   titleText: {
-    fontFamily: 'Poppins_600SemiBold',
-    fontSize: 28,
+    ...FONTS.semibold(33),
     color: '#fff',
     lineHeight: 34,
   },

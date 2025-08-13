@@ -46,6 +46,40 @@ export type RootStackParamList = {
     name: string;
   };
 
+  // Noor Card Flow
+  NoorIntro: { planId: string };
+  NoorStudio: { planId: string };
+  NoorAddress: { planId: string; selectedColor: string };
+  NoorReview: {
+    planId: string;
+    selectedColor: string;
+    deliveryAddress: {
+      address: string;
+    };
+  };
+  NoorMinting: {
+    planId: string;
+    selectedColor: string;
+    deliveryAddress: {
+      address: string;
+    };
+    features: {
+      smartSpend: boolean;
+      fraudShield: boolean;
+      robinAI: boolean;
+    };
+    toggles: Record<string, boolean>;
+  };
+  NoorFund: {
+    selectedColor: string;
+  };
+  // Post-order intermediate screen
+  NoorOrderStatus: {
+    planId?: string;
+    selectedColor: string;
+    cardId: string;
+  };
+
   // Shams Metal Card Flow
   ShamsIntro: undefined;
   ShamsStudio: undefined;

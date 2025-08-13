@@ -49,6 +49,14 @@ import CardMintingScreen from './screens/cards/CardMintingScreen';
 import FundCardScreen from './screens/cards/FundCardScreen';
 import WalletAddScreen from './screens/cards/WalletAddScreen';
 
+// Noor Flow screens
+import NoorIntroScreen from 'screens/cards/noor/NoorIntroScreen';
+import NoorAddressScreen from 'screens/cards/noor/NoorAddressScreen';
+import NoorReviewScreen from 'screens/cards/noor/NoorReviewScreen';
+import NoorStudioScreen from 'screens/cards/noor/NoorStudioScreen';
+import NoorMintingScreen from 'screens/cards/noor/NoorMintingScreen';
+import NoorFundScreen from 'screens/cards/noor/NoorFundScreen';
+
 // Shams Flow screens
 import ShamsIntroScreen from './screens/cards/shams/ShamsIntroScreen';
 import ShamsStudioScreen from './screens/cards/shams/ShamsStudioScreen';
@@ -181,6 +189,16 @@ function RootStack({ isCheckingAuth, isUserLoggedIn, isInSignupFlow, hasUser }: 
           <Stack.Screen name="ShamsStudio" component={ShamsStudioScreen} />
           <Stack.Screen name="ShamsAddress" component={ShamsAddressScreen} />
           <Stack.Screen name="ShamsReview" component={ShamsReviewScreen} />
+
+          {/* Noor Card Flow */}
+          <Stack.Screen name="NoorIntro" component={NoorIntroScreen} />
+          <Stack.Screen name="NoorStudio" component={NoorStudioScreen} />
+          <Stack.Screen name="NoorAddress" component={NoorAddressScreen} />
+          <Stack.Screen name="NoorReview" component={NoorReviewScreen} />
+          <Stack.Screen name="NoorMinting" component={NoorMintingScreen} />
+          <Stack.Screen name="NoorFund" component={NoorFundScreen} />
+          <Stack.Screen name="NoorOrderStatus" component={require('./screens/cards/noor/NoorOrderStatusScreen').default} />
+
 
           {/* Qamar Card Flow */}
           <Stack.Screen name="QamarIntro" component={QamarIntroScreen} />

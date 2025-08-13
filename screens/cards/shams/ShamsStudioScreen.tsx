@@ -98,20 +98,20 @@ const ShamsStudioScreen: React.FC = () => {
           showsHorizontalScrollIndicator={false}
           snapToAlignment="center"
           decelerationRate="fast"
-          snapToInterval={220}
+          snapToInterval={240}
           contentContainerStyle={{ paddingHorizontal: 24 }}
           initialScrollIndex={selectedIndex}
-          getItemLayout={(_, i) => ({ length: 220, offset: 220 * i, index: i })}
+          getItemLayout={(_, i) => ({ length: 240, offset: 240 * i, index: i })}
           onScrollToIndexFailed={(info) => setTimeout(() => carouselRef.current?.scrollToIndex?.({ index: info.index, animated: true }), 200)}
           onMomentumScrollEnd={(e) => {
-            const index = Math.round(e.nativeEvent.contentOffset.x / 220);
+            const index = Math.round(e.nativeEvent.contentOffset.x / 240);
             if (index >= 0 && index < METAL_OPTIONS.length && index !== selectedIndex) {
               setSelectedIndex(index);
               Haptics.selectionAsync();
             }
           }}
           renderItem={({ item, index }) => (
-            <View style={{ width: 220, alignItems: 'center' }}>
+            <View style={{ width: 240, alignItems: 'center' }}>
               <ShamsCardPreview metalId={item.id} playSheen={selectedIndex === index} />
             </View>
           )}
@@ -140,7 +140,7 @@ const ShamsStudioScreen: React.FC = () => {
               className="w-full"
             >
               <LinearGradient
-                colors={selectedIndex >= 0 ? CTA_GRADIENT.colors : ['#D39C90', '#FFFFFF', '#D39B8E']}
+                colors={['#D39C90', '#FFFFFF', '#D39B8E']}
                 start={CTA_GRADIENT.start}
                 end={CTA_GRADIENT.end}
                 style={{ height: 55, borderRadius: 40, alignItems: 'center', justifyContent: 'center' }}

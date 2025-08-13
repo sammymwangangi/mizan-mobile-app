@@ -33,7 +33,7 @@ const CTAButton: React.FC<{ title: string; onPress: () => void } & { style?: any
 const PlanSelectScreen: React.FC = () => {
   const navigation = useNavigation<PlanSelectNavigationProp>();
 
-  const handleNoor = () => navigation.navigate('CardStudio', { planId: 'noor' });
+  const handleNoor = () => navigation.navigate('NoorIntro', { planId: 'noor' });
   const handleQamar = () => navigation.navigate('QamarIntro', { planId: 'qamar' });
   const handleShams = () => navigation.navigate('ShamsIntro');
 
