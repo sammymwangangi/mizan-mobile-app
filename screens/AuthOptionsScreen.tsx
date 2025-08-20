@@ -10,6 +10,8 @@ import {
   Alert,
   StatusBar,
   Image,
+  Modal,
+  TextInput,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -24,6 +26,7 @@ import { smsService } from '../services/smsService';
 import * as Google from 'expo-auth-session/providers/google';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { normalize } from 'utils';
+import { COUNTRIES } from '../constants/countries';
 
 type AuthOptionsScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'AuthOptions'>;
 type AuthOptionsScreenRouteProp = NativeStackScreenProps<RootStackParamList, 'AuthOptions'>['route'];
@@ -33,10 +36,14 @@ const AuthOptionsScreen = () => {
   const route = useRoute<AuthOptionsScreenRouteProp>();
 
   const [loading, setLoading] = useState(false);
-  const [selectedCountry] = useState('United Arab Emirates (+971)');
+  const [selectedCountry, setSelectedCountry] = useState('United Arab Emirates (+971)');
+  const [countries] = useState<string[]>(COUNTRIES);
+  const [isCountryModalVisible, setCountryModalVisible] = useState(false);
+  const [countrySearch, setCountrySearch] = useState('');
+  const [countryCode, setCountryCode] = useState('971');
   const { user, session, updateProfile } = useAuth();
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [countryCode] = useState('254');
+  // removed old fixed countryCode state; countryCode is managed via setCountryCode above
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [error, setError] = useState('');
 
@@ -216,13 +223,56 @@ const AuthOptionsScreen = () => {
 
         {/* Country/Region Selector */}
         <View style={styles.inputContainer}>
-          <TouchableOpacity style={styles.countrySelector}>
+          <TouchableOpacity
+            style={styles.countrySelector}
+            onPress={() => setCountryModalVisible(true)}
+          >
             <View style={styles.countrySelectorContent}>
               <Text style={styles.countryPlaceholder}>Country / Region</Text>
               <Text style={styles.countrySelectorText}>{selectedCountry}</Text>
             </View>
             <ChevronDown size={20} color="#6D6E8A" />
           </TouchableOpacity>
+
+          <Modal
+            visible={isCountryModalVisible}
+            animationType="slide"
+            transparent={true}
+            onRequestClose={() => setCountryModalVisible(false)}
+          >
+            <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' }}>
+              <View style={{ maxHeight: '70%', backgroundColor: 'white', borderTopLeftRadius: 16, borderTopRightRadius: 16, padding: 16 }}>
+                <TextInput
+                  placeholder="Search country"
+                  value={countrySearch}
+                  onChangeText={setCountrySearch}
+                  style={{ height: 44, borderWidth: 1, borderColor: '#E0E0E0', borderRadius: 8, paddingHorizontal: 12, marginBottom: 12 }}
+                />
+                <ScrollView>
+                  {countries
+                    .filter(c => c.toLowerCase().includes(countrySearch.toLowerCase()))
+                    .map(countryLabel => (
+                      <TouchableOpacity
+                        key={countryLabel}
+                        style={{ paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#F0F0F0' }}
+                        onPress={() => {
+                          setSelectedCountry(countryLabel);
+                          // extract digits inside parentheses as country code (e.g. +971 -> 971)
+                          const match = countryLabel.match(/\(\+?([0-9\-]+)\)/);
+                          if (match && match[1]) {
+                            const code = match[1].replace(/[^0-9]/g, '');
+                            setCountryCode(code);
+                          }
+                          setCountryModalVisible(false);
+                        }}
+                      >
+                        <Text style={{ ...FONTS.body5 }}>{countryLabel}</Text>
+                      </TouchableOpacity>
+                    ))}
+                </ScrollView>
+              </View>
+            </View>
+          </Modal>
         </View>
 
         {/* Phone Number Input */}
