@@ -59,9 +59,9 @@ const HomeScreen = () => {
 
   const quickActions = [
     { id: '1', icon: require('../assets/home/icons/cards.png'), title: 'Cards' },
-    { id: '2', icon: require('../assets/home/icons/pay-later.png'), title: 'Pay Later' },
+    { id: '2', icon: require('../assets/home/icons/round-ups.png'), title: 'Round-Ups' },
     { id: '3', icon: require('../assets/home/icons/send.png'), title: 'Send' },
-    { id: '4', icon: require('../assets/home/icons/m-pesa.png'), title: 'Round Ups' },
+    { id: '4', icon: require('../assets/home/icons/m-pesa.png'), title: 'M-Pesa' },
   ];
 
   const promotions = [
@@ -272,14 +272,12 @@ const HomeScreen = () => {
                 style={styles.actionButton}
                 onPress={() => {
                   if (action.title === 'Cards') {
-                    navigation.navigate('CardsDashboard');
+                    navigation.navigate('CardClaim');
                   } else if (action.title === 'M-Pesa') {
                     navigation.navigate('MPESA');
                   } else if (action.title === 'Send') {
                     navigation.navigate('SendMoney');
-                  } else if (action.title === 'Pay Later') {
-                    navigation.navigate('Shop');
-                  } else if (action.title === 'Round Ups') {
+                  } else if (action.title === 'Round-Ups') {
                     navigation.navigate('RoundUps');
                   } else {
                     console.log(`${action.title} pressed`);
@@ -438,7 +436,7 @@ const styles = StyleSheet.create({
   },
   cardsScrollContainer: {
     paddingHorizontal: SIZES.padding,
-    paddingBottom: normalize(10),
+    paddingBottom: normalize(30),
   },
   card: {
     width: getResponsiveWidth(82), // Responsive width instead of fixed 320px

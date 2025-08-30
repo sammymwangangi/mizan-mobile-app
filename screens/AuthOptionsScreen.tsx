@@ -52,9 +52,9 @@ const AuthOptionsScreen = () => {
 
   // Configure Google Sign-in
   const [, , promptAsync] = Google.useAuthRequest({
-    clientId: 'YOUR_CLIENT_ID',
-    iosClientId: 'YOUR_IOS_CLIENT_ID',
-    androidClientId: 'YOUR_ANDROID_CLIENT_ID',
+    clientId: process.env.EXPO_PUBLIC_WEB_CLIENT_ID,
+    iosClientId: process.env.EXPO_PUBLIC_IOS_CLIENT_ID,
+    androidClientId: process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID,
   });
 
   // Handle terms checkbox toggle

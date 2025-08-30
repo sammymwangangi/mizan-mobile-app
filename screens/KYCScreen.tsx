@@ -20,6 +20,7 @@ import * as LocalAuthentication from 'expo-local-authentication';
 import * as SecureStore from 'expo-secure-store';
 import { Camera, CameraView } from 'expo-camera';
 import * as FileSystem from 'expo-file-system';
+import HomeScreen from './HomeScreen';
 
 type KYCScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'KYC'>;
 
@@ -284,6 +285,7 @@ const KYCScreen: React.FC = () => {
   const handleSkip = () => {
     // Skip KYC and go directly to the app
     clearSignupFlow();
+    simulateAuthentication();
   };
 
   useEffect(() => {
@@ -858,10 +860,15 @@ const KYCScreen: React.FC = () => {
 
           {/* Action Buttons */}
           <View style={styles.financialActionButtons}>
-            <TouchableOpacity style={styles.skipButton} onPress={() => clearSignupFlow()}>
+            <TouchableOpacity
+              style={styles.skipButton}
+              onPress={() => {
+                clearSignupFlow();
+                simulateAuthentication();
+              }}
+            >
               <Text style={styles.skipButtonText}>Skip to home</Text>
             </TouchableOpacity>
-
             <TouchableOpacity style={styles.fixButton} onPress={handleNext}>
               <Text style={styles.fixButtonText}>Let&apos;s fix this</Text>
             </TouchableOpacity>
