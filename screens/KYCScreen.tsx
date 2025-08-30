@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Platform, Animated, TextInput, ScrollView, ImageSourcePropType } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -212,6 +212,25 @@ const KYCScreen: React.FC = () => {
 
   const flatListRef = useRef<FlatList>(null);
 
+  // Move handleNext above useEffect hooks
+  const handleNext = useCallback(() => {
+    // Validate full name if on the full name step
+    if (currentStep === KYCStep.FULL_NAME) {
+      if (!fullName.trim()) {
+        setFullNameError('Please enter your full name');
+        return;
+      }
+      setFullNameError('');
+    }
+
+    if (currentStep < KYCStep.COMPLETE) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      // Complete the signup flow and navigate to authenticated app
+      clearSignupFlow();
+    }
+  }, [currentStep, fullName, clearSignupFlow]);
+
   // Check biometric availability when entering passcode step
   useEffect(() => {
     const checkBiometricAvailability = async () => {
@@ -280,7 +299,26 @@ const KYCScreen: React.FC = () => {
         handlePasscodeComplete();
       }
     }
-  }, [passcode, confirmPasscode, passcodeStep, currentStep, biometricAvailable]);
+  }, [passcode, confirmPasscode, passcodeStep, currentStep, biometricAvailable, handleNext]);
+
+  // Ensure correct focus when switching between create and confirm passcode steps
+  useEffect(() => {
+    if (currentStep === KYCStep.PASSCODE) {
+      if (passcodeStep === 'confirm') {
+        // Reset confirm inputs and focus first confirm input after UI updates
+        setConfirmPasscode(['', '', '', '', '', '']);
+        setTimeout(() => {
+          // Focus the first confirm input (small delay to allow render)
+          confirmPasscodeInputRefs.current?.[0]?.focus?.();
+        }, 100);
+      } else if (passcodeStep === 'create') {
+        // When returning to create step, ensure first create input is focused
+        setTimeout(() => {
+          passcodeInputRefs.current?.[0]?.focus?.();
+        }, 100);
+      }
+    }
+  }, [passcodeStep, currentStep]);
 
   const handleSkip = () => {
     // Skip KYC and go directly to the app
@@ -325,23 +363,23 @@ const KYCScreen: React.FC = () => {
     }
   }, [currentStep, arrowTranslateX]);
 
-  const handleNext = () => {
-    // Validate full name if on the full name step
-    if (currentStep === KYCStep.FULL_NAME) {
-      if (!fullName.trim()) {
-        setFullNameError('Please enter your full name');
-        return;
-      }
-      setFullNameError('');
-    }
+  // const handleNext = () => {
+  //   // Validate full name if on the full name step
+  //   if (currentStep === KYCStep.FULL_NAME) {
+  //     if (!fullName.trim()) {
+  //       setFullNameError('Please enter your full name');
+  //       return;
+  //     }
+  //     setFullNameError('');
+  //   }
 
-    if (currentStep < KYCStep.COMPLETE) {
-      setCurrentStep(currentStep + 1);
-    } else {
-      // Complete the signup flow and navigate to authenticated app
-      clearSignupFlow();
-    }
-  };
+  //   if (currentStep < KYCStep.COMPLETE) {
+  //     setCurrentStep(currentStep + 1);
+  //   } else {
+  //     // Complete the signup flow and navigate to authenticated app
+  //     clearSignupFlow();
+  //   }
+  // };
 
   const handleBack = () => {
     if (currentStep > KYCStep.FULL_NAME) {
