@@ -31,13 +31,16 @@
     "expo": "^53.0.9",
     "expo-apple-authentication": "^7.2.4",
     "expo-auth-session": "~6.2.1",
+    "expo-blur": "~14.1.5",
     "expo-camera": "~16.1.6",
+    "expo-crypto": "~14.1.5",
     "expo-dev-client": "~5.1.8",
     "expo-font": "~13.3.1",
     "expo-haptics": "~14.1.4",
     "expo-linear-gradient": "~14.1.4",
     "expo-local-authentication": "^16.0.4",
     "expo-media-library": "~17.1.6",
+    "expo-random": "^14.0.1",
     "expo-secure-store": "^14.2.3",
     "expo-splash-screen": "~0.30.8",
     "expo-sqlite": "^15.2.10",
@@ -59,9 +62,7 @@
     "react-native-wheel-picker": "^1.2.0",
     "react-native-wheel-scrollview-picker": "^2.0.9",
     "sonner-native": "0.19.1",
-    "victory-native": "^41.17.3",
-    "expo-blur": "~14.1.5",
-    "expo-crypto": "~14.1.5"
+    "victory-native": "^41.17.3"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

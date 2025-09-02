@@ -3,6 +3,7 @@
     "name": "Mizan Money",
     "slug": "mizan-banking-app",
     "version": "1.0.0",
+    "scheme": "com.wingi.mizanbankingapp",
     "web": {
       "favicon": "./assets/favicon.png"
     },
@@ -43,7 +44,23 @@
         "foregroundImage": "./assets/LauncherIcon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.wingi.mizanbankingapp"
+      "package": "com.wingi.mizanbankingapp",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "zibhzfmeyifbrduiesoh.supabase.co"
+            },
+            {
+              "scheme": "com.wingi.mizanbankingapp"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
     },
     "extra": {
       "eas": {

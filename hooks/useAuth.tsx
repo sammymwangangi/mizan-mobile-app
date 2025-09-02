@@ -49,7 +49,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isAuthenticated: boolean;
   } | null>(null);
 
-  // Fetch user profile from database
+  // Fetch or create user profile from database
   const fetchUserProfile = async (userId: string) => {
     try {
       console.log('🔍 Fetching user profile for:', userId);
@@ -57,16 +57,40 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         .from('users')
         .select('*')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('❌ Error fetching user profile:', error);
-        throw error;
+        // Don't throw on "no rows" scenarios with maybeSingle; continue to try create
       }
 
-      console.log('✅ User profile fetched successfully');
-      setUserProfile(data);
-      return data;
+      if (!data) {
+        console.log('ℹ️ No user profile found, creating one...');
+        const authUser = supabase.auth.getUser ? (await supabase.auth.getUser()).data.user : null;
+        const email = authUser?.email || undefined;
+        const { error: insertError } = await supabase
+          .from('users')
+          .insert({ id: userId, email, kyc_status: 'pending', is_active: true })
+          .select()
+          .maybeSingle();
+        if (insertError) {
+          console.error('⚠️ Error creating user profile:', insertError);
+        }
+      }
+
+      const { data: finalData } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', userId)
+        .maybeSingle();
+
+      if (finalData) {
+        console.log('✅ User profile ready');
+        setUserProfile(finalData);
+        return finalData;
+      }
+
+      return null;
     } catch (err) {
       console.error('💥 Fetch user profile error:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch user profile');

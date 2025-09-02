@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -22,11 +22,19 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { ChevronDown } from 'lucide-react-native';
 import Input from '../components/Input';
 import { smsService } from '../services/smsService';
+import { supabase } from '../supabaseConfig';
 
 import * as Google from 'expo-auth-session/providers/google';
+import * as WebBrowser from 'expo-web-browser';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { normalize } from 'utils';
 import { COUNTRIES } from '../constants/countries';
+
+import * as Crypto from 'expo-crypto';
+import * as Random from 'expo-random';
+
+// Complete the auth session for better OAuth handling
+WebBrowser.maybeCompleteAuthSession();
 
 type AuthOptionsScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'AuthOptions'>;
 type AuthOptionsScreenRouteProp = NativeStackScreenProps<RootStackParamList, 'AuthOptions'>['route'];
@@ -47,15 +55,85 @@ const AuthOptionsScreen = () => {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [error, setError] = useState('');
 
+  const [appleAvailable, setAppleAvailable] = useState(false);
+  useEffect(() => {
+    if (Platform.OS === 'ios') {
+      AppleAuthentication.isAvailableAsync()
+        .then(setAppleAvailable)
+        .catch(() => setAppleAvailable(false));
+    }
+  }, []);
+
   const routeParams = route.params;
   const tempUserId = routeParams?.tempUserId;
 
-  // Configure Google Sign-in
-  const [, , promptAsync] = Google.useAuthRequest({
+  // Configure Google Sign-in for React Native
+  const [request, response, promptAsync] = Google.useAuthRequest({
     clientId: process.env.EXPO_PUBLIC_WEB_CLIENT_ID,
     iosClientId: process.env.EXPO_PUBLIC_IOS_CLIENT_ID,
     androidClientId: process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID,
+    scopes: ['openid', 'profile', 'email'],
   });
+
+  // Debug environment variables on component mount
+  useEffect(() => {
+    console.log('🔍 Google OAuth Configuration:');
+    console.log('📱 Web Client ID:', process.env.EXPO_PUBLIC_WEB_CLIENT_ID ? '✅ Set' : '❌ Missing');
+    console.log('🤖 Android Client ID:', process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID ? '✅ Set' : '❌ Missing');
+    console.log('🍎 iOS Client ID:', process.env.EXPO_PUBLIC_IOS_CLIENT_ID ? '✅ Set' : '❌ Missing');
+    console.log('🔧 Request ready:', request ? '✅ Ready' : '❌ Not ready');
+  }, [request]);
+
+  // Handle Google OAuth response
+  useEffect(() => {
+    if (response?.type === 'success') {
+      const { authentication } = response;
+      console.log('🔥 Google OAuth success, processing token...');
+      console.log('🎫 Authentication object:', authentication);
+      handleGoogleAuthSuccess(authentication);
+    } else if (response?.type === 'error') {
+      console.error('❌ Google OAuth error:', response.error);
+      Alert.alert('Authentication Error', `Google sign-in failed: ${response.error?.message || 'Unknown error'}`);
+      setLoading(false);
+    } else if (response?.type === 'cancel') {
+      console.log('ℹ️ Google OAuth cancelled by user');
+      setLoading(false);
+    } else if (response?.type === 'dismiss') {
+      console.log('ℹ️ Google OAuth dismissed');
+      setLoading(false);
+    }
+  }, [response]);
+
+  const handleGoogleAuthSuccess = async (authentication: any) => {
+    try {
+      const { idToken } = authentication || {};
+      if (!idToken) {
+        Alert.alert('Authentication Error', 'No ID token received from Google');
+        return;
+      }
+
+      if (__DEV__) console.log('🔄 Exchanging Google ID token with Supabase...');
+
+      const { data, error } = await supabase.auth.signInWithIdToken({
+        provider: 'google',
+        token: idToken,
+      });
+
+      if (error) {
+        console.error('❌ Supabase Google auth error:', error);
+        Alert.alert('Authentication Error', `Failed to authenticate with Google: ${error.message}`);
+        return;
+      }
+
+      if (__DEV__) console.log('✅ Google authentication successful!', data.user?.email);
+      // Navigation handled by useAuth hook
+    } catch (error) {
+      console.error('💥 Error processing Google authentication:', error);
+      Alert.alert('Authentication Error', 'Failed to complete Google sign-in');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Handle terms checkbox toggle
   const handleTermsToggle = () => {
@@ -158,24 +236,41 @@ const AuthOptionsScreen = () => {
 
     try {
       setLoading(true);
-      const result = await promptAsync();
-      if (result.type === 'success') {
-        // Handle successful Google authentication
-        // In production, you would exchange the token with your backend
-        console.log('Google auth successful:', result);
+      console.log('🔵 Starting Google OAuth flow...');
+      console.log('🔍 Request object:', request);
 
-        // Navigate to success screen
-        navigation.navigate('SuccessScreen', { authMethod: 'google' });
+      if (!request) {
+        console.error('❌ Google OAuth request not ready');
+        Alert.alert('Authentication Error', 'Google authentication is not ready. Please try again.');
+        return;
       }
-    } catch (error) {
-      console.error('Google sign-in error:', error);
-      Alert.alert('Authentication Error', 'Failed to sign in with Google');
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  // Handle Apple Sign-in
+      // Trigger Google OAuth flow
+      console.log('🚀 Calling promptAsync...');
+      const result = await promptAsync();
+      console.log('� Google OAuth result:', result);
+
+      if (result.type === 'cancel') {
+        console.log('ℹ️ User cancelled Google OAuth');
+      } else if (result.type === 'dismiss') {
+        console.log('ℹ️ Google OAuth dismissed');
+      } else if (result.type === 'error') {
+        console.error('❌ Google OAuth error:', result.error);
+        Alert.alert('Authentication Error', `Google sign-in failed: ${result.error?.message || 'Unknown error'}`);
+      }
+
+      // Success case is handled by useEffect
+
+    } catch (error) {
+      console.error('💥 Google sign-in error:', error);
+      Alert.alert('Authentication Error', 'Failed to sign in with Google. Please try again.');
+    } finally {
+      // Only set loading to false if we're not processing a successful response
+      if (!response || response.type !== 'success') {
+        setLoading(false);
+      }
+    }
+  };  // Handle Apple Sign-in
   const handleAppleSignIn = async () => {
     if (!termsAccepted) {
       Alert.alert('Error', 'Please accept the Terms & Conditions to continue');
@@ -184,21 +279,47 @@ const AuthOptionsScreen = () => {
 
     try {
       setLoading(true);
+
+      // Generate a cryptographically secure nonce
+      const nonceBytes = await Random.getRandomBytesAsync(16);
+      const rawNonce = Array.from(nonceBytes).map((b) => b.toString(16).padStart(2, '0')).join('');
+      const hashedNonce = await Crypto.digestStringAsync(
+        Crypto.CryptoDigestAlgorithm.SHA256,
+        rawNonce
+      );
+
       const credential = await AppleAuthentication.signInAsync({
         requestedScopes: [
           AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
           AppleAuthentication.AppleAuthenticationScope.EMAIL,
         ],
+        nonce: hashedNonce,
       });
 
-      // Handle successful Apple authentication
-      console.log('Apple auth successful:', credential);
+      if (__DEV__) console.log('Apple auth successful');
 
-      // Navigate to success screen
-      navigation.navigate('SuccessScreen', { authMethod: 'apple' });
-    } catch (error) {
+      if (!credential.identityToken) {
+        Alert.alert('Authentication Error', 'No identity token received from Apple');
+        return;
+      }
+
+      const { error } = await supabase.auth.signInWithIdToken({
+        provider: 'apple',
+        token: credential.identityToken,
+        nonce: rawNonce,
+      });
+
+      if (error) {
+        console.error('Supabase Apple auth error:', error);
+        Alert.alert('Authentication Error', 'Failed to complete Apple sign-in');
+        return;
+      }
+
+      if (__DEV__) console.log('✅ Apple authentication with Supabase successful');
+      // Navigation handled by the auth state change in useAuth
+    } catch (error: any) {
       console.error('Apple sign-in error:', error);
-      if (error instanceof Error && 'code' in error && error.code !== 'ERR_CANCELED') {
+      if (error?.code !== 'ERR_CANCELED') {
         Alert.alert('Authentication Error', 'Failed to sign in with Apple');
       }
     } finally {
@@ -333,14 +454,16 @@ const AuthOptionsScreen = () => {
         </TouchableOpacity>
 
         {/* Apple Authentication */}
-        <TouchableOpacity
-          style={styles.secondaryButton}
-          onPress={handleAppleSignIn}
-          disabled={loading}
-        >
-          <Image source={require('../assets/apple-icon.png')} style={styles.buttonIcon} />
-          <Text style={styles.secondaryButtonText}>Continue with Apple</Text>
-        </TouchableOpacity>
+        {Platform.OS === 'ios' && appleAvailable && (
+          <TouchableOpacity
+            style={styles.secondaryButton}
+            onPress={handleAppleSignIn}
+            disabled={loading}
+          >
+            <Image source={require('../assets/apple-icon.png')} style={styles.buttonIcon} />
+            <Text style={styles.secondaryButtonText}>Continue with Apple</Text>
+          </TouchableOpacity>
+        )}
 
         {/* Google Authentication */}
         <TouchableOpacity
