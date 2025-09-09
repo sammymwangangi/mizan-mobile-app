@@ -94,10 +94,10 @@ const styles = StyleSheet.create({
 
   phoneImage: {
     position: 'absolute',
-    top: -10,
-    right: -170,  // Adjust this value to move the image to the right
-    width: 500,
-    height: 840,
+    top: 0,
+    right: -185,  // Adjust this value to move the image to the right
+    width: 550,
+    height: 860,
   },
   textContainer: {
     alignItems: 'center',

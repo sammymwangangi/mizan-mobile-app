@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
 
   planCard: {
     position: 'absolute',
-    top: 60, // More responsive positioning
+    top: 100, // More responsive positioning
     left: 40, // Position from right edge
     width: 350, // Responsive width
     height: 472, // Responsive height
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
   },
   choosePlan: {
     position: 'absolute',
-    top: 231, // Slightly higher than card1
+    top: 250, // Slightly higher than card1
     left: -63, // Position from left edge
     width: 347, // Responsive width
     height: 544, // Responsive height
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
   },
   card3Container: {
     position: 'absolute',
-    top: 325, // Position in middle-lower area
+    top: 360, // Position in middle-lower area
     left: 130,
   },
   watchImage: {
@@ -149,14 +149,14 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     position: 'absolute',
-    bottom: height * 0.06, // More responsive bottom positioning
+    bottom: 64, // More responsive bottom positioning
     left: 0,
     right: 0,
     alignItems: 'center',
     shadowColor: '#391A7380',
     shadowOffset: {
-      width: 0,
-      height: 20,
+      width: 10,
+      height: 30,
     },
     shadowOpacity: 0.5,
     shadowRadius: 40,

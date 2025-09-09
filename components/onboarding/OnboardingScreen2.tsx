@@ -8,6 +8,7 @@ import {
   StatusBar,
   TouchableOpacity,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, FONTS, SIZES } from '../../constants/theme';
 
@@ -19,13 +20,25 @@ interface OnboardingScreen2Props {
 }
 
 const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({ onNext, onBack }) => {
-  // Calculate responsive dimensions
-  const imageWidth = width * 0.7; // 70% of screen width
-  const imageHeight = imageWidth * 1.69; // Maintain aspect ratio (850/503)
-  const maxImageHeight = height * 0.55; // Don't exceed 55% of screen height
-  
-  const finalImageHeight = Math.min(imageHeight, maxImageHeight);
-  const finalImageWidth = finalImageHeight / 1.69;
+  const insets = useSafeAreaInsets();
+  const isSmallPhone = width < 375; // iPhone SE and similar
+
+  // Calculate responsive dimensions (503x850)
+  const aspect = 850 / 503; // H/W
+  const baseImageHeight = height * (isSmallPhone ? 0.9 : 1.05); // Larger to match the design
+  const finalImageHeight = baseImageHeight;
+  const finalImageWidth = finalImageHeight / aspect;
+
+  // Image transform to match the diagonal composition
+  const rotateDeg = isSmallPhone ? '-20deg' : '0deg';
+  const translateX = width * (isSmallPhone ? -0.18 : -0.25);
+  const translateY = height * (isSmallPhone ? -0.02 : -0.04);
+
+  // Safe top/bottom paddings to avoid notch/home indicator (keep tight like design)
+  const topPadding = insets.top + (isSmallPhone ? 8 : 12);
+  const bottomPadding = insets.bottom + (isSmallPhone ? 20 : 28);
+  const progressBottom = insets.bottom + (isSmallPhone ? 10 : 16);
+  const imageTop = insets.top + (isSmallPhone ? 0 : 4);
 
   return (
     <TouchableOpacity style={styles.container} onPress={onNext} activeOpacity={1}>
@@ -39,9 +52,9 @@ const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({ onNext, onBack })
         style={styles.gradient}
       >
         <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
-      
+
         {/* Main Content */}
-        <View style={styles.contentContainer}>
+        <View style={[styles.contentContainer, { paddingTop: topPadding, paddingBottom: bottomPadding }]}>
           {/* Phone Image */}
           <View style={styles.imageContainer}>
             <Image
@@ -51,6 +64,12 @@ const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({ onNext, onBack })
                 {
                   width: finalImageWidth,
                   height: finalImageHeight,
+                  transform: [
+                    { translateY },
+                    { translateX },
+                    { rotate: rotateDeg },
+                  ],
+                  marginTop: imageTop,
                 }
               ]}
               resizeMode="contain"
@@ -66,7 +85,7 @@ const OnboardingScreen2: React.FC<OnboardingScreen2Props> = ({ onNext, onBack })
         </View>
 
         {/* Progress Bar */}
-        <View style={styles.progressContainer}>
+        <View style={[styles.progressContainer, { bottom: progressBottom }]}>
           <View style={styles.progressBar}>
             <View style={[styles.progressFill, { width: '40%' }]} />
           </View>
@@ -88,17 +107,18 @@ const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     paddingHorizontal: SIZES.padding,
-    paddingTop: height * 0.1, // 10% of screen height for top padding
-    paddingBottom: height * 0.15, // 15% for bottom padding (space for progress bar)
   },
   imageContainer: {
-    flex: 1,
+    position: 'absolute',
+    top: 0,
+    left: 122,
+    right: 0,
+    bottom: 0,
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
-    maxHeight: height * 0.6, // Maximum 60% of screen height
   },
   phoneImage: {
     // Dynamic dimensions will be applied inline
@@ -109,29 +129,27 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   subtitle: {
-    ...FONTS.medium(Math.max(14, width * 0.04), Math.max(20, width * 0.055)), // Responsive font size
+    ...FONTS.medium(Math.max(15, width * 0.042), Math.max(22, width * 0.062)),
     color: COLORS.textWhite,
     textAlign: 'center',
-    lineHeight: Math.max(22, width * 0.06), // Responsive line height
   },
   progressContainer: {
     position: 'absolute',
-    bottom: height * 0.06, // 6% from bottom
     left: 0,
     right: 0,
     alignItems: 'center',
     paddingHorizontal: 40,
   },
   progressBar: {
-    width: '100%',
+    width: '70%',
     height: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)', // More visible on gradient
+    backgroundColor: '#EEEFF5',
     borderRadius: 2,
-    overflow: 'hidden', 
+    overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#FFFFFF', // White for better contrast
+    backgroundColor: '#7A4BFF',
     borderRadius: 2,
   },
 });

@@ -53,7 +53,7 @@ const OnboardingScreen7: React.FC<OnboardingScreen7Props> = ({ onNext, onBack })
         {/* Text Content */}
         <View style={styles.textContainer}>
           <Text style={styles.subtitle}>
-            While manifesting your future{'\n'}soft life.
+            Send USDT from UAE to Africa in seconds — pegged{'\n'} 1:1, 100 % halal.
           </Text>
         </View>
       </View>
@@ -104,8 +104,8 @@ const styles = StyleSheet.create({
     rotation: 7.45,
   },
   phoneImage: {
-    width: 554,
-    height: 650,
+    width: 555,
+    height: 800,
   },
   textContainer: {
     position: 'absolute',
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
   },
   progressBar: {
-    width: '100%',
+    width: '70%',
     height: 4,
     backgroundColor: '#EEEFF5',
     borderRadius: 2,

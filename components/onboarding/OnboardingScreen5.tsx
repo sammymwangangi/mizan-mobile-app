@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
   },
   progressBar: {
-    width: '100%',
+    width: '70%',
     height: 4,
     backgroundColor: '#EEEFF5',
     borderRadius: 2,

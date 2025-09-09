@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: width * 0.1, // Responsive horizontal padding
   },
   progressBar: {
-    width: '100%',
+    width: '70%',
     height: 4,
     backgroundColor: '#EEEFF5',
     borderRadius: 2,

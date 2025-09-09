@@ -58,11 +58,13 @@ const WelcomeScreen = () => {
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
       
       {/* Decorative Pattern Background */}
-      <Image
-        source={require('../assets/kyc/PhoneNumberPattern.png')}
-        style={styles.patternImage}
-        resizeMode="cover"
-      />
+      <View>
+        <Image
+          source={require('../assets/kyc/PhoneNumberPattern.png')}
+          style={styles.patternImage}
+          resizeMode="cover"
+        />
+      </View>
 
       {/* Content */}
       <View style={styles.content}>
@@ -112,7 +114,7 @@ const styles = StyleSheet.create({
   },
   patternImage: {
     width: '100%',
-    height: 330,
+    height: 390,
   },
   content: {
     flex: 1,
