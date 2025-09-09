@@ -93,8 +93,9 @@ const HomeScreen = () => {
 
       {/* Gradient Background */}
       <GradientBackground
-        colors={['#CE72E3', '#8C5FED', '#8C5FED' ]}
-        start={{ x: 1, y: 0}}
+        colors={['#8C5FED', '#8C5FED', '#CE72E3']}
+        locations={[0, 0.17, 1]}
+        start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         style={{
           ...styles.headerBackground,
