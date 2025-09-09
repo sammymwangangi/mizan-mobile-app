@@ -126,8 +126,8 @@ enum KYCStep {
   DOCUMENT_SCAN,
   DOCUMENT_REVIEW,
   CARD,
-  CONGRATULATIONS,
-  COMPLETE
+  COMPLETE,
+  CONGRATULATIONS
 }
 
 const KYCScreen: React.FC = () => {
@@ -327,19 +327,19 @@ const KYCScreen: React.FC = () => {
   };
 
   useEffect(() => {
-    if (currentStep === KYCStep.CONGRATULATIONS) {
-      // Navigate to complete step after 5 seconds
+    if (currentStep === KYCStep.COMPLETE) {
+      // Auto-advance to the final congratulations screen after ~3.5s
       const timer = setTimeout(() => {
-        setCurrentStep(KYCStep.COMPLETE);
-      }, 5000);
+        setCurrentStep(KYCStep.CONGRATULATIONS);
+      }, 3500);
 
       return () => clearTimeout(timer);
     }
   }, [currentStep]);
 
-  // Animate the arrow to indicate swipe direction
+  // Animate the arrow to indicate swipe direction (final screen)
   useEffect(() => {
-    if (currentStep === KYCStep.COMPLETE) {
+    if (currentStep === KYCStep.CONGRATULATIONS) {
       const pulseAnimation = Animated.loop(
         Animated.sequence([
           Animated.timing(arrowTranslateX, {
@@ -392,6 +392,20 @@ const KYCScreen: React.FC = () => {
       return null;
     }
   };
+
+  // Finish KYC and enter the app
+  const handleCompleteSignup = useCallback(() => {
+    console.log('🚀 Completing signup - SIMULATION MODE...');
+    if (SIMULATION_MODE) {
+      clearSignupFlow();
+      simulateAuthentication();
+      console.log('✅ SIMULATION: Mock auth state created - App should navigate automatically!');
+    } else {
+      // TODO: Real auth flow implementation
+      console.log('🔐 PRODUCTION MODE: Implement real auth flow here');
+      clearSignupFlow();
+    }
+  }, [clearSignupFlow, simulateAuthentication]);
 
   const renderProgressBar = () => {
     // Total number of steps (excluding CONGRATULATIONS and COMPLETE)
@@ -1755,7 +1769,7 @@ const KYCScreen: React.FC = () => {
             <TouchableOpacity disabled style={{ opacity: 0.4 }}>
               <Text style={{ color: '#C7C7C7', fontSize: normalize(18), fontFamily: 'Poppins' }}>Yes please</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => setCurrentStep(KYCStep.CONGRATULATIONS)}>
+            <TouchableOpacity onPress={() => setCurrentStep(KYCStep.COMPLETE)}>
               <Text style={{ color: '#A276FF', ...FONTS.semibold(18) }}>Skip for now</Text>
             </TouchableOpacity>
           </View>
@@ -1765,63 +1779,7 @@ const KYCScreen: React.FC = () => {
   };
 
   const renderCongratulationsStep = () => {
-    return (
-      <View style={styles.congratulationsContainer}>
-        <Text style={styles.congratulationsTitle}>That&apos;s it</Text>
-
-        <View style={styles.congratulationsIconContainer}>
-          <View style={styles.congratulationsCheckmarkCircle}>
-            <Text style={styles.congratulationsCheckmark}>✓</Text>
-          </View>
-        </View>
-
-        <Text style={styles.congratulationsSubtitle}>
-          That&apos;s it, let&apos;s unlock ethical{'\n'}wealth
-        </Text>
-
-        <View style={styles.congratulationsButtonContainer}>
-          <TouchableOpacity style={styles.congratulationsSwipeButton} onPress={() => handleNext()}>
-            <LinearGradient
-              colors={['#D155FF', '#B532F2', '#A016E8', '#9406E2', '#8F00E0', '#921BE6', '#A08CFF']}
-              locations={[0, 0.15, 0.3, 0.45, 0.6, 0.75, 1]}
-              start={{ x: 0, y: 0.5 }}
-              end={{ x: 1, y: 0.5 }}
-              style={styles.congratulationsSwipeButtonGradient}
-            >
-              <View style={styles.congratulationsSwipeContent}>
-                <View style={styles.congratulationsArrowCircle}>
-                  <ArrowRight size={20} color="#000" />
-                </View>
-                <Text style={styles.congratulationsSwipeText}>SWIPE TO START</Text>
-              </View>
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
-  };
-
-  const renderCompleteStep = () => {
-    const handleCompleteSignup = () => {
-      console.log('🚀 Completing signup - SIMULATION MODE...');
-
-      if (SIMULATION_MODE) {
-        // SIMULATION: Create isolated mock authentication state
-        // This completely bypasses Supabase and creates a separate auth state
-        console.log('🎭 SIMULATION: Creating isolated mock authentication...');
-
-        clearSignupFlow();
-        simulateAuthentication();
-
-        console.log('✅ SIMULATION: Mock auth state created - App should navigate automatically!');
-      } else {
-        // TODO: Real auth flow implementation
-        // When ready for production, implement real Supabase auth here
-        console.log('🔐 PRODUCTION MODE: Implement real auth flow here');
-        clearSignupFlow();
-      }
-    };
-
+    // Swipe handlers (moved from previous complete step)
     const onGestureEvent = Animated.event(
       [{ nativeEvent: { translationX: translateX } }],
       { useNativeDriver: true }
@@ -1830,60 +1788,41 @@ const KYCScreen: React.FC = () => {
     const onHandlerStateChange = (event: any) => {
       if (event.nativeEvent.oldState === State.ACTIVE) {
         const { translationX } = event.nativeEvent;
-
-        // If swiped more than 120px (about half the button width), navigate to Home
         if (translationX > 120) {
-          // Animate the button to slide out and fade
           Animated.parallel([
-            Animated.timing(buttonOpacity, {
-              toValue: 0,
-              duration: 200,
-              useNativeDriver: true
-            }),
-            Animated.timing(translateX, {
-              toValue: 300, // Slide all the way out
-              duration: 200,
-              useNativeDriver: true
-            })
+            Animated.timing(buttonOpacity, { toValue: 0, duration: 200, useNativeDriver: true }),
+            Animated.timing(translateX, { toValue: 300, duration: 200, useNativeDriver: true })
           ]).start(() => {
             handleCompleteSignup();
           });
         } else {
-          // Reset the position with a spring animation
-          Animated.spring(translateX, {
-            toValue: 0,
-            useNativeDriver: true,
-            bounciness: 5,
-            speed: 12
-          }).start();
+          Animated.spring(translateX, { toValue: 0, useNativeDriver: true, bounciness: 5, speed: 12 }).start();
         }
       }
     };
 
     return (
-      <View className="flex-1 flex-col justify-between items-center px-2 py-20">
+      <View style={styles.congratulationsContainer}>
+        <Text style={styles.congratulationsTitle}>That&apos;s it</Text>
 
-        <Text className="text-[#1B1C39] text-center" style={{ ...FONTS.semibold(25) }}>That&apos;s it</Text>
+        <View style={styles.congratulationsIconContainer}>
+            <Image
+              source={require('../assets/kyc/tick.png')}
+              style={{ width: normalize(88), height: normalize(88) }}
+              resizeMode="contain"
+            />
+          {/* <View style={styles.congratulationsCheckmarkCircle}>
+          </View> */}
+        </View>
 
-        <Image
-          source={require('../assets/kyc/high_five.png')}
-          className='w-[200px] h-[200px]'
-          resizeMode="contain"
-        />
-
-        <Text className="text-[#1B1C39] text-[20px] text-center" style={{ fontFamily: 'Poppins' }}>
-          That&apos;s it, start moving moolah
+        <Text style={styles.congratulationsSubtitle}>
+          That&apos;s it, let&apos;s unlock ethical{'\n'}wealth
         </Text>
 
         <Animated.View style={[styles.swipeButtonContainer, { opacity: buttonOpacity }]}>
           <TouchableOpacity
             onPress={() => {
-              // Fallback tap handler
-              Animated.timing(buttonOpacity, {
-                toValue: 0,
-                duration: 200,
-                useNativeDriver: true
-              }).start(() => {
+              Animated.timing(buttonOpacity, { toValue: 0, duration: 200, useNativeDriver: true }).start(() => {
                 handleCompleteSignup();
               });
             }}
@@ -1895,22 +1834,9 @@ const KYCScreen: React.FC = () => {
               end={{ x: 0, y: 1 }}
               style={styles.swipeButton}
             >
-              <PanGestureHandler
-                onGestureEvent={onGestureEvent}
-                onHandlerStateChange={onHandlerStateChange}
-              >
-                <Animated.View
-                  style={[
-                    styles.swipeContent,
-                    { transform: [{ translateX: translateX }] }
-                  ]}
-                >
-                  <Animated.View
-                    style={[
-                      styles.arrowCircle,
-                      { transform: [{ translateX: arrowTranslateX }] }
-                    ]}
-                  >
+              <PanGestureHandler onGestureEvent={onGestureEvent} onHandlerStateChange={onHandlerStateChange}>
+                <Animated.View style={[styles.swipeContent, { transform: [{ translateX }] }]}>
+                  <Animated.View style={[styles.arrowCircle, { transform: [{ translateX: arrowTranslateX }] }]}>
                     <ArrowRight size={20} color="#000" />
                   </Animated.View>
                   <Text style={styles.swipeButtonText}>SWIPE TO START</Text>
@@ -1919,6 +1845,23 @@ const KYCScreen: React.FC = () => {
             </LinearGradient>
           </TouchableOpacity>
         </Animated.View>
+      </View>
+    );
+  };
+
+  const renderCompleteStep = () => {
+    // Now a passive screen: high-five + copy, no buttons; auto-advances handled by useEffect
+    return (
+      <View className="flex-1 flex-col justify-between items-center px-2 py-20">
+        <Text className="text-[#1B1C39] text-center" style={{ ...FONTS.semibold(25) }}>Congratulations!</Text>
+        <Image
+          source={require('../assets/kyc/high_five.png')}
+          className='w-[200px] h-[200px]'
+          resizeMode="contain"
+        />
+        <Text className="text-[#1B1C39] text-[20px] text-center" style={{ fontFamily: 'Poppins' }}>
+          Great job Habibi, your account is{'\n'}being setup. Sabr In Shaa Allah.
+        </Text>
       </View>
     );
   };
@@ -1959,10 +1902,10 @@ const KYCScreen: React.FC = () => {
         return renderDocumentReviewStep();
       case KYCStep.CARD:
         return renderCardStep();
-      case KYCStep.CONGRATULATIONS:
-        return renderCongratulationsStep();
       case KYCStep.COMPLETE:
         return renderCompleteStep();
+      case KYCStep.CONGRATULATIONS:
+        return renderCongratulationsStep();
       default:
         return null;
     }
