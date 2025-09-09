@@ -21,10 +21,10 @@
       ]
     ],
     "orientation": "portrait",
-    "icon": "./assets/gradient-logo.png",
+    "icon": "./assets/mizan-icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/LauncherIcon.png",
+      "image": "./assets/mizan-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#FFFFFF"
     },
@@ -41,7 +41,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/LauncherIcon.png",
+        "foregroundImage": "./assets/mizan-icon.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.wingi.mizanbankingapp",
