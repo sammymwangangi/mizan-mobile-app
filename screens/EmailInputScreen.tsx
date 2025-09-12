@@ -70,11 +70,12 @@ const EmailInputScreen = () => {
         <TouchableOpacity onPress={handleBack} style={styles.backButton}>
           <ArrowLeft size={24} color={COLORS.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Type your email</Text>
+        <Text style={styles.backTitle}>Back</Text>
       </View>
 
       <View style={styles.content}>
         <View style={styles.inputContainer}>
+          <Text style={styles.headerTitle}>Type your emailss</Text>
           <Input
             placeholder="Type your email here"
             value={email}
@@ -99,7 +100,7 @@ const EmailInputScreen = () => {
             style={styles.submitButtonGradient}
           >
             <Text style={styles.submitButtonText}>
-              {loading ? 'SENDING...' : 'CONFIRM IDENTITY'}
+              {loading ? 'Sending...' : 'Confirm Identity'}
             </Text>
           </LinearGradient>
         </TouchableOpacity>
@@ -122,10 +123,15 @@ const styles = StyleSheet.create({
   backButton: {
     padding: 10,
   },
-  headerTitle: {
-    ...FONTS.h2,
+  backTitle: {
+    ...FONTS.medium(15),
     color: COLORS.text,
-    marginLeft: 10,
+    marginLeft: 100,
+  },
+  headerTitle: {
+    ...FONTS.bold(34),
+    color: COLORS.text,
+    marginBottom: 10,
   },
   content: {
     flex: 1,
@@ -133,7 +139,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   inputContainer: {
-    marginTop: 20,
+    marginTop: 200,
   },
   emailIcon: {
     width: 24,
@@ -154,7 +160,7 @@ const styles = StyleSheet.create({
   },
   submitButtonText: {
     color: 'white',
-    ...FONTS.semibold(16),
+    ...FONTS.semibold(20),
     letterSpacing: 1,
   },
 });

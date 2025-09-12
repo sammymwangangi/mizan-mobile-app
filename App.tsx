@@ -247,34 +247,58 @@ function AppContent() {
   const { isAuthenticated, isInSignupFlow, user } = useAuth();
 
   useEffect(() => {
+    let cancelled = false;
+
     async function prepare() {
       try {
         await SplashScreen.preventAutoHideAsync(); // Keep splash visible
 
-        // Load fonts
-        await Font.loadAsync({
-          'Poppins': Poppins_400Regular,
-          'Poppins_500Medium': Poppins_500Medium,
-          'Poppins_600SemiBold': Poppins_600SemiBold,
-          'Poppins_700Bold': Poppins_700Bold,
-          'Poppins_900Black': Poppins_900Black,
-        });
+        const initTasks = [
+          Font.loadAsync({
+            'Poppins': Poppins_400Regular,
+            'Poppins_500Medium': Poppins_500Medium,
+            'Poppins_600SemiBold': Poppins_600SemiBold,
+            'Poppins_700Bold': Poppins_700Bold,
+            'Poppins_900Black': Poppins_900Black,
+          }),
+          testSupabaseConnection(),
+          testSupabaseAuth(),
+        ];
 
-        // Test Supabase connection
-        await testSupabaseConnection();
-        await testSupabaseAuth();
+        // Timebox initialization to avoid indefinite splash hangs
+        await Promise.race([
+          Promise.allSettled(initTasks),
+          new Promise((res) => setTimeout(res, 5000)), // 5s safety timeout
+        ]);
+
+        if (cancelled) return;
 
         console.log('App initialization complete');
       } catch (e) {
         console.warn("Error in prepare function:", e);
       } finally {
-        setAppIsReady(true);
-        console.log("App is ready.");
+        if (!cancelled) {
+          setAppIsReady(true);
+          console.log("App is ready.");
+        }
       }
     }
 
     prepare();
+    return () => {
+      cancelled = true;
+    };
   }, []);
+
+  // Fallback: hide splash as soon as appIsReady, in case onLayout doesn't fire on device
+  useEffect(() => {
+    if (appIsReady) {
+      SplashScreen.hideAsync()
+        .then(() => console.log("Splash screen hidden (effect)."))
+        .catch((e) => console.warn("Splash hide failed:", e));
+    }
+  }, [appIsReady]);
+
 
   const onLayoutRootView = useCallback(async () => {
     console.log(`onLayoutRootView called. appIsReady: ${appIsReady}`);

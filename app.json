@@ -18,7 +18,10 @@
             "node_modules/@expo-google-fonts/poppins/900Black/Poppins_900Black.ttf"
           ]
         }
-      ]
+      ],
+      "expo-secure-store",
+      "expo-sqlite",
+      "expo-web-browser"
     ],
     "orientation": "portrait",
     "icon": "./assets/mizan-icon.png",
@@ -58,7 +61,10 @@
               "scheme": "com.wingi.mizanbankingapp"
             }
           ],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
       ]
     },
