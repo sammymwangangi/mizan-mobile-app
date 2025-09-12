@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -8,14 +8,15 @@ import {
   Platform,
   Image,
   Alert,
+  Linking,
 } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
-import { ArrowLeft } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../hooks/useAuth';
+import { supabase } from '../supabaseConfig';
 
 type EmailVerificationScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'EmailVerification'>;
 type EmailVerificationScreenRouteProp = RouteProp<RootStackParamList, 'EmailVerification'>;
@@ -26,7 +27,7 @@ const EmailVerificationScreen = () => {
   const { email } = route.params;
   const [timer, setTimer] = useState(60);
   const [loading, setLoading] = useState(false);
-  const { signIn } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -42,94 +43,102 @@ const EmailVerificationScreen = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const handleBack = () => {
-    navigation.goBack();
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigation.navigate('SuccessScreen', { authMethod: 'email' });
+    }
+  }, [isAuthenticated, navigation]);
+
+  const formatMMSS = (s: number) => {
+    const m = Math.floor(s / 60)
+      .toString()
+      .padStart(2, '0');
+    const sec = (s % 60)
+      .toString()
+      .padStart(2, '0');
+    return `${m}:${sec}`;
   };
 
-  const handleOpenEmailApp = () => {
-    // In a real app, you would use Linking to open the email app
-    Alert.alert('Open Email App', 'This would open the default email app');
+  const handleOpenEmailApp = async () => {
+    try {
+      const supported = await Linking.canOpenURL('mailto:');
+      if (supported) {
+        await Linking.openURL('mailto:');
+      } else {
+        Alert.alert('Open Email App', 'Please open your email app to find the Magic link.');
+      }
+    } catch {
+      Alert.alert('Open Email App', 'Unable to open email app on this device.');
+    }
   };
 
-  const handleResendLink = () => {
-    setLoading(true);
-    setTimer(60);
-    
-    // Simulate sending a new verification link
-    setTimeout(() => {
+  const handleResendLink = async () => {
+    try {
+      setLoading(true);
+      setTimer(60);
+
+      const { error } = await supabase.auth.signInWithOtp({ email });
+      if (error) throw error;
+
+      Alert.alert('Link Sent', 'A new Magic link has been sent to your email.');
+    } catch (e: any) {
+      Alert.alert('Resend Failed', e?.message || 'Could not resend verification email.');
+    } finally {
       setLoading(false);
-      Alert.alert('Link Sent', 'A new verification link has been sent to your email');
-    }, 1500);
-  };
-
-  const handleVerificationSuccess = () => {
-    // This would be called when the user returns from verifying their email
-    navigation.navigate('SuccessScreen', { authMethod: 'email' });
+    }
   };
 
   return (
-    <KeyboardAvoidingView
+    <View
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-          <ArrowLeft size={24} color={COLORS.text} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Check your e-mail</Text>
-      </View>
-
       <View style={styles.content}>
-        <Image
-          source={require('../assets/email-verification.png')}
-          style={styles.emailImage}
-          resizeMode="contain"
-        />
-        
-        <Text style={styles.description}>
-          We&apos;ve sent a magic link to <Text style={styles.emailText}>{email}</Text>. Open your inbox to log in. Can&apos;t spot it? Check in Spam or Promotions.
-        </Text>
+        <View>
+          <Image
+            source={require('../assets/email-verification.png')}
+            style={styles.emailImage}
+            resizeMode="contain"
+          />
 
-        <TouchableOpacity
-          style={styles.openEmailButton}
-          onPress={handleOpenEmailApp}
-        >
-          <LinearGradient
-            colors={['#D155FF', '#B532F2', '#A016E8', '#9406E2', '#8F00E0', '#921BE6', '#A08CFF']}
-            locations={[0, 0.15, 0.3, 0.45, 0.6, 0.75, 1]}
-            start={{ x: 0, y: 0.5 }}
-            end={{ x: 1, y: 0.5 }}
-            style={styles.buttonGradient}
+          <Text style={styles.title}>Check your e-mail</Text>
+          <Text style={styles.description}>
+            We’ve sent a Magic link! Open your inbox to hop in. Can’t spot it? Peek in Spam or Promotions
+          </Text>
+        </View>
+
+        <View style={{marginBottom: 60}}>
+          <TouchableOpacity
+            style={styles.openEmailButton}
+            onPress={handleOpenEmailApp}
+            activeOpacity={0.9}
           >
-            <Text style={styles.buttonText}>OPEN EMAIL APP</Text>
-          </LinearGradient>
-        </TouchableOpacity>
+            <LinearGradient
+              colors={['#D155FF', '#B532F2', '#A016E8', '#9406E2', '#8F00E0', '#A08CFF']}
+              locations={[0, 0.15, 0.3, 0.45, 0.6, 1]}
+              start={{ x: 0, y: 0.5 }}
+              end={{ x: 1, y: 0.5 }}
+              style={styles.primaryButton}
+            >
+              <Text style={styles.primaryButtonText}>Open Email App</Text>
+            </LinearGradient>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[styles.resendButton, timer > 0 && styles.resendButtonDisabled]}
-          onPress={handleResendLink}
-          disabled={timer > 0 || loading}
-        >
-          <Text style={styles.resendButtonText}>
-            {timer > 0 ? `RE-SEND IN ${timer}s` : 'RE-SEND LINK'}
-          </Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.resendButton, (timer > 0 || loading) && styles.resendButtonDisabled]}
+            onPress={handleResendLink}
+            disabled={timer > 0 || loading}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.resendButtonText}>
+              {timer > 0 ? `Re-send in ${formatMMSS(timer)}` : 'Re-send link'}
+            </Text>
+          </TouchableOpacity>
 
-        <Text style={styles.expiryText}>
-          Link expires in 10 min for your safety.
-        </Text>
+          <Text style={styles.expiryText}>Link expires in 10 min for your safety.</Text>
+        </View>
 
-        {/* For demo purposes - this button simulates successful verification */}
-        <TouchableOpacity
-          style={styles.demoButton}
-          onPress={handleVerificationSuccess}
-        >
-          <Text style={styles.demoButtonText}>
-            (Demo: Simulate Successful Verification)
-          </Text>
-        </TouchableOpacity>
       </View>
-    </KeyboardAvoidingView>
+    </View>
   );
 };
 
@@ -138,84 +147,78 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: SIZES.padding,
-    paddingTop: Platform.OS === 'ios' ? 50 : 20,
-  },
-  backButton: {
-    padding: 10,
-  },
-  headerTitle: {
-    ...FONTS.h2,
-    color: COLORS.text,
-    marginLeft: 10,
-  },
   content: {
     flex: 1,
     padding: SIZES.padding,
-    alignItems: 'center',
+    paddingTop: 120,
+    alignItems: 'stretch',
+    justifyContent: 'space-between',
   },
   emailImage: {
     width: 120,
     height: 120,
-    marginVertical: 30,
+    alignSelf: 'center',
+    marginTop: 8,
+    marginBottom: 28,
+  },
+  title: {
+    ...FONTS.bold(34),
+    color: COLORS.text,
+    textAlign: 'left',
+    marginBottom: 10,
   },
   description: {
-    ...FONTS.body3,
-    color: COLORS.text,
-    textAlign: 'center',
-    marginBottom: 30,
-  },
-  emailText: {
-    ...FONTS.semibold(16),
-    color: COLORS.primary,
+    ...FONTS.body4,
+    color: COLORS.textLight,
+    textAlign: 'left',
+    marginBottom: 36,
   },
   openEmailButton: {
     width: '100%',
-    marginBottom: 15,
+    marginBottom: 14,
   },
-  buttonGradient: {
-    height: 56,
-    borderRadius: 28,
+  primaryButton: {
+    height: 55,
+    borderRadius: 40,
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: '#6943AF',
+    shadowOffset: { width: 0, height: 20 },
+    shadowOpacity: 0.26,
+    shadowRadius: 40,
+    elevation: 8,
   },
-  buttonText: {
-    color: 'white',
+  primaryButtonText: {
+    color: '#FFFFFF',
     ...FONTS.semibold(16),
-    letterSpacing: 1,
+    letterSpacing: 0.5,
   },
   resendButton: {
     width: '100%',
-    height: 56,
-    borderRadius: 28,
+    height: 55,
+    borderRadius: 40,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5F5F5',
-    marginBottom: 15,
+    backgroundColor: '#EEE8FF',
+    shadowColor: '#6943AF',
+    shadowOffset: { width: 0, height: 20 },
+    shadowOpacity: 0.1,
+    shadowRadius: 40,
+    elevation: 4,
+    marginBottom: 16,
   },
   resendButtonDisabled: {
-    opacity: 0.6,
+    opacity: 0.7,
   },
   resendButtonText: {
     ...FONTS.semibold(16),
-    color: COLORS.textLight,
+    color: '#B9B2E3',
   },
   expiryText: {
-    ...FONTS.body4,
+    ...FONTS.h6,
     color: COLORS.textLight,
-    marginBottom: 30,
-  },
-  demoButton: {
-    padding: 10,
-    marginTop: 20,
-  },
-  demoButtonText: {
-    ...FONTS.body4,
-    color: COLORS.primary,
-    textDecorationLine: 'underline',
+    marginTop: 4,
+    textAlign: 'center',
   },
 });
 

@@ -75,7 +75,7 @@ const EmailInputScreen = () => {
 
       <View style={styles.content}>
         <View style={styles.inputContainer}>
-          <Text style={styles.headerTitle}>Type your emailss</Text>
+          <Text style={styles.headerTitle}>Type your emails</Text>
           <Input
             placeholder="Type your email here"
             value={email}
