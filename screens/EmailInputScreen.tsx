@@ -18,8 +18,21 @@ import { LinearGradient } from 'expo-linear-gradient';
 import Input from '../components/Input';
 import { validateEmail } from '../utils';
 import { useAuth } from '../hooks/useAuth';
+import { supabase } from '../supabaseConfig';
+import { makeRedirectUri } from 'expo-auth-session';
+import Constants from 'expo-constants';
 
 type EmailInputScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'EmailInput'>;
+
+// Generate proper redirect for Expo Go vs standalone builds
+const getEmailRedirectTo = () => {
+  // @ts-ignore: some versions don't surface `useProxy` in types though it works at runtime
+  return makeRedirectUri({
+    scheme: 'com.wingi.mizanbankingapp',
+    path: 'auth',
+    useProxy: (Constants as any)?.appOwnership === 'expo',
+  } as any);
+};
 
 const EmailInputScreen = () => {
   const navigation = useNavigation<EmailInputScreenNavigationProp>();
@@ -46,18 +59,24 @@ const EmailInputScreen = () => {
   };
 
   const handleSubmit = async () => {
-    if (validateForm()) {
-      setLoading(true);
-      try {
-        // In a real implementation, you would send a magic link or verification code
-        // For now, we'll just navigate to the verification screen
-        navigation.navigate('EmailVerification', { email });
-      } catch (error) {
-        console.error('Email verification error:', error);
-        Alert.alert('Verification Error', 'Failed to send verification email');
-      } finally {
-        setLoading(false);
-      }
+    if (!validateForm()) return;
+
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: { emailRedirectTo: getEmailRedirectTo() },
+      });
+
+      if (error) throw error;
+
+      // Navigate to verification screen to await Magic link
+      navigation.navigate('EmailVerification', { email });
+    } catch (error: any) {
+      console.error('Email verification error:', error);
+      Alert.alert('Verification Error', error?.message || 'Failed to send verification email');
+    } finally {
+      setLoading(false);
     }
   };
 

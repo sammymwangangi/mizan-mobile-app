@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -17,6 +17,20 @@ import { COLORS, FONTS, SIZES } from '../constants/theme';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../supabaseConfig';
+import { makeRedirectUri } from 'expo-auth-session';
+import Constants from 'expo-constants';
+
+
+const getEmailRedirectTo = () => {
+  // Use Expo proxy in Expo Go, otherwise use app scheme
+  // @ts-ignore - some versions don't surface `useProxy` in types though it works at runtime
+  return makeRedirectUri({
+    scheme: 'com.wingi.mizanbankingapp',
+    path: 'auth',
+    // Expo Go: Constants.appOwnership === 'expo'
+    useProxy: (Constants as any)?.appOwnership === 'expo',
+  } as any);
+};
 
 type EmailVerificationScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'EmailVerification'>;
 type EmailVerificationScreenRouteProp = RouteProp<RootStackParamList, 'EmailVerification'>;
@@ -77,7 +91,10 @@ const EmailVerificationScreen = () => {
       setLoading(true);
       setTimer(60);
 
-      const { error } = await supabase.auth.signInWithOtp({ email });
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: { emailRedirectTo: getEmailRedirectTo() },
+      });
       if (error) throw error;
 
       Alert.alert('Link Sent', 'A new Magic link has been sent to your email.');

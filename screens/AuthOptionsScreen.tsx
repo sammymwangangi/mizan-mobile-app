@@ -26,12 +26,8 @@ import { supabase } from '../supabaseConfig';
 
 import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from 'expo-web-browser';
-import * as AppleAuthentication from 'expo-apple-authentication';
 import { normalize } from 'utils';
 import { COUNTRIES } from '../constants/countries';
-
-import * as Crypto from 'expo-crypto';
-import * as Random from 'expo-random';
 
 // Complete the auth session for better OAuth handling
 WebBrowser.maybeCompleteAuthSession();
@@ -56,13 +52,26 @@ const AuthOptionsScreen = () => {
   const [error, setError] = useState('');
 
   const [appleAvailable, setAppleAvailable] = useState(false);
+
   useEffect(() => {
-    if (Platform.OS === 'ios') {
-      AppleAuthentication.isAvailableAsync()
-        .then(setAppleAvailable)
-        .catch(() => setAppleAvailable(false));
-    }
+    (async () => {
+      if (Platform.OS !== 'ios') return;
+      try {
+        // Dynamically import AppleAuth only if available
+        const Apple = await import('expo-apple-authentication');
+        if (Apple?.isAvailableAsync) {
+          const available = await Apple.isAvailableAsync();
+          setAppleAvailable(available);
+        } else {
+          setAppleAvailable(false);
+        }
+      } catch (err) {
+        console.log('⚠️ AppleAuth not available, skipping:', err);
+        setAppleAvailable(false);
+      }
+    })();
   }, []);
+
 
   const routeParams = route.params;
   const tempUserId = routeParams?.tempUserId;
@@ -270,62 +279,39 @@ const AuthOptionsScreen = () => {
         setLoading(false);
       }
     }
-  };  // Handle Apple Sign-in
+  };
+
+  // Handle Apple Sign-in
   const handleAppleSignIn = async () => {
     if (!termsAccepted) {
       Alert.alert('Error', 'Please accept the Terms & Conditions to continue');
       return;
     }
-
     try {
       setLoading(true);
-
-      // Generate a cryptographically secure nonce
-      const nonceBytes = await Random.getRandomBytesAsync(16);
-      const rawNonce = Array.from(nonceBytes).map((b) => b.toString(16).padStart(2, '0')).join('');
-      const hashedNonce = await Crypto.digestStringAsync(
-        Crypto.CryptoDigestAlgorithm.SHA256,
-        rawNonce
-      );
-
-      const credential = await AppleAuthentication.signInAsync({
+      const Apple = await import('expo-apple-authentication');
+      if (!Apple?.isAvailableAsync || !(await Apple.isAvailableAsync())) {
+        Alert.alert('Error', 'Apple Sign-in not available on this device');
+        return;
+      }
+      const credential = await Apple.signInAsync({
         requestedScopes: [
-          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
-          AppleAuthentication.AppleAuthenticationScope.EMAIL,
+          Apple.AppleAuthenticationScope.FULL_NAME,
+          Apple.AppleAuthenticationScope.EMAIL,
         ],
-        nonce: hashedNonce,
       });
-
-      if (__DEV__) console.log('Apple auth successful');
-
-      if (!credential.identityToken) {
-        Alert.alert('Authentication Error', 'No identity token received from Apple');
-        return;
-      }
-
-      const { error } = await supabase.auth.signInWithIdToken({
-        provider: 'apple',
-        token: credential.identityToken,
-        nonce: rawNonce,
-      });
-
-      if (error) {
-        console.error('Supabase Apple auth error:', error);
-        Alert.alert('Authentication Error', 'Failed to complete Apple sign-in');
-        return;
-      }
-
-      if (__DEV__) console.log('✅ Apple authentication with Supabase successful');
-      // Navigation handled by the auth state change in useAuth
-    } catch (error: any) {
-      console.error('Apple sign-in error:', error);
-      if (error?.code !== 'ERR_CANCELED') {
+      console.log('✅ Apple auth successful', credential);
+    } catch (err: any) {
+      console.log('❌ Apple sign-in error:', err);
+      if (err?.code !== 'ERR_CANCELED') {
         Alert.alert('Authentication Error', 'Failed to sign in with Apple');
       }
     } finally {
       setLoading(false);
     }
   };
+
+
 
   return (
     <KeyboardAvoidingView
@@ -464,6 +450,7 @@ const AuthOptionsScreen = () => {
             <Text style={styles.secondaryButtonText}>Continue with Apple</Text>
           </TouchableOpacity>
         )}
+
 
         {/* Google Authentication */}
         <TouchableOpacity
