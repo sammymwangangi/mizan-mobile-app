@@ -19,18 +19,20 @@ import { RootStackParamList } from '../navigation/types';
 import { COLORS, FONTS } from '../constants/theme';
 import { useAuth } from '../hooks/useAuth';
 import { LinearGradient } from 'expo-linear-gradient';
+
 import { ChevronDown } from 'lucide-react-native';
+
 import Input from '../components/Input';
 import { smsService } from '../services/smsService';
 import { supabase } from '../supabaseConfig';
 
-import * as Google from 'expo-auth-session/providers/google';
-import * as WebBrowser from 'expo-web-browser';
+
+
 import { normalize } from 'utils';
 import { COUNTRIES } from '../constants/countries';
 
 // Complete the auth session for better OAuth handling
-WebBrowser.maybeCompleteAuthSession();
+
 
 type AuthOptionsScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'AuthOptions'>;
 type AuthOptionsScreenRouteProp = NativeStackScreenProps<RootStackParamList, 'AuthOptions'>['route'];
@@ -57,73 +59,13 @@ const AuthOptionsScreen = () => {
   const routeParams = route.params;
   const tempUserId = routeParams?.tempUserId;
 
-  // Configure Google Sign-in for React Native
-  const [request, response, promptAsync] = Google.useAuthRequest({
-    clientId: process.env.EXPO_PUBLIC_WEB_CLIENT_ID,
-    iosClientId: process.env.EXPO_PUBLIC_IOS_CLIENT_ID,
-    androidClientId: process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID,
-    scopes: ['openid', 'profile', 'email'],
-  });
 
-  // Debug environment variables on component mount
-  useEffect(() => {
-    console.log('🔍 Google OAuth Configuration:');
-    console.log('📱 Web Client ID:', process.env.EXPO_PUBLIC_WEB_CLIENT_ID ? '✅ Set' : '❌ Missing');
-    console.log('🤖 Android Client ID:', process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID ? '✅ Set' : '❌ Missing');
-    console.log('🍎 iOS Client ID:', process.env.EXPO_PUBLIC_IOS_CLIENT_ID ? '✅ Set' : '❌ Missing');
-    console.log('🔧 Request ready:', request ? '✅ Ready' : '❌ Not ready');
-  }, [request]);
 
-  // Handle Google OAuth response
-  useEffect(() => {
-    if (response?.type === 'success') {
-      const { authentication } = response;
-      console.log('🔥 Google OAuth success, processing token...');
-      console.log('🎫 Authentication object:', authentication);
-      handleGoogleAuthSuccess(authentication);
-    } else if (response?.type === 'error') {
-      console.error('❌ Google OAuth error:', response.error);
-      Alert.alert('Authentication Error', `Google sign-in failed: ${response.error?.message || 'Unknown error'}`);
-      setLoading(false);
-    } else if (response?.type === 'cancel') {
-      console.log('ℹ️ Google OAuth cancelled by user');
-      setLoading(false);
-    } else if (response?.type === 'dismiss') {
-      console.log('ℹ️ Google OAuth dismissed');
-      setLoading(false);
-    }
-  }, [response]);
 
-  const handleGoogleAuthSuccess = async (authentication: any) => {
-    try {
-      const { idToken } = authentication || {};
-      if (!idToken) {
-        Alert.alert('Authentication Error', 'No ID token received from Google');
-        return;
-      }
 
-      if (__DEV__) console.log('🔄 Exchanging Google ID token with Supabase...');
 
-      const { data, error } = await supabase.auth.signInWithIdToken({
-        provider: 'google',
-        token: idToken,
-      });
 
-      if (error) {
-        console.error('❌ Supabase Google auth error:', error);
-        Alert.alert('Authentication Error', `Failed to authenticate with Google: ${error.message}`);
-        return;
-      }
 
-      if (__DEV__) console.log('✅ Google authentication successful!', data.user?.email);
-      // Navigation handled by useAuth hook
-    } catch (error) {
-      console.error('💥 Error processing Google authentication:', error);
-      Alert.alert('Authentication Error', 'Failed to complete Google sign-in');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // Handle terms checkbox toggle
   const handleTermsToggle = () => {
@@ -217,49 +159,13 @@ const AuthOptionsScreen = () => {
     navigation.navigate('EmailInput');
   };
 
-  // Handle Google Sign-in
+  // Handle Google Sign-in (UI only, disabled)
   const handleGoogleSignIn = async () => {
     if (!termsAccepted) {
       Alert.alert('Error', 'Please accept the Terms & Conditions to continue');
       return;
     }
-
-    try {
-      setLoading(true);
-      console.log('🔵 Starting Google OAuth flow...');
-      console.log('🔍 Request object:', request);
-
-      if (!request) {
-        console.error('❌ Google OAuth request not ready');
-        Alert.alert('Authentication Error', 'Google authentication is not ready. Please try again.');
-        return;
-      }
-
-      // Trigger Google OAuth flow
-      console.log('🚀 Calling promptAsync...');
-      const result = await promptAsync();
-      console.log('� Google OAuth result:', result);
-
-      if (result.type === 'cancel') {
-        console.log('ℹ️ User cancelled Google OAuth');
-      } else if (result.type === 'dismiss') {
-        console.log('ℹ️ Google OAuth dismissed');
-      } else if (result.type === 'error') {
-        console.error('❌ Google OAuth error:', result.error);
-        Alert.alert('Authentication Error', `Google sign-in failed: ${result.error?.message || 'Unknown error'}`);
-      }
-
-      // Success case is handled by useEffect
-
-    } catch (error) {
-      console.error('💥 Google sign-in error:', error);
-      Alert.alert('Authentication Error', 'Failed to sign in with Google. Please try again.');
-    } finally {
-      // Only set loading to false if we're not processing a successful response
-      if (!response || response.type !== 'success') {
-        setLoading(false);
-      }
-    }
+    Alert.alert('Not available', 'Google sign-in is temporarily disabled');
   };
 
 
