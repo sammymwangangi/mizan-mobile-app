@@ -51,26 +51,7 @@ const AuthOptionsScreen = () => {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [error, setError] = useState('');
 
-  const [appleAvailable, setAppleAvailable] = useState(false);
 
-  useEffect(() => {
-    (async () => {
-      if (Platform.OS !== 'ios') return;
-      try {
-        // Dynamically import AppleAuth only if available
-        const Apple = await import('expo-apple-authentication');
-        if (Apple?.isAvailableAsync) {
-          const available = await Apple.isAvailableAsync();
-          setAppleAvailable(available);
-        } else {
-          setAppleAvailable(false);
-        }
-      } catch (err) {
-        console.log('⚠️ AppleAuth not available, skipping:', err);
-        setAppleAvailable(false);
-      }
-    })();
-  }, []);
 
 
   const routeParams = route.params;
@@ -281,37 +262,6 @@ const AuthOptionsScreen = () => {
     }
   };
 
-  // Handle Apple Sign-in
-  const handleAppleSignIn = async () => {
-    if (!termsAccepted) {
-      Alert.alert('Error', 'Please accept the Terms & Conditions to continue');
-      return;
-    }
-    try {
-      setLoading(true);
-      const Apple = await import('expo-apple-authentication');
-      if (!Apple?.isAvailableAsync || !(await Apple.isAvailableAsync())) {
-        Alert.alert('Error', 'Apple Sign-in not available on this device');
-        return;
-      }
-      const credential = await Apple.signInAsync({
-        requestedScopes: [
-          Apple.AppleAuthenticationScope.FULL_NAME,
-          Apple.AppleAuthenticationScope.EMAIL,
-        ],
-      });
-      console.log('✅ Apple auth successful', credential);
-    } catch (err: any) {
-      console.log('❌ Apple sign-in error:', err);
-      if (err?.code !== 'ERR_CANCELED') {
-        Alert.alert('Authentication Error', 'Failed to sign in with Apple');
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-
 
   return (
     <KeyboardAvoidingView
@@ -439,11 +389,11 @@ const AuthOptionsScreen = () => {
           <Text style={styles.secondaryButtonText}>Continue with e-mail</Text>
         </TouchableOpacity>
 
-        {/* Apple Authentication */}
-        {Platform.OS === 'ios' && appleAvailable && (
+        {/* Apple Authentication (UI only) */}
+        {Platform.OS === 'ios' && (
           <TouchableOpacity
             style={styles.secondaryButton}
-            onPress={handleAppleSignIn}
+            onPress={() => Alert.alert('Not available', 'Apple sign-in is temporarily disabled')}
             disabled={loading}
           >
             <Image source={require('../assets/apple-icon.png')} style={styles.buttonIcon} />
