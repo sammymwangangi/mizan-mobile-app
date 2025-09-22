@@ -1,15 +1,18 @@
 import React, { useEffect } from 'react';
-import { View, Image, StyleSheet, Animated, ImageBackground, StatusBar } from 'react-native';
+import { Image, StyleSheet, Animated, ImageBackground, StatusBar, useWindowDimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
-import { LinearGradient } from 'expo-linear-gradient';
+
 
 type IntroScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Intro'>;
 
 const IntroScreen = () => {
   const navigation = useNavigation<IntroScreenNavigationProp>();
   const logoOpacity = React.useMemo(() => new Animated.Value(0), []);
+  const { width: screenWidth } = useWindowDimensions();
+  const logoWidth = Math.min(220, Math.max(140, screenWidth * 0.45));
+  const logoHeight = (logoWidth * 76) / 150;
 
   useEffect(() => {
     // Animate logo appearance
@@ -28,28 +31,20 @@ const IntroScreen = () => {
   }, [navigation, logoOpacity]);
 
   return (
-    <LinearGradient
-      colors={[
-        '#D155FF',
-        '#B532F2',
-        '#A016E8',
-        '#9406E2',
-        '#8F00E0',
-        '#A08CFF'
-      ]}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
+    <ImageBackground
+      source={require('../assets/splash2-bg.png')}
       style={styles.container}
+      resizeMode="cover"
     >
       <StatusBar barStyle="light-content" />
       <Animated.View style={[styles.logoContainer, { opacity: logoOpacity }]}>
         <Image
           source={require('../assets/logo.png')}
-          style={styles.logo}
+          style={{ width: logoWidth, height: logoHeight }}
           resizeMode="contain"
         />
       </Animated.View>
-    </LinearGradient>
+    </ImageBackground>
     // <ImageBackground
     //   source={require('../assets/splash2-bg.png')}
     //   style={styles.container}
@@ -82,7 +77,6 @@ const styles = StyleSheet.create({
   logo: {
     width: 150,
     height: 76,
-    tintColor: '#FFFFFF',
   },
 });
 

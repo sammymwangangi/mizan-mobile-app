@@ -27,7 +27,7 @@
     "icon": "./assets/mizan-icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/mizan-icon.png",
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#FFFFFF"
     },

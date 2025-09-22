@@ -48,7 +48,7 @@ const SplashScreen = () => {
       >
         <View style={styles.iconBackground}>
           <Image
-            source={require('../assets/LauncherIcon.png')}
+            source={require('../assets/logo.png')}
             style={styles.logo}
             resizeMode="contain"
           />
