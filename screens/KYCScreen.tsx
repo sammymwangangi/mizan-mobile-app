@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Platform, Animated, TextInput, ScrollView, ImageSourcePropType } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Platform, Animated, TextInput, ScrollView, ImageSourcePropType, FlatList, PanResponder } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
@@ -9,7 +9,7 @@ import Button from '../components/Button';
 import { ArrowLeft, ArrowRight, Clock, Wrench, BarChart2, TrendingUp, Umbrella, HelpCircle } from 'lucide-react-native';
 import Slider from '@react-native-community/slider';
 import { LinearGradient } from 'expo-linear-gradient';
-import { FlatList, PanGestureHandler, State } from 'react-native-gesture-handler';
+
 import Input from '../components/Input';
 import DurationPicker from '../components/DurationPicker';
 import LiquidProgressCircle from '../components/LiquidProgressCircle';
@@ -406,6 +406,25 @@ const KYCScreen: React.FC = () => {
       clearSignupFlow();
     }
   }, [clearSignupFlow, simulateAuthentication]);
+  const panResponder = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: (_, gestureState) => Math.abs(gestureState.dx) > 5,
+      onPanResponderMove: Animated.event([null, { dx: translateX }], { useNativeDriver: false }),
+      onPanResponderRelease: (_, gestureState) => {
+        if (gestureState.dx > 120) {
+          Animated.parallel([
+            Animated.timing(buttonOpacity, { toValue: 0, duration: 200, useNativeDriver: true }),
+            Animated.timing(translateX, { toValue: 300, duration: 200, useNativeDriver: false }),
+          ]).start(() => {
+            handleCompleteSignup();
+          });
+        } else {
+          Animated.spring(translateX, { toValue: 0, useNativeDriver: false, bounciness: 5, speed: 12 }).start();
+        }
+      },
+    })
+  ).current;
+
 
   const renderProgressBar = () => {
     // Total number of steps (excluding CONGRATULATIONS and COMPLETE)
@@ -1780,26 +1799,9 @@ const KYCScreen: React.FC = () => {
 
   const renderCongratulationsStep = () => {
     // Swipe handlers (moved from previous complete step)
-    const onGestureEvent = Animated.event(
-      [{ nativeEvent: { translationX: translateX } }],
-      { useNativeDriver: true }
-    );
 
-    const onHandlerStateChange = (event: any) => {
-      if (event.nativeEvent.oldState === State.ACTIVE) {
-        const { translationX } = event.nativeEvent;
-        if (translationX > 120) {
-          Animated.parallel([
-            Animated.timing(buttonOpacity, { toValue: 0, duration: 200, useNativeDriver: true }),
-            Animated.timing(translateX, { toValue: 300, duration: 200, useNativeDriver: true })
-          ]).start(() => {
-            handleCompleteSignup();
-          });
-        } else {
-          Animated.spring(translateX, { toValue: 0, useNativeDriver: true, bounciness: 5, speed: 12 }).start();
-        }
-      }
-    };
+
+
 
     return (
       <View style={styles.congratulationsContainer}>
@@ -1834,14 +1836,12 @@ const KYCScreen: React.FC = () => {
               end={{ x: 0, y: 1 }}
               style={styles.swipeButton}
             >
-              <PanGestureHandler onGestureEvent={onGestureEvent} onHandlerStateChange={onHandlerStateChange}>
-                <Animated.View style={[styles.swipeContent, { transform: [{ translateX }] }]}>
-                  <Animated.View style={[styles.arrowCircle, { transform: [{ translateX: arrowTranslateX }] }]}>
-                    <ArrowRight size={20} color="#000" />
-                  </Animated.View>
-                  <Text style={styles.swipeButtonText}>SWIPE TO START</Text>
+              <Animated.View {...panResponder.panHandlers} style={[styles.swipeContent, { transform: [{ translateX }] }]}>
+                <Animated.View style={[styles.arrowCircle, { transform: [{ translateX: arrowTranslateX }] }]}>
+                  <ArrowRight size={20} color="#000" />
                 </Animated.View>
-              </PanGestureHandler>
+                <Text style={styles.swipeButtonText}>SWIPE TO START</Text>
+              </Animated.View>
             </LinearGradient>
           </TouchableOpacity>
         </Animated.View>
