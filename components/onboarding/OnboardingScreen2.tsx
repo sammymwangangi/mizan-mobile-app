@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
   imageContainer: {
     position: 'absolute',
     top: 0,
-    left: 122,
+    left: 130,
     right: 0,
     bottom: 0,
     justifyContent: 'center',

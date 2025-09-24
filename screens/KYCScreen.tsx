@@ -16,6 +16,7 @@ import LiquidProgressCircle from '../components/LiquidProgressCircle';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import { useAuth } from '../hooks/useAuth';
 import Svg, { Path, Circle, Line } from 'react-native-svg';
+import CodeInput from '../components/CodeInput';
 import * as LocalAuthentication from 'expo-local-authentication';
 import * as SecureStore from 'expo-secure-store';
 import { Camera, CameraView } from 'expo-camera';
@@ -1132,9 +1133,13 @@ const KYCScreen: React.FC = () => {
         setPasscode(newPasscode);
         setPasscodeError('');
 
-        // Auto focus to next input
+        // Auto focus to next input with robust scheduling
         if (text !== '' && index < 5) {
-          passcodeInputRefs.current[index + 1]?.focus();
+          const nextIndex = index + 1;
+          const nextRef = passcodeInputRefs.current[nextIndex];
+          passcodeInputRefs.current[index]?.blur();
+          requestAnimationFrame(() => nextRef?.focus());
+          setTimeout(() => nextRef?.focus(), 60);
         }
       } else if (passcodeStep === 'confirm') {
         const newConfirmPasscode = [...confirmPasscode];
@@ -1142,9 +1147,13 @@ const KYCScreen: React.FC = () => {
         setConfirmPasscode(newConfirmPasscode);
         setPasscodeError('');
 
-        // Auto focus to next input
+        // Auto focus to next input with robust scheduling
         if (text !== '' && index < 5) {
-          confirmPasscodeInputRefs.current[index + 1]?.focus();
+          const nextIndex = index + 1;
+          const nextRef = confirmPasscodeInputRefs.current[nextIndex];
+          confirmPasscodeInputRefs.current[index]?.blur();
+          requestAnimationFrame(() => nextRef?.focus());
+          setTimeout(() => nextRef?.focus(), 60);
         }
       }
     };
@@ -1188,31 +1197,21 @@ const KYCScreen: React.FC = () => {
 
       return (
         <View style={styles.otpContainer}>
-          {currentPasscode.map((digit, index) => (
-            <View
-              key={index}
-              style={[
-                styles.otpInputContainer,
-                index === 2 || index === 3 ? styles.otpInputWithDash : null
-              ]}
-            >
-              <TextInput
-                ref={(ref) => {
-                  if (ref) {
-                    inputRefs.current[index] = ref;
-                  }
-                }}
-                style={styles.otpInput}
-                value={digit}
-                onChangeText={(text) => handlePasscodeChange(text, index)}
-                onKeyPress={(e) => handlePasscodeKeyPress(e, index)}
-                keyboardType="number-pad"
-                maxLength={1}
-                selectTextOnFocus
-              />
-              {digit ? <View style={styles.otpDot} /> : null}
-            </View>
-          ))}
+          <CodeInput
+            length={6}
+            mode="passcode"
+            value={currentPasscode.join('')}
+            onChange={(code) => {
+              const chars = code.split('');
+              if (passcodeStep === 'create') {
+                setPasscode(chars.concat(Array(6 - chars.length).fill('')));
+              } else {
+                setConfirmPasscode(chars.concat(Array(6 - chars.length).fill('')));
+              }
+              setPasscodeError('');
+            }}
+            autoFocus
+          />
         </View>
       );
     };
@@ -2774,7 +2773,7 @@ const styles = StyleSheet.create({
     height: '100%',
     textAlign: 'center',
     fontSize: normalize(20),
-    color: 'transparent',
+    color: COLORS.text,
   },
   otpDot: {
     position: 'absolute',

@@ -17,6 +17,7 @@ import { useAuth } from '../hooks/useAuth';
 import { smsService } from '../services/smsService';
 import MaskedView from '@react-native-masked-view/masked-view';
 import { LinearGradient } from 'expo-linear-gradient';
+import CodeInput from '../components/CodeInput';
 
 type OTPScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'OTP'>;
 type OTPScreenRouteProp = RouteProp<RootStackParamList, 'OTP'>;
@@ -119,9 +120,14 @@ const OTPScreen = () => {
     newOtp[index] = text;
     setOtp(newOtp);
 
-    // Auto focus to next input
+    // Auto focus to next input with robust scheduling
     if (text !== '' && index < 5) {
-      inputRefs.current[index + 1]?.focus();
+      const nextIndex = index + 1;
+      const nextRef = inputRefs.current[nextIndex];
+      // Blur current to help some Android keyboards
+      inputRefs.current[index]?.blur();
+      requestAnimationFrame(() => nextRef?.focus());
+      setTimeout(() => nextRef?.focus(), 60);
     }
   };
 
@@ -175,32 +181,14 @@ const OTPScreen = () => {
 
         {/* OTP Input */}
         <View style={styles.otpContainer}>
-            {otp.map((digit, index) => (
-              <View
-                key={index}
-                style={[
-                  styles.otpInputContainer,
-                  index === 2 || index === 3 ? styles.otpInputWithDash : null
-                ]}
-              >
-                <TextInput
-                  ref={(ref) => {
-                    if (ref) {
-                      inputRefs.current[index] = ref;
-                    }
-                  }}
-                  style={styles.otpInput}
-                  value={digit}
-                  onChangeText={(text) => handleOtpChange(text, index)}
-                  onKeyPress={(e) => handleKeyPress(e, index)}
-                  keyboardType="number-pad"
-                  maxLength={1}
-                  selectTextOnFocus
-                />
-                {digit ? <View style={styles.otpDot} /> : null}
-              </View>
-            ))}
-          </View>
+          <CodeInput
+            length={6}
+            mode="otp"
+            value={otp.join('')}
+            onChange={(code) => setOtp(code.split(''))}
+            autoFocus
+          />
+        </View>
 
           {/* Error Message */}
           {error ? (
@@ -305,7 +293,7 @@ const styles = StyleSheet.create({
     height: '100%',
     textAlign: 'center',
     fontSize: 20,
-    color: 'transparent',
+    color: COLORS.text,
   },
   otpDot: {
     position: 'absolute',
