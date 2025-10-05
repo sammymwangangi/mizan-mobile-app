@@ -93,13 +93,13 @@ const FundCardScreen: React.FC = () => {
     = ({ value, label, isInput }) => {
       const isSelected = typeof value === 'number' && selectedAmount === value;
       const baseStyle = {
-        width: 160, height: 88, borderRadius: 18,
-        marginBottom: 12, alignItems: 'center' as const, justifyContent: 'center' as const,
+        width: 160, height: 88, borderRadius: 20,
+        marginBottom: 0, alignItems: 'center' as const, justifyContent: 'center' as const,
         backgroundColor: '#FFFFFF', borderWidth: isSelected ? 0 : 1,
         borderColor: '#E6E2F5',
         shadowColor: isSelected ? '#6943AF' : 'transparent',
         shadowOpacity: isSelected ? 0.15 : 0,
-        shadowOffset: { width: 0, height: 10 }, shadowRadius: isSelected ? 18 : 0,
+        shadowOffset: { width: 0, height: 4 }, shadowRadius: isSelected ? 6 : 0,
         elevation: isSelected ? 4 : 0
       };
 
@@ -254,16 +254,16 @@ const FundCardScreen: React.FC = () => {
         {/* Select amount */}
         <Text style={{ color: '#0F172A', fontWeight: '600', marginBottom: 10 }}>Select amount</Text>
 
-        <Text className="text-white text-2xl font-bold mb-2">
+        <Text className="text-black text-2xl font-bold mb-2">
           Fund to Activate
         </Text>
-        <Text className="text-white/70 mb-6">
+        <Text className="text-black mb-6">
           Choose your starting amount
         </Text>
 
         {/* Amount Selection */}
         <View style={{ marginBottom: 24 }}>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: 16 }}>
             {/* Row 1 */}
             <AmountTile value={1} label="$1" />
             <AmountTile value={5} label="$5" />
@@ -293,7 +293,7 @@ const FundCardScreen: React.FC = () => {
         <TouchableOpacity
           onPress={handleFund}
           disabled={isProcessing}
-          className="w-full"
+          className="w-full mb-4"
           activeOpacity={0.9}
         >
           <LinearGradient
@@ -301,7 +301,7 @@ const FundCardScreen: React.FC = () => {
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={{ height: 55, borderRadius: 40, alignItems: 'center', justifyContent: 'center',
-              shadowColor: '#6943AF', shadowOpacity: 0.26, shadowRadius: 18, shadowOffset: { width: 0, height: 10 }, elevation: 6,
+              shadowColor: '#6943AF', shadowOpacity: 0.26, shadowRadius: 18, shadowOffset: { width: 0, height: 2 }, elevation: 4,
               opacity: isProcessing ? 0.5 : 1 }}
           >
             <Text style={{ ...FONTS.bold(18), color: '#FFFFFF' }}>

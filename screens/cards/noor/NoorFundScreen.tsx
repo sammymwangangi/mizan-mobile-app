@@ -97,18 +97,7 @@ const NoorFundScreen: React.FC = () => {
 
           {/* Custom amount */}
           <View>
-            <Text style={{ ...FONTS.medium(12), color: '#64748B', marginBottom: 4 }}>
-              Or enter amount
-            </Text>
-            <TextInput
-              value={amount}
-              onChangeText={setAmount}
-              placeholder="Enter amount"
-              keyboardType="decimal-pad"
-              placeholderTextColor="#94A3B8"
-              className="bg-[#F8FAFC] h-[55px] px-4 rounded-xl"
-              style={{ ...FONTS.medium(16), color: '#0F172A' }}
-            />
+            
           </View>
         </View>
 

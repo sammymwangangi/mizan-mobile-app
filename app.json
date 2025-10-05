@@ -2,7 +2,7 @@
   "expo": {
     "name": "Mizan Money",
     "slug": "mizan-banking-app",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "scheme": "com.wingi.mizanbankingapp",
     "web": {
       "favicon": "./assets/favicon.png"
