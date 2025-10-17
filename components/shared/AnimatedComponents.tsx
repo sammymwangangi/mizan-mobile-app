@@ -13,6 +13,8 @@ import * as Haptics from 'expo-haptics';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import { ANIMATION_DURATIONS, CONFETTI_CONFIG } from '../../constants/qamar';
 
+import Svg, { Circle, Defs, LinearGradient as SvgLinearGradient, Stop } from 'react-native-svg';
+
 const { width } = Dimensions.get('window');
 
 interface AnimatedSwatchProps {
@@ -187,8 +189,6 @@ export const AnimatedSuccessCheck: React.FC<AnimatedSuccessCheckProps> = ({
   );
 };
 
-import Svg, { Circle, Defs, LinearGradient as SvgLinearGradient, Stop } from 'react-native-svg';
-
 interface AnimatedProgressRingProps {
   progress: number; // 0-100
   size?: number;
@@ -198,7 +198,7 @@ interface AnimatedProgressRingProps {
 
 export const AnimatedProgressRing: React.FC<AnimatedProgressRingProps> = ({
   progress,
-  size = 120,
+  size = 110,
   strokeWidth = 8,
   color = '#7B5CFF'
 }) => {
@@ -206,7 +206,8 @@ export const AnimatedProgressRing: React.FC<AnimatedProgressRingProps> = ({
 
   React.useEffect(() => {
     pct.value = withTiming(progress, { duration: 500 });
-  }, [progress, pct]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [progress]);
 
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
@@ -260,7 +261,7 @@ export const AnimatedProgressRing: React.FC<AnimatedProgressRingProps> = ({
       <Animated.Text
         style={{
           position: 'absolute',
-          fontSize: size * 0.22,
+          fontSize: 24,
           fontWeight: 'bold',
           color: '#111827'
         }}

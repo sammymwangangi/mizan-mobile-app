@@ -109,6 +109,17 @@ export type RootStackParamList = {
 
   ShamsOrderStatus: {
     planId?: string;
+    selectedMetal: string;
+    selectedColor: string;
+    cardId: string;
+  };
+  ShamsFund: {
+    selectedMetal: string;
+    selectedColor: string;
+    cardId: string;
+  };
+  ShamsWalletAdd: {
+    selectedMetal: string;
     selectedColor: string;
     cardId: string;
   };

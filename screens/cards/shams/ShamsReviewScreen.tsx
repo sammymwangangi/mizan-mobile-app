@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Switch, Animated, ScrollView } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -10,7 +10,7 @@ import { CTA_GRADIENT, ANALYTICS_EVENTS, SHAMS_TOKENS, SHAMS_FEATURES, BARAKAH_P
 import ShamsCardPreview from '../../../components/cards/shams/ShamsCardPreview';
 import ShamsHeader from '../../../components/cards/shams/ShamsHeader';
 import { FONTS } from 'constants/theme';
-import { MintingSheet, CancelSheet, ErrorSheet, SuccessSheet, TnCSheet } from 'components/cards/shams/ShamsBottomSheets';
+import { ShamsMintingSheet, ShamsCancelSheet, ShamsErrorSheet, ShamsSuccessSheet, TnCSheet } from 'components/cards/shams/ShamsBottomSheets';
 
 type ShamsReviewNavigationProp = NativeStackNavigationProp<RootStackParamList, 'ShamsReview'>;
 type ShamsReviewRouteProp = RouteProp<RootStackParamList, 'ShamsReview'>;
@@ -48,6 +48,25 @@ const ShamsReviewScreen: React.FC = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [mintingProgress, setMintingProgress] = useState(0);
   const shakeAnim = useRef(new Animated.Value(0)).current;
+
+  // Simulate minting progress
+  useEffect(() => {
+    if (!showMinting) return;
+
+    const interval = setInterval(() => {
+      setMintingProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          setShowMinting(false);
+          setShowSuccess(true);
+          return 100;
+        }
+        return prev + 2; // Increment by 2% every 100ms (completes in ~5 seconds)
+      });
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, [showMinting]);
 
   const handleFeatureToggle = (featureId: keyof FeatureToggles) => {
     setFeatures(prev => ({
@@ -92,9 +111,9 @@ const ShamsReviewScreen: React.FC = () => {
 
   const handleSuccessComplete = () => {
     setShowSuccess(false);
-    // PostHog.capture?.(QAMAR_ANALYTICS.CARD_ORDER_SUCCESS);
-    const cardId = `qamar-${Date.now()}`;
-    navigation.navigate('QamarOrderStatus', { planId, selectedColor, cardId });
+    // PostHog.capture?.(SHAMS_ANALYTICS.CARD_ORDER_SUCCESS);
+    const cardId = `shams-${Date.now()}`;
+    navigation.navigate('ShamsOrderStatus', { planId, selectedMetal, selectedColor, cardId });
   };
 
   const handleOrderCard = () => {
@@ -189,28 +208,28 @@ const ShamsReviewScreen: React.FC = () => {
           />
 
           {/* Bottom Sheets (modals) */}
-          <MintingSheet
+          <ShamsMintingSheet
             visible={showMinting}
             onClose={() => setShowMinting(false)}
             progress={mintingProgress}
             onCancel={handleMintingCancel}
           />
 
-          <CancelSheet
+          <ShamsCancelSheet
             visible={showCancel}
             onClose={() => setShowCancel(false)}
             onKeep={handleKeepMinting}
             onCancel={handleCancelOrder}
           />
 
-          <ErrorSheet
+          <ShamsErrorSheet
             visible={showError}
             onClose={() => setShowError(false)}
             onRetry={handleRetryError}
             onExit={handleExitError}
           />
 
-          <SuccessSheet
+          <ShamsSuccessSheet
             visible={showSuccess}
             onClose={() => setShowSuccess(false)}
             onComplete={handleSuccessComplete}

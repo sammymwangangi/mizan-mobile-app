@@ -63,6 +63,9 @@ import ShamsStudioScreen from './screens/cards/shams/ShamsStudioScreen';
 import ShamsAddressScreen from './screens/cards/shams/ShamsAddressScreen';
 import ShamsReviewScreen from './screens/cards/shams/ShamsReviewScreen';
 import ShamsMintingScreen from 'screens/cards/shams/ShamsMintingScreen';
+import ShamsOrderStatusScreen from './screens/cards/shams/ShamsOrderStatusScreen';
+import ShamsFundScreen from './screens/cards/shams/ShamsFundScreen';
+import ShamsWalletAddScreen from './screens/cards/shams/ShamsWalletAddScreen';
 
 // Qamar Flow screens
 import QamarIntroScreen from './screens/cards/qamar/QamarIntroScreen';
@@ -191,6 +194,9 @@ function RootStack({ isCheckingAuth, isUserLoggedIn, isInSignupFlow, hasUser }: 
           <Stack.Screen name="ShamsAddress" component={ShamsAddressScreen} />
           <Stack.Screen name="ShamsReview" component={ShamsReviewScreen} />
           <Stack.Screen name="ShamsMinting" component={ShamsMintingScreen} />
+          <Stack.Screen name="ShamsOrderStatus" component={ShamsOrderStatusScreen} />
+          <Stack.Screen name="ShamsFund" component={ShamsFundScreen} />
+          <Stack.Screen name="ShamsWalletAdd" component={ShamsWalletAddScreen} />
 
           {/* Noor Card Flow */}
           <Stack.Screen name="NoorIntro" component={NoorIntroScreen} />

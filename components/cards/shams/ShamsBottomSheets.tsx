@@ -110,7 +110,7 @@ export const TnCSheet: React.FC<TnCSheetProps> = ({ visible, onClose, onAgree, o
   );
 };
 
-// Minting Progress Sheet
+// Minting Progress Sheet (Qamar/Barakah version)
 interface MintingSheetProps extends BaseSheetProps {
   progress: number;
   onCancel: () => void;
@@ -126,15 +126,15 @@ export const MintingSheet: React.FC<MintingSheetProps> = ({ visible, progress, o
             <Text className="text-gray-400 text-lg">×</Text>
           </TouchableOpacity>
         </View>
-        
+
         <View className="flex-1 items-center justify-center px-6">
           <AnimatedProgressRing progress={progress} />
-          
+
           <Text className="text-xl font-bold text-gray-900 mt-6 mb-2">
-            Processing card
+            Minting card
           </Text>
-          <Text className="text-gray-600 text-center">
-            Sabr in shaa Allah, almost done
+          <Text className="text-gray-600 text-center text-[16px]">
+            A little sabr, we’re almost done
           </Text>
         </View>
       </View>
@@ -142,7 +142,34 @@ export const MintingSheet: React.FC<MintingSheetProps> = ({ visible, progress, o
   </Modal>
 );
 
-// Cancel Confirmation Sheet
+// Shams Minting Progress Sheet
+export const ShamsMintingSheet: React.FC<MintingSheetProps> = ({ visible, progress, onCancel }) => (
+  <Modal visible={visible} transparent animationType="slide">
+    <View className="flex-1 bg-black/50 justify-end">
+      <View className="bg-white rounded-3xl" style={{ height: '60%', marginHorizontal: 16, marginBottom: 16, shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 12, shadowOffset: { width: 0, height: 6 }, elevation: 4 }}>
+        <View className="flex-row items-center justify-between px-6 pt-6 pb-4">
+          <View className="w-12 h-1 bg-gray-300 rounded-full" />
+          <TouchableOpacity onPress={onCancel} className="w-6 h-6">
+            <Text style={{ color: '#DDA79B', fontSize: 24, fontWeight: '300' }}>×</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View className="flex-1 items-center justify-center px-6">
+          <AnimatedProgressRing progress={progress} size={110} strokeWidth={8} color="#DDA79B" />
+
+          <Text style={{ ...FONTS.bold(28), color: '#1B1C39', marginTop: 24, marginBottom: 8 }}>
+            Minting card
+          </Text>
+          <Text style={{ ...FONTS.medium(16), color: '#6D6E8A', textAlign: 'center' }}>
+            A little sabr, we&apos;re almost done
+          </Text>
+        </View>
+      </View>
+    </View>
+  </Modal>
+);
+
+// Cancel Confirmation Sheet (Qamar/Barakah version)
 interface CancelSheetProps extends BaseSheetProps {
   onKeep: () => void;
   onCancel: () => void;
@@ -153,7 +180,7 @@ export const CancelSheet: React.FC<CancelSheetProps> = ({ visible, onKeep, onCan
     <View className="flex-1 bg-black/50 justify-end">
       <View className="bg-white rounded-t-3xl p-6">
         <View className="w-12 h-1 bg-gray-300 rounded-full self-center mb-6" />
-        
+
         <Text className="text-xl font-bold text-gray-900 mb-2 text-center">
           Change of heart?
         </Text>
@@ -185,7 +212,54 @@ export const CancelSheet: React.FC<CancelSheetProps> = ({ visible, onKeep, onCan
   </Modal>
 );
 
-// Error Sheet
+// Shams Cancel Confirmation Sheet
+export const ShamsCancelSheet: React.FC<CancelSheetProps> = ({ visible, onKeep, onCancel }) => (
+  <Modal visible={visible} transparent animationType="slide">
+    <View className="flex-1 bg-black/50 justify-end">
+      <View className="bg-white rounded-t-3xl p-6">
+        <View className="w-12 h-1 bg-gray-300 rounded-full self-center mb-6" />
+
+        <Text style={{ ...FONTS.bold(20), color: '#1B1C39', textAlign: 'center', marginBottom: 8 }}>
+          Need a moment?
+        </Text>
+        <Text style={{ ...FONTS.medium(14), color: '#6D6E8A', textAlign: 'center', marginBottom: 32 }}>
+          You can finish your order later{'\n'}in shaa Allah. No fees charged yet.
+        </Text>
+
+        <View className="space-y-3">
+          <TouchableOpacity onPress={onKeep} className="w-full">
+            <LinearGradient
+              colors={['#DDA79B', '#F6CFCA', '#D39B8E']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              className="h-14 rounded-full justify-center items-center"
+              style={{ borderRadius: 40, marginBottom: 12 }}
+            >
+              <Text style={{ ...FONTS.semibold(16), color: '#1B1C39' }}>Keep Minting</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={onCancel}
+            className="w-full"
+          >
+            <LinearGradient
+              colors={['#DDA79B', '#F6CFCA', '#D39B8E']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              className="h-14 rounded-full justify-center items-center"
+              style={{ borderRadius: 40, marginBottom: 12 , opacity: 0.3 }}
+            >
+              <Text style={{ ...FONTS.semibold(16), color: '#1B1C39' }}>Save & Exit</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
+  </Modal>
+);
+
+// Error Sheet (Qamar/Barakah version)
 interface ErrorSheetProps extends BaseSheetProps {
   onRetry: () => void;
   onExit: () => void;
@@ -196,12 +270,12 @@ export const ErrorSheet: React.FC<ErrorSheetProps> = ({ visible, onRetry, onExit
     <View className="flex-1 bg-black/50 justify-end">
       <View className="bg-white rounded-t-3xl p-6">
         <View className="w-12 h-1 bg-gray-300 rounded-full self-center mb-6" />
-        
+
         <View className="items-center mb-6">
           <View className="w-16 h-16 bg-red-100 rounded-full items-center justify-center mb-4">
             <Text className="text-red-500 text-2xl">📶</Text>
           </View>
-          
+
           <Text className="text-xl font-bold text-gray-900 mb-2">
             Connection lost
           </Text>
@@ -234,7 +308,52 @@ export const ErrorSheet: React.FC<ErrorSheetProps> = ({ visible, onRetry, onExit
   </Modal>
 );
 
-// Success Sheet
+// Shams Error Sheet
+export const ShamsErrorSheet: React.FC<ErrorSheetProps> = ({ visible, onRetry, onExit }) => (
+  <Modal visible={visible} transparent animationType="slide">
+    <View className="flex-1 bg-black/50 justify-end">
+      <View className="bg-white rounded-t-3xl p-6">
+        <View className="w-12 h-1 bg-gray-300 rounded-full self-center mb-6" />
+
+        <View className="items-center mb-6">
+          <View className="w-16 h-16 rounded-full items-center justify-center mb-4" style={{ backgroundColor: '#FEF2F2' }}>
+            <Text className="text-2xl">📶</Text>
+          </View>
+
+          <Text style={{ ...FONTS.bold(20), color: '#1B1C39', marginBottom: 8 }}>
+            Connection lost
+          </Text>
+          <Text style={{ ...FONTS.medium(14), color: '#6D6E8A', textAlign: 'center' }}>
+            Allah knows best. No fees{'\n'}charged
+          </Text>
+        </View>
+
+        <View className="space-y-3">
+          <TouchableOpacity onPress={onRetry} className="w-full">
+            <LinearGradient
+              colors={['#DDA79B', '#F6CFCA', '#D39B8E']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              className="h-14 rounded-full justify-center items-center"
+            >
+              <Text style={{ ...FONTS.semibold(16), color: '#1B1C39' }}>Retry Now</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={onExit}
+            className="w-full h-14 rounded-full justify-center items-center"
+            style={{ backgroundColor: '#F5F5F8' }}
+          >
+            <Text style={{ ...FONTS.semibold(16), color: '#6D6E8A' }}>Save & Exit</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
+  </Modal>
+);
+
+// Success Sheet (Qamar/Barakah version)
 interface SuccessSheetProps extends BaseSheetProps {
   onComplete: () => void;
 }
@@ -269,6 +388,43 @@ export const SuccessSheet: React.FC<SuccessSheetProps> = ({ visible, onComplete 
         </Text>
         <Text style={{ fontSize: 14, color: '#475569', textAlign: 'center', marginTop: 8 }}>
           You&apos;re good to go
+        </Text>
+      </View>
+    </View>
+  </Modal>
+);
+
+// Shams Success Sheet
+export const ShamsSuccessSheet: React.FC<SuccessSheetProps> = ({ visible, onComplete }) => (
+  <Modal visible={visible} transparent animationType="fade">
+    <View className="flex-1 bg-black/50 items-center justify-center">
+      <ConfettiBurst visible={visible} onComplete={onComplete} colors={['#DDA79B', '#F8E7A0']} />
+
+      {/* Modal container with explicit sizing per spec */}
+      <View
+        style={{
+          width: 341,
+          height: 304,
+          backgroundColor: '#FFFFFF',
+          borderRadius: 24,
+          alignItems: 'center',
+          justifyContent: 'flex-start',
+          paddingTop: 20,
+          paddingHorizontal: 24
+        }}
+      >
+        {/* Optional handle bar for visual polish */}
+        <View style={{ width: 56, height: 4, borderRadius: 2, backgroundColor: '#E5E7EB', marginBottom: 12 }} />
+
+        {/* Success check at exact 120x120 with rose gold color */}
+        <AnimatedSuccessCheck visible={visible} size={120} color="#DDA79B" />
+
+        {/* Texts with spacing */}
+        <Text style={{ ...FONTS.bold(22), color: '#1B1C39', marginTop: 16 }}>
+          Order Complete
+        </Text>
+        <Text style={{ ...FONTS.medium(14), color: '#6D6E8A', textAlign: 'center', marginTop: 8 }}>
+          Welcome to the Gold Club
         </Text>
       </View>
     </View>
@@ -313,11 +469,11 @@ export const FundSuccessSheet: React.FC<SuccessSheetProps> = ({ visible, onCompl
           {/* Card */}
           <View style={{ width: 340, height: 300, backgroundColor: '#FFFFFF', borderTopLeftRadius: 24, borderTopRightRadius: 24, borderBottomLeftRadius: 24, borderBottomRightRadius: 24, alignItems: 'center', paddingTop: 14 }}>
             {/* Handle indicator */}
-            <View style={{ width: 48, height: 4, borderRadius: 2, backgroundColor: '#D1D5DB', marginBottom: 10 }} />
+            <View style={{ width: 48, height: 4, borderRadius: 2, backgroundColor: '#DDA79B', marginBottom: 10 }} />
 
             {/* Outlined circle with check */}
             <View style={{ width: 118, height: 118, borderRadius: 59, borderWidth: 3, borderColor: '#A08CFF', alignItems: 'center', justifyContent: 'center' }}>
-              <Check size={44} color="#A08CFF" strokeWidth={3} />
+              <Check size={44} color="#DDA79B" strokeWidth={3} />
             </View>
 
             {/* Title */}
@@ -425,6 +581,146 @@ export const ReferralSheet: React.FC<ReferralSheetProps> = ({ visible, onShare, 
                 <Image source={require('../../../assets/cards/social/messenger.png')} style={{ width: 36, height: 36 }} />
               </TouchableOpacity>
             </View>
+          </View>
+        </View>
+      </View>
+    </Modal>
+  );
+};
+
+// Shams Referral Sheet
+export const ShamsReferralSheet: React.FC<ReferralSheetProps> = ({ visible, onShare, onSkip }) => {
+  if (!visible) return null;
+  return (
+    <Modal visible={visible} transparent animationType="fade">
+      <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end', alignItems: 'center' }}>
+        <View style={{ position: 'relative', alignItems: 'center', marginBottom: 24, alignSelf: 'center' }}>
+          {/* Rose gold base accent */}
+          <LinearGradient
+            colors={['#DDA79B', '#F6CFCA', '#D39B8E']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={{ position: 'absolute', bottom: 8, width: 340, height: 20, borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }}
+          />
+
+          {/* Card */}
+          <View style={{ width: 340, height: 300, backgroundColor: '#FFFFFF', borderRadius: 24, paddingTop: 12, paddingHorizontal: 16 }}>
+            {/* Handle + Close */}
+            <View style={{ alignItems: 'center' }}>
+              <View style={{ width: 48, height: 4, borderRadius: 2, backgroundColor: '#D1D5DB', marginBottom: 6 }} />
+              <TouchableOpacity onPress={onSkip} style={{ position: 'absolute', right: 6, top: -6, padding: 8 }}>
+                <Text style={{ color: '#DDA79B', fontSize: 22 }}>×</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Heart */}
+            <View style={{ alignItems: 'center', marginTop: 6, width: '100%'  }}>
+              <Image source={require('../../../assets/cards/shams/referral-heart.png')} style={{ width: 50, height: 44 }} />
+            </View>
+
+            {/* Title */}
+            <Text style={{ marginTop: 10, textAlign: 'center', ...FONTS.bold(20), color: '#1B1C39' }}>
+              Share the love, you{"\n"}both get $10.00
+            </Text>
+            <Text style={{ marginTop: 8, textAlign: 'center', ...FONTS.medium(12), color: '#6D6E8A' }}>
+              Once their first top-up is complete,{"\n"}we credit you instantly.
+            </Text>
+
+            {/* Social icons row */}
+            <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center', marginTop: 18, paddingHorizontal: 10 }}>
+              <TouchableOpacity onPress={() => onShare('whatsapp')} style={{ padding: 6 }}>
+                <Image source={require('../../../assets/cards/social/whatsapp.png')} style={{ width: 36, height: 36 }} />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => onShare('instagram')} style={{ padding: 6 }}>
+                <Image source={require('../../../assets/cards/social/instagram.png')} style={{ width: 36, height: 36 }} />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => onShare('twitter')} style={{ padding: 6 }}>
+                <Image source={require('../../../assets/cards/social/twitter.png')} style={{ width: 36, height: 36 }} />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => onShare('messenger')} style={{ padding: 6 }}>
+                <Image source={require('../../../assets/cards/social/messenger.png')} style={{ width: 36, height: 36 }} />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </View>
+    </Modal>
+  );
+};
+
+// Shams Apple Wallet Sheet
+export const ShamsAppleWalletSheet: React.FC<SuccessSheetProps> = ({ visible, onComplete }) => {
+  React.useEffect(() => {
+    if (visible) {
+      const t = setTimeout(() => onComplete && onComplete(), 1600);
+      return () => clearTimeout(t);
+    }
+  }, [visible, onComplete]);
+
+  return (
+    <Modal visible={visible} transparent animationType="fade">
+      <View className="flex-1 bg-black/50 justify-end">
+        <View style={{ position: 'relative', alignItems: 'center', marginBottom: 24 }}>
+          {/* Rose gold base accent shadow */}
+          <LinearGradient
+            colors={['#DDA79B', '#F6CFCA', '#D39B8E']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={{ position: 'absolute', bottom: 8, width: 340, height: 20, borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }}
+          />
+
+          {/* Card */}
+          <View style={{ width: 340, height: 300, backgroundColor: '#FFFFFF', borderRadius: 24, alignItems: 'center', paddingTop: 14 }}>
+            {/* Handle indicator */}
+            <View style={{ width: 48, height: 4, borderRadius: 2, backgroundColor: '#D1D5DB', marginBottom: 10 }} />
+
+            {/* Outlined circle with check */}
+            <View style={{ width: 118, height: 118, borderRadius: 59, borderWidth: 3, borderColor: '#DDA79B', alignItems: 'center', justifyContent: 'center' }}>
+              <Check size={44} color="#DDA79B" strokeWidth={3} />
+            </View>
+
+            {/* Title */}
+            <Text style={{ marginTop: 24, ...FONTS.bold(20), color: '#1B1C39' }}>Added to Apple Wallet</Text>
+          </View>
+        </View>
+      </View>
+    </Modal>
+  );
+};
+
+// Shams Google Wallet Sheet
+export const ShamsGoogleWalletSheet: React.FC<SuccessSheetProps> = ({ visible, onComplete }) => {
+  React.useEffect(() => {
+    if (visible) {
+      const t = setTimeout(() => onComplete && onComplete(), 1600);
+      return () => clearTimeout(t);
+    }
+  }, [visible, onComplete]);
+
+  return (
+    <Modal visible={visible} transparent animationType="fade">
+      <View className="flex-1 bg-black/50 justify-end">
+        <View style={{ position: 'relative', alignItems: 'center', marginBottom: 24 }}>
+          {/* Rose gold base accent shadow */}
+          <LinearGradient
+            colors={['#DDA79B', '#F6CFCA', '#D39B8E']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={{ position: 'absolute', bottom: 8, width: 340, height: 20, borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }}
+          />
+
+          {/* Card */}
+          <View style={{ width: 340, height: 300, backgroundColor: '#FFFFFF', borderRadius: 24, alignItems: 'center', paddingTop: 14 }}>
+            {/* Handle indicator */}
+            <View style={{ width: 48, height: 4, borderRadius: 2, backgroundColor: '#D1D5DB', marginBottom: 10 }} />
+
+            {/* Outlined circle with check */}
+            <View style={{ width: 118, height: 118, borderRadius: 59, borderWidth: 3, borderColor: '#DDA79B', alignItems: 'center', justifyContent: 'center' }}>
+              <Check size={44} color="#DDA79B" strokeWidth={3} />
+            </View>
+
+            {/* Title */}
+            <Text style={{ marginTop: 24, ...FONTS.bold(20), color: '#1B1C39' }}>Added to Google Wallet</Text>
           </View>
         </View>
       </View>
