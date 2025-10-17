@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
-import { Image, StyleSheet, ImageBackground, StatusBar, useWindowDimensions, View } from 'react-native';
+import { Image, StyleSheet, StatusBar, useWindowDimensions, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { LinearGradient } from 'expo-linear-gradient';
 import { RootStackParamList } from '../navigation/types';
-
 
 type IntroScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Intro'>;
 
@@ -22,25 +23,31 @@ const IntroScreen = () => {
   }, [navigation]);
 
   return (
-    <ImageBackground
-      source={require('../assets/splash2-bg.png')}
-      style={styles.container}
-      resizeMode="cover"
-    >
-      <StatusBar barStyle="light-content" />
-      <View style={styles.logoContainer}>
-        <Image
-          source={require('../assets/logo.png')}
-          style={{ width: logoWidth, height: logoHeight }}
-          resizeMode="contain"
-        />
-      </View>
-    </ImageBackground>
-
+    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+      <LinearGradient
+        colors={['#D155FF', '#B532F2', '#A016E8', '#9406E2', '#8F00E0', '#A08CFF']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.container}
+      >
+        <StatusBar barStyle="light-content" />
+        <View style={styles.logoContainer}>
+          <Image
+            source={require('../assets/logo.png')}
+            style={{ width: logoWidth, height: logoHeight }}
+            resizeMode="contain"
+          />
+        </View>
+      </LinearGradient>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#D155FF', // Match the top gradient color
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
